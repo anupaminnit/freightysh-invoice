@@ -467,11 +467,13 @@ function makePDF(){
           fn(5.5,"normal");tc(BK);doc.text(sv,sx+sw[ci]/2,sry+3.2,{align:"center",maxWidth:sw[ci]-1});sx+=sw[ci];
         });
       });
-      const bky=Y+10+Object.keys(sm).length*4.5+5;
+      const bky=Y+10+Object.keys(sm).length*4.5+4;
       fn(6.5,"bold");tc(N);doc.text("PAYMENT DETAILS:",ML+3,bky);
       fn(6,"normal");tc(BK);
-      doc.text("YES BANK | A/C: 008127000000642",ML+3,bky+4.5);
-      doc.text("IFSC: YESB0000081  |  BRANCH: ROURKELA",ML+3,bky+8.5);
+      doc.text("BENEFICIARY: FREIGHTYSH LLP",ML+3,bky+4.5);
+      doc.text("BANK: YES BANK",ML+3,bky+8.5);
+      doc.text("A/C NO.: 008127000000642",ML+3,bky+12.5);
+      doc.text("IFSC: YESB0000081  |  BRANCH: ROURKELA",ML+3,bky+16.5);
       fn(5.5,"normal");tc(MD);doc.text("TAX ON REVERSE CHARGES: INR 0.00",ML+3,bky+13);
 
       // Totals
@@ -509,8 +511,21 @@ function makePDF(){
       doc.text("E & O.E",ML,fy+1.5);
       doc.text("** COMPUTER-GENERATED INVOICE **  |  ORIGINAL FOR RECIPIENT  |  PAGE: 1/1",ML+CW,fy+1.5,{align:"right"});
 
-      doc.save((g("iNo")||"FSH-INVOICE").replace(/\//g,"-")+".pdf");
-      toast("PDF downloaded!","ok");
+      const fname=(g("iNo")||"FSH-INVOICE").replace(/\//g,"-")+".pdf";
+      // Mobile-safe: open blob URL in new tab; desktop gets direct download
+      const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if(isMobile){
+        const blob=doc.output("blob");
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement("a");
+        a.href=url; a.target="_blank"; a.rel="noopener";
+        document.body.appendChild(a); a.click();
+        setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},3000);
+        toast("PDF opened — tap Share → Save to Files","ok");
+      } else {
+        doc.save(fname);
+        toast("PDF downloaded!","ok");
+      }
     }catch(e){console.error(e);toast("Error: "+e.message,"err");}
     finally{btn.disabled=false;btn.textContent="⬇ Download Invoice (PDF)";}
   },100);
