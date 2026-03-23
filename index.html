@@ -359,7 +359,7 @@ function makePDF(){
       fn(10,"bold");tc(BK);doc.text("FREIGHTYSH LLP",PW/2,Y+11,{align:"center"});
       fn(6.5,"normal");tc(MD);
       doc.text("C/308 KOELNAGAR, ROURKELA, ODISHA - 769014",PW/2,Y+15,{align:"center"});
-      doc.text("EMAIL: INFO@FREIGHTYSH.IN  |  MOB: 9437141851",PW/2,Y+18.5,{align:"center"});
+      doc.text("EMAIL: INFO@FREIGHTYSH.IN  |  MOB: 7000070408",PW/2,Y+18.5,{align:"center"});
       const rx=PW-MR-58;
       [["GSTIN:","21AAKFF8134C1ZU"],["STATE:","[21] ODISHA"],["PAN:","AAKFF8134C"]].forEach(([l,v],i)=>{
         fn(6,"bold");tc(BK);doc.text(l,rx,Y+5+i*4.2);fn(6,"normal");doc.text(v,rx+13,Y+5+i*4.2);
@@ -452,12 +452,14 @@ function makePDF(){
       Y+=5.8;
 
       // BOTTOM
-      const bH=PH-Y-9,c1=68,c2=70,c3=CW-c1-c2-4;
+      // c1: SAC+Bank block, c2: Totals, c3: Sig+Terms
+      const c1=82,c2=72,c3=CW-c1-c2-4;
+      const bH=PH-Y-9;
 
-      // SAC block
+      // SAC block background
       box(ML,Y,c1,bH,[248,249,255]);
       fn(6,"bold");tc(N);doc.text("SAC/HSN BREAKUP",ML+c1/2,Y+4,{align:"center"});
-      const sh=["SAC","IGST%","TAXABLE","IGST"],sw=[17,12,22,17];
+      const sh=["SAC","IGST%","TAXABLE","IGST"],sw=[20,13,26,20];
       box(ML+1,Y+5.5,c1-2,4.5,N);
       let sx=ML+1;
       sh.forEach((h,i)=>{fn(5.5,"bold");tc(W);doc.text(h,sx+sw[i]/2,Y+8.5,{align:"center"});sx+=sw[i];});
@@ -467,14 +469,18 @@ function makePDF(){
           fn(5.5,"normal");tc(BK);doc.text(sv,sx+sw[ci]/2,sry+3.2,{align:"center",maxWidth:sw[ci]-1});sx+=sw[ci];
         });
       });
-      const bky=Y+10+Object.keys(sm).length*4.5+4;
+      // Payment details — positioned strictly after SAC table, no overlap
+      const sacTableBottom=Y+10+Object.keys(sm).length*4.5+4;
+      const bky=sacTableBottom+2;
       fn(6.5,"bold");tc(N);doc.text("PAYMENT DETAILS:",ML+3,bky);
       fn(6,"normal");tc(BK);
-      doc.text("BENEFICIARY: FREIGHTYSH LLP",ML+3,bky+4.5);
-      doc.text("BANK: YES BANK",ML+3,bky+8.5);
-      doc.text("A/C NO.: 008127000000642",ML+3,bky+12.5);
-      doc.text("IFSC: YESB0000081  |  BRANCH: ROURKELA",ML+3,bky+16.5);
-      fn(5.5,"normal");tc(MD);doc.text("TAX ON REVERSE CHARGES: INR 0.00",ML+3,bky+13);
+      doc.text("BENEFICIARY: FREIGHTYSH LLP",ML+3,bky+5);
+      doc.text("BANK: YES BANK",ML+3,bky+9.5);
+      doc.text("A/C NO.: 008127000000642",ML+3,bky+14);
+      doc.text("IFSC: YESB0000081",ML+3,bky+18.5);
+      doc.text("BRANCH: ROURKELA",ML+3,bky+22.5);
+      fn(5.5,"normal");tc(MD);
+      doc.text("TAX ON REVERSE CHARGES: INR 0.00",ML+3,bky+27);
 
       // Totals
       const tx2=ML+c1+2;
