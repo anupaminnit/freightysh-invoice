@@ -364,7 +364,7 @@ function makePDF(){
       [["GSTIN:","21AAKFF8134C1ZU"],["STATE:","[21] ODISHA"],["PAN:","AAKFF8134C"]].forEach(([l,v],i)=>{
         fn(6,"bold");tc(BK);doc.text(l,rx,Y+5+i*4.2);fn(6,"normal");doc.text(v,rx+13,Y+5+i*4.2);
       });
-      Y+=19;sc(N);doc.setLineWidth(.8);doc.line(ML,Y,ML+CW,Y);Y+=1.5;
+      Y+=21;sc(N);doc.setLineWidth(.8);doc.line(ML,Y,ML+CW,Y);Y+=3;
 
       // CUSTOMER + META block
       const hw=(CW-2)/2;
@@ -495,7 +495,7 @@ function makePDF(){
       box(tx2,npy-4,c2,7.5,N);fn(7.5,"bold");tc(W);
       doc.text("NET PAYABLE",tx2+2,npy);doc.text("INR  "+fmtI(gt),tx2+c2-1.5,npy,{align:"right"});
       fn(5.5,"normal");tc(MD);
-      doc.splitTextToSize("IN WORDS: "+n2w(gt)+" ONLY.",c2-3).forEach((w,i)=>doc.text(w,tx2+2,npy+5+i*3.8));
+      doc.splitTextToSize("IN WORDS: "+n2w(gt)+" ONLY.",c2-3).forEach((w,i)=>doc.text(w,tx2+2,npy+10+i*4));
 
       // Sig + Terms
       const sigX=ML+c1+c2+4;
