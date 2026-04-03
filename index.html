@@ -71,6 +71,20 @@ nav{background:var(--navy);padding:0 32px;display:flex;align-items:center;justif
 .sb p{font-size:.81rem;line-height:1.6}
 .gb{background:var(--navy);color:#fff;border-radius:9px;padding:18px 22px;display:flex;justify-content:space-between;align-items:center}
 .ga{font-family:"DM Serif Display",serif;font-size:1.9rem;color:var(--orange)}
+
+.type-card{background:#fff;border:2px solid var(--border);border-radius:12px;padding:22px 18px;cursor:pointer;transition:all .2s;text-align:center;font-family:"DM Sans",sans-serif}
+.type-card:hover{border-color:var(--org);box-shadow:0 4px 16px rgba(214,90,13,.15)}
+.type-card.active{border-color:var(--org);background:var(--lorg);box-shadow:0 4px 16px rgba(214,90,13,.2)}
+.type-icon{font-size:2rem;margin-bottom:8px}
+.type-title{font-weight:700;font-size:.95rem;color:var(--blk);margin-bottom:6px}
+.type-desc{font-size:.75rem;color:var(--muted);line-height:1.5}
+.ct{width:100%;border-collapse:collapse;font-size:.81rem}
+.ct th{background:var(--blk);color:#fff;padding:8px 9px;font-size:.69rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;text-align:left}
+.ct td{padding:7px 9px;border-bottom:1px solid var(--border);vertical-align:middle}
+.ct tr:nth-child(even) td{background:var(--lorg)}
+.ct input,.ct select{border:1.5px solid var(--border);border-radius:5px;padding:5px 7px;font-family:"DM Sans",sans-serif;font-size:.8rem;width:100%;background:#fff}
+.ct input:focus,.ct select:focus{outline:none;border-color:var(--org)}
+
 </style>
 </head>
 <body>
@@ -79,10 +93,32 @@ nav{background:var(--navy);padding:0 32px;display:flex;align-items:center;justif
     <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCADIAMgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD06iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKADtRR2ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAO1FHaigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA7UUdqKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKADtRQelFABRRRQAUVTvdUtLJtkzkvjOxRk1HZ6xaXkwhj8wOegZetZ+1hzct9TRUqjjzW0NCiiitDMKKKpXmq2lnMIpnbeRk7Vzge9TKSirtlRhKTtFXLtFIrBlDKcgjII70tUSFFVb3ULexKfaCw35xhc9KmgmS4gSaMko4yMjHFSpJvlvqU4SS5mtCSiiiqJCisjVdOuXY3FhPIsnVkDkBvp71hNqeoxZie5lVgeQ3UVy1MT7N2lE66WE9qrwkjrZbuGNtu8MwOCqsMj8M0z+0LUSLG8mx3+6rAjNciuoTeeZpfKmcjH71Q2Pp6U+a/jlQ/6JbxS5BWSLKkGsfrq3Rv/AGe07M7WisjQ9TFzH5M0jtOoyS2OR7YqvpfjDRtVvvsdrNJ5u0t88ZUYHXk13U5KpHmjscFSnKnLllub9FRrcQscLNGx9mBqSquRawUUUUAB6UUHpRQAVHPNHbwtLMwVF6k9qkqK6t47q3eCXOxuuDg0ne2m442ur7HHu8E+sPJcSZgeUksM/d7f0rbt59CtpxNBIiOARwGrFFrF/bX2TnyvO2decfWpdbsYbGeJIN2HUk7jnvXkwlOClOydme1UhCpKNO7V0dHNqllBs824UF1DAYJOD3p0+oWlvGjyzqocZXuSPpWFBpCSaa17dzSBihcAY6AcVRsEhurwtfzhIwuSS2M9gBXS8TUVk0tdv+CciwtJptN6b/8AAOnh1ewncIk4DHoGBGfzqhrNtpz3oe5uzBIVG5Qucj+lUNWt9NSFXsJlLZwyB92R61Qu52nWEuSWSPYSe+CcVlVxDs4TSf5GtHDK6nTbS/E7KS4tbK2QySrHGAAue4xVV9csfKkaObLqpKqVIyfSsS/zca2sMzER5ROvRcD/ABq1r2nWdpaRyQJ5b7wuMk7h+Nayr1GpOCVkZRw9NOKm3eRT1O+lv4LeWWERgFgCDw3TNbdnf2tnpdqLiUKxjBC9SfwrCvZHl0uwL9V3qPcAjFaGl6LDc2aXF00jFx8oDYwO1ZUpVPaPl1bS3Nq0afslz6JN7fM1Y9VsZYnkW4XCDLZBBA+lZFxq7Pdo0c5EMc+GIyAUOMH+dZs1qtvqxtSWZBIFJzgkHH+NPe1iXWvsg3eV5oTGeccUTxFWSttrYIYWlF3vfS/yOk/trTcf8fS/98n/AAqy0NvPtkeKOTI4ZlB4rA1jR4bS08+23/Kw37mzwf8A69aPh+58/TVQn5oTsP07fpXTCrJz9nUSOSpSgqftKTfYluJ9Ms5BHP5MbEZxs7fgKz9T8QeG9Nk8q9uLcS4BMaxb2H1AHH41mXJk1PVZ3gG4gMU+ig4/Mj9a8/8AC40W41SQ+J5ZBGylgxZgGcnncRzW+ESrc0mtF2IxEPZcqvq1qep6VrPhvVrhUsJbZrgfMqGPY/4AgZ/CvPPh46J4wMkjKqLDMWZjgAccmur0rwh4bm1eHUtKvhPDB8/kJKHAcdDnOQB6GvP/AA/pcmta+mnxzNEsxfzXX+4OT9egrupwglJR2OaUm7XPUJfGHhN5zFJeQOc43GFiv/fWMVqppthcRrPaOyK43LJBKQCPUdq4bxh4J03SdAk1CwedZICu4SPuDgkD8DzWr8K7mSXQLiB2JWC4ITPYEA4/PP51hUoU5Q5kVGpOL0ZvTW2r23zWl39oUfwSgZ/OoofEBjk8q/t2jYcEr2/A1u1R1TTo7+AggCVR8j+h9PpXHOnOOtN/I6IVYSdqq+a0ZZguIbmLzIJFdD3FFcbY3kthdB1zjOHT1FFRTxkJL3tGaVcDUjL3NUdvRRRXWcRyQ/5Gf/t5/rU/in/j6g/65n+daH9i/wDEz+2/aP8Alp5mzZ+mc0/VNJ/tGWN/P8vYpGNuc157oT9nONtWz0liKftYSvokSCIz6EIl6vbgD67a5vSY7OW5MV9lQw+U7tuD6Guvgj8m3jiznYoXPrisy/0GC6laWJzC7ctxlSfpWlajKXLJK9uhnh68Y80ZOyfUr3llo1pFvkLtnoqyZJrJ1RLVZY/sRzCY8g5zzk5rUh8MgODNc5XuEXBP41Yv9DjnZXjm8mOOPaFCZ4GfesZ0Zzi7QSN6denCSvNv8jN1hoLi/igRQkqhVeVmwvTv9PWpo9DEjr9o1FHQdApyfwyeKrJH/beokR7IMJyepYDj86mufDzQW8kouEIRSxBTGcVCi5tz5br1sW5KCjT5+V+lx/iOGOCOziiGEQMAPyrZ0n/kFW3/AFzFc1plo+psYHnZUiXcuRuxk9K6u0g+zWsUG7d5ahc4xmujDXnN1ErJnNirQpqk3dpnL6j/AMjG3/XVP6UXTLF4jZ5DtVZ1JJ7Dite50Xz9RN39oK5dW27PTHfPtT9T0aO+l85JPLlxgnGQazlh6nvNLrc1jiaXupv7NmXJjb3cUlt5iMXQ5AIJA9a5O1u5dOa6hIO50MePRh3/AJ1u6Xo32G585rjc20jaq4B+tY+upG2rsLchmcDcB/e6Y/lTxDnyqo1ZiwqhzypJ3i9S94chS3t576ZlRAMbmOAFHJP+fSsIaZ4O8XTzz2krW1zvIfY4jL/7e08EH1/OuzisIf7LFhPGskRj2OrDhs9a4fUPhfC8xfT9RaJCciOaPft+hBFehhIRpwUW7M4cRUdSo5HJalbN4W8UqmmX3nvCVZZE4PPVGxx/+ur/AMOP+RzHGP3UvH5V1Wg/Dq0028ju766N28R3JGI9iBh0J5JNWPDngcaHrP8AaI1Ezna67DDt+975rslWg4tX1sYWLfxC/wCRLv8A6J/6GtY3wm/5BN//ANfA/wDQBXV+INKGt6NPpxmMPnbfn27sYYHp+FU/CnhweG7SeAXZuPOkD7jHtxxjHU1ipr2Tj1H1N6o7mdLaB5pThUGTUd3ewWgHmv8AOfuooyzfQVlyWl9q8itdZtbZTlY+rH3PvXJUqW0jqzenTT1m7L+tjFsLSTUb3ABClt0h/ujNFdhbWsNpD5UCBV7+pPqaKxpYWMY+/qzatjJyl7jsiaiiius4woorG1O7u4tReKPzFtvKjaWVQCYgWcEgdzwMnsATTSuBs0Vzx1y7AmIgi/dkgqWG6L5wuWG7kYOf4fy5ofXLlQMtaKwhaRQST5xDkALgkZOPU8+tPlYHQ0EAjBrG1W8u4Jx5EoiXykZt67lXMigk/gT3qS/u7m3vrZ4Q00Ihd5Y41yXGVAK+4z09CaVgKlx4edZTJYzhOcgNkFfoRTDoupTDbcXgKehdm/SlXVb22jkFzJCJA0rfODhiCMRpjvg4zyT6GrB1K4kk8lodjwzRrNgkY3SLtx/wE5P5VzvB0zqWMq9/wL2m6dFp8RVCWduWY96uVgpq98LeJ5o4AZolkBVWxECwBLc8gAg9vy5q9pWofbEkEjxGRZHVdmQGVTjdg1vGCgrLY55Tc3zS3NCiuXt9Xv0tI57pHV2ij8tWxtZSQGlY8cgn7uRgEevFmPWrx54YzDAA+3B3jEuXK/Kd3YDOBu6496fKySbV9Kur26WWGVFVU24JINJpmhC1nE9xIHdfuqo4B9fel0nVpb6WNXMDiRGdhEDmIhsANn1/Dp3pNIvLqW5WO5nQq0G5VZcMzb3BIPsAO3pWLw0Ofna1N/rNTk5E9DaorAhmv0imuRvZjMY4/NlynM20fKBkYHv2pJtVu2e6hKIPK3AhW2uMEAN97OD16dxya25TA6CiudvNWuyk8SNEkhjnIQKweMp93J6HPX+WetWJb6/W9jtzLbIRMYyTGQrkxhlHXg5yPf8ASjlYG1UUkbyceaUX/Y4P51jSa5PsSbZFFCWKPv5fcuNwC5GcEkcZPHQ1Y026u/OjjuCjxytPtODuXa+Bk9+D6Dp3ocQTNCG1ggJaOMBj1Y8sfqTzU1FFSklsNtvcD0ooPSimIKKKKACiiigAwKYIYxMZQg8wqF3ew5x+tPooAKKKKACiiigBk0KTxGOQZU+hI/UUkEEVvEI4UCrkn1yT1JPc1JRQAUYFFFADIYo4IljiQIijAA7U+iigAooooAgjs7eO4M6x/vDnkknGeuM9M+1SuiujIw4YYPOKdRQBHDDHBEsUSBUXoKkoooAKKKKAA9KKD0ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAD0ooPSigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAPSig9KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAA9KKD0ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAD0ooooA//2Q==" alt="Freightysh"/>
     <span class="nt">Invoice Generator</span>
   </div>
-  <span class="nb">Freightysh LLP</span>
+  <span class="nb" id="invTypeBadge">Tax Invoice</span>
 </nav>
 
 <div class="wrap">
+  
+  <!-- ═══ INVOICE TYPE SELECTOR ═══ -->
+  <div id="typeSelector" style="margin-bottom:24px">
+    <div style="text-align:center;margin-bottom:16px">
+      <span style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Select Invoice Type</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:640px;margin:0 auto">
+      <button class="type-card active" id="btnTax" onclick="setInvType('tax')">
+        <div class="type-icon">🧾</div>
+        <div class="type-title">Tax Invoice</div>
+        <div class="type-desc">Freight charges, LTHC, BL fees, Seal charges with full GST breakup</div>
+      </button>
+      <button class="type-card" id="btnComm" onclick="setInvType('commission')">
+        <div class="type-icon">💼</div>
+        <div class="type-title">Commission Invoice</div>
+        <div class="type-desc">USD 20 commission per shipment with booking-level details</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ TAX INVOICE FLOW ═══ -->
+  <div id="taxFlow">
   <div class="prog" id="prog">
     <div class="stp on" onclick="go(0)">① Invoice &amp; Customer</div>
     <div class="stp"    onclick="go(1)">② Shipment Details</div>
@@ -227,9 +263,123 @@ nav{background:var(--navy);padding:0 32px;display:flex;align-items:center;justif
   </div>
 </div>
 
-<div class="toast" id="toast"><span id="tIco">✓</span> <span id="tMsg"></span></div>
+  </div><!-- /taxFlow -->
 
+  <!-- ═══ COMMISSION INVOICE FLOW ═══ -->
+  <div id="commFlow" style="display:none">
+
+  <div class="prog">
+    <div class="stp on" onclick="cgo(0)">① Invoice & Customer</div>
+    <div class="stp"    onclick="cgo(1)">② Shipments</div>
+    <div class="stp"    onclick="cgo(2)">③ Preview & Generate</div>
+  </div>
+
+  <!-- COMM STEP 0: Invoice + Customer -->
+  <div id="cs0">
+    <div class="card">
+      <div class="ch"><div class="ci">🧾</div><h2>Commission Invoice Details</h2></div>
+      <div class="cb">
+        <div class="g4">
+          <div class="f"><label>Invoice No <span>*</span></label><input class="mono" id="cInvNo" value="FSH/002/25-26"/></div>
+          <div class="f"><label>Invoice Date <span>*</span></label><input type="date" id="cInvDate"/></div>
+          <div class="f"><label>Due Date</label><input type="date" id="cDueDate"/></div>
+          <div class="f"><label>USD/INR Rate</label><input class="mono" type="number" id="cUsdRate" value="94" step="0.01"/></div>
+        </div>
+        <div class="g2" style="margin-top:13px">
+          <div class="f"><label>Tax Type <span>*</span></label>
+            <select id="cTaxType">
+              <option value="igst">IGST @ 18% (Inter-State)</option>
+              <option value="cgst_sgst">CGST + SGST @ 9% Each (Intra-State)</option>
+            </select>
+          </div>
+          <div class="f"><label>Commission Rate</label>
+            <div class="f" style="flex-direction:row;align-items:center;gap:8px">
+              <input class="mono" type="number" id="cRate" value="20" step="1" style="width:100px"/>
+              <span style="font-size:.85rem;color:var(--muted)">USD per shipment</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ci">🏢</div><h2>Bill To</h2></div>
+      <div class="cb">
+        <div class="g2">
+          <div class="f s2"><label>Company Name <span>*</span></label><input id="cToName" value="MICBAC INDIA (OPC) PRIVATE LIMITED"/></div>
+          <div class="f s2"><label>Address <span>*</span></label><textarea id="cToAddr">NO-314, GREEN OASIS UNIT, KAIKHALI, KOLKATA - 700052, WEST BENGAL</textarea></div>
+          <div class="f"><label>State</label><input id="cToState" value="WEST BENGAL"/></div>
+          <div class="f"><label>State Code</label><input class="mono" id="cToStateCode" value="19"/></div>
+          <div class="f"><label>GSTIN</label><input class="mono" id="cToGstin" value="19AANCM7741C1Z8"/></div>
+          <div class="f"><label>PAN</label><input class="mono" id="cToPan" value="AANCM7741C"/></div>
+        </div>
+      </div>
+    </div>
+    <div class="br"><span></span><button class="btn bp" onclick="cgo(1)">Next: Shipments →</button></div>
+  </div>
+
+  <!-- COMM STEP 1: Shipments -->
+  <div id="cs1" style="display:none">
+    <div class="card">
+      <div class="ch"><div class="ci">🚢</div><h2>Shipment Line Items</h2></div>
+      <div class="cb">
+        <div style="overflow-x:auto">
+          <table class="ct" style="min-width:900px">
+            <thead><tr>
+              <th style="width:26px">#</th>
+              <th style="min-width:130px">Invoice No.</th>
+              <th style="width:100px">Inv. Date</th>
+              <th style="width:60px">Liner</th>
+              <th style="width:110px">Booking Ref</th>
+              <th style="min-width:160px">Vessel / Voyage</th>
+              <th style="width:110px">Port of Loading</th>
+              <th style="width:110px">Port of Dest.</th>
+              <th style="width:70px">CNTR</th>
+              <th style="width:80px">ETD</th>
+              <th style="width:60px">USD</th>
+              <th style="width:32px"></th>
+            </tr></thead>
+            <tbody id="commBody"></tbody>
+          </table>
+        </div>
+        <button class="ab" onclick="addCommRow()">＋ Add Shipment Line</button>
+        <div class="tp" style="margin-top:14px">
+          <h4>Live Commission Preview</h4>
+          <div class="tr"><span class="lb">Total USD</span><span class="vl" id="cpUsd">—</span></div>
+          <div class="tr"><span class="lb">Taxable (INR)</span><span class="vl" id="cpTax">—</span></div>
+          <div class="tr"><span class="lb">Tax Amount</span><span class="vl" id="cpGst">—</span></div>
+          <div class="tr gd"><span class="lb">NET PAYABLE</span><span class="vl" id="cpNet">—</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="br">
+      <button class="btn bs" onclick="cgo(0)">← Back</button>
+      <button class="btn bp" onclick="cgo(2)">Next: Preview →</button>
+    </div>
+  </div>
+
+  <!-- COMM STEP 2: Preview -->
+  <div id="cs2" style="display:none">
+    <div class="card">
+      <div class="ch"><div class="ci">👁</div><h2>Commission Invoice Summary</h2></div>
+      <div class="cb">
+        <div class="sg" id="csg"></div>
+        <div class="grand-box">
+          <div><div style="font-size:.83rem;opacity:.8">Net Payable (INR)</div><div class="ga" id="cGrand">—</div></div>
+          <div style="text-align:right"><div style="font-size:.75rem;opacity:.7;margin-bottom:4px">Shipments</div><div id="cCount" style="font-family:'JetBrains Mono',monospace;font-size:.9rem"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="br">
+      <button class="btn bs" onclick="cgo(1)">← Back</button>
+      <button class="btn bg" id="genBtn" onclick="makeCommissionPDF()">⬇ Download Commission Invoice (PDF)</button>
+    </div>
+  </div>
+
+  </div><!-- /commFlow -->
+
+<div class="toast" id="toast"><span id="tIco">✓</span> <span id="tMsg"></span></div>
 <script>
+
 const LOGO="/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCADIAMgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD06iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKADtRR2ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAO1FHaigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA7UUdqKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKADtRQelFABRRRQAUVTvdUtLJtkzkvjOxRk1HZ6xaXkwhj8wOegZetZ+1hzct9TRUqjjzW0NCiiitDMKKKpXmq2lnMI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a25TA6CiudvNWuyk8SNEkhjnIQKweMp93J6HPX+WetWJb6/W9jtzLbIRMYyTGQrkxhlHXg5yPf8ASjlYG1UUkbyceaUX/Y4P51jSa5PsSbZFFCWKPv5fcuNwC5GcEkcZPHQ1Y026u/OjjuCjxytPtODuXa+Bk9+D6Dp3ocQTNCG1ggJaOMBj1Y8sfqTzU1FFSklsNtvcD0ooPSimIKKKKACiiigAwKYIYxMZQg8wqF3ew5x+tPooAKKKKACiiigBk0KTxGOQZU+hI/UUkEEVvEI4UCrkn1yT1JPc1JRQAUYFFFADIYo4IljiQIijAA7U+iigAooooAgjs7eO4M6x/vDnkknGeuM9M+1SuiujIw4YYPOKdRQBHDDHBEsUSBUXoKkoooAKKKKAA9KKD0ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAD0ooPSigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAPSig9KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAA9KKD0ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAD0ooooA//2Q==",SIG="/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCACgARgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD06iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKA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9Et4HuZYEurpIpGjPzeXzv8Arx2rq6xfEWgjWXsJlkEc1lcLKjHJGMgsMepxTW+oHOi5itbiw/4Re81S88px59tl5Y/JA5Hz8A9AMGmadrOpaBYSXGoWNohmuWmuIWugLgl36hMYwARxntXf1ycng+drK4sE1OOO2mLEutqpmYlt3zOTzz7Diq5l1AuS6rq9xrl9pumW1mBZiNmluJGG4OM4AUZ9eawdH1jX4fDenvGtpNcX2oNEjzyMflJckt6EFSBjtXW2Ol/ZNVvb8z+Y92kSsCgGCgIzn3z0rOtPCqW8VtC1/NJDaXn2q3Qoo2feypIHIJY80roCnL4h1TSDqcWqpa3L2sUUkT26sm8yMVAI5PBHWn6brOqvqttBLm7hnZhKV0+WAQYGQQzcMOMc4NbFxoVpdXt3cTmRvtUCQSR7sLhSSGGOQcnrmktdESC7juJr6+umhB8tZ5squeM4AGTjuc0XQGH4I+2XpvNdu74N9qkZHgEQAXYdq/N14GePer3goGfSptVk/wBZqVzJOSf7udqj6bVFYUtzN4X/ALX0WKN2+1nzNMY8mR5MKy/gTn6V2mk2S6bpNpYqQRbwrHkdyByaJAW6KKKkAooooAKKKKACiiigAooooAKKKKACiiigBHcIhds4UZOBmloooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAayIxUsoJU5UkdDTqKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k=";
 let step=0,rows=[
   {desc:"OCEAN FREIGHT",sac:"996521",cur:"USD",rate:4600,qty:1,igst:5,type:"T"},
@@ -333,7 +483,7 @@ function n2w(n){
   return h(n)||"ZERO";
 }
 
-function makePDF(){
+function makeTaxInvoicePDF(){
   const btn=document.getElementById("genBtn");
   btn.disabled=true;btn.textContent="⏳ Generating...";
   setTimeout(()=>{
@@ -533,10 +683,473 @@ function makePDF(){
         toast("PDF downloaded!","ok");
       }
     }catch(e){console.error(e);toast("Error: "+e.message,"err");}
-    finally{btn.disabled=false;btn.textContent="⬇ Download Invoice (PDF)";}
+    finally{btn.disabled=false;btn.textContent="⬇ Download Invoice (PDF)";btn.onclick=makePDF;}
   },100);
 }
 
+rebuildRows();
+
+
+// ── Invoice Type State ────────────────────────────────────────────────────
+let invType = 'tax';
+function setInvType(type) {
+  invType = type;
+  document.getElementById('taxFlow').style.display  = type==='tax'?'':'none';
+  document.getElementById('commFlow').style.display = type==='commission'?'':'none';
+  document.getElementById('btnTax').classList.toggle('active',  type==='tax');
+  document.getElementById('btnComm').classList.toggle('active', type==='commission');
+  document.getElementById('invTypeBadge').textContent = type==='tax'?'Tax Invoice':'Commission Invoice';
+  if(type==='commission') rebuildCommRows();
+}
+
+// Override makePDF to route based on type
+function makePDF() {
+  if(invType==='commission') makeCommissionPDF();
+  else makeTaxInvoicePDF();
+}
+
+// ── Commission rows state ────────────────────────────────────────────────
+let commRows = [
+  {invNo:"", invDate:"", liner:"OOCL", booking:"", vessel:"", pol:"", pod:"", cntr:"1×40'HC", etd:"", usd:20},
+];
+
+function addCommRow() {
+  const rate = parseFloat(document.getElementById("cRate")?.value)||20;
+  commRows.push({invNo:"",invDate:"",liner:"OOCL",booking:"",vessel:"",pol:"",pod:"",cntr:"1×40'HC",etd:"",usd:rate});
+  rebuildCommRows();
+}
+
+function deleteCommRow(i) {
+  if(commRows.length===1){toast("At least one row required","err");return;}
+  commRows.splice(i,1); rebuildCommRows();
+}
+
+function rebuildCommRows() {
+  const rate = parseFloat(document.getElementById("cRate")?.value)||20;
+  const tbody = document.getElementById("commBody");
+  if(!tbody) return;
+  tbody.innerHTML="";
+  commRows.forEach((r,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td style="text-align:center;color:var(--muted);font-size:.75rem">${i+1}</td>
+      <td><input value="${r.invNo}" placeholder="MIPLWB/063/25-26" oninput="commRows[${i}].invNo=this.value"/></td>
+      <td><input type="date" value="${r.invDate}" oninput="commRows[${i}].invDate=this.value" style="width:100px"/></td>
+      <td><input value="${r.liner}" oninput="commRows[${i}].liner=this.value.toUpperCase();this.value=this.value.toUpperCase()" style="width:56px"/></td>
+      <td><input class="mono" value="${r.booking}" oninput="commRows[${i}].booking=this.value" placeholder="2321570190"/></td>
+      <td><input value="${r.vessel}" oninput="commRows[${i}].vessel=this.value.toUpperCase();this.value=this.value.toUpperCase()" placeholder="VESSEL / VOYAGE"/></td>
+      <td><input value="${r.pol}" oninput="commRows[${i}].pol=this.value.toUpperCase();this.value=this.value.toUpperCase()" placeholder="KOLKATA PORT"/></td>
+      <td><input value="${r.pod}" oninput="commRows[${i}].pod=this.value.toUpperCase();this.value=this.value.toUpperCase()" placeholder="HAI PHONG"/></td>
+      <td><input value="${r.cntr}" oninput="commRows[${i}].cntr=this.value.toUpperCase();this.value=this.value.toUpperCase()" style="width:68px"/></td>
+      <td><input value="${r.etd}" oninput="commRows[${i}].etd=this.value" placeholder="12.04.2026" style="width:78px"/></td>
+      <td><input class="mono" type="number" value="${r.usd}" oninput="commRows[${i}].usd=parseFloat(this.value)||0;refreshCommTotals()" style="width:56px"/></td>
+      <td><button class="db" onclick="deleteCommRow(${i})">✕</button></td>`;
+    tbody.appendChild(tr);
+  });
+  refreshCommTotals();
+}
+
+function commTotals() {
+  const usdRate = parseFloat(document.getElementById("cUsdRate")?.value||94)||94;
+  const taxType = document.getElementById("cTaxType")?.value||"igst";
+  const totalUsd = commRows.reduce((s,r)=>s+(parseFloat(r.usd)||0),0);
+  const taxable  = parseFloat((totalUsd*usdRate).toFixed(2));
+  let tax=0;
+  if(taxType==="igst") tax=parseFloat((taxable*0.18).toFixed(2));
+  else tax=parseFloat((taxable*0.18).toFixed(2)); // cgst+sgst total same 18%
+  const raw=taxable+tax, net=Math.round(raw);
+  return {totalUsd,taxable,tax,net};
+}
+
+function refreshCommTotals() {
+  const {totalUsd,taxable,tax,net}=commTotals();
+  const el=id=>document.getElementById(id);
+  if(el("cpUsd")) el("cpUsd").textContent="$"+fmtC(totalUsd);
+  if(el("cpTax")) el("cpTax").textContent="₹"+fmtC(taxable);
+  if(el("cpGst")) el("cpGst").textContent="₹"+fmtC(tax);
+  if(el("cpNet")) el("cpNet").textContent="₹"+fmtCI(net);
+}
+
+function fmtC(n){return Math.abs(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtCI(n){return Math.abs(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+// Commission step navigation
+let cStep=0;
+function cgo(n) {
+  if(n>cStep&&!cchk(cStep))return;
+  document.getElementById("cs"+cStep).style.display="none";
+  cStep=n;
+  document.getElementById("cs"+cStep).style.display="";
+  document.querySelectorAll("#commFlow .stp").forEach((s,i)=>
+    s.className="stp"+(i===n?" on":i<n?" dn":""));
+  if(n===1){rebuildCommRows();refreshCommTotals();}
+  if(n===2)buildCommSummary();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function cchk(n){
+  const req={0:["cInvNo","cInvDate","cToName"],1:[]};
+  for(const id of(req[n]||[])){
+    const el=document.getElementById(id);
+    if(!el?.value?.trim()){toast("Fill all required fields","err");el?.focus();return false;}
+  }
+  return true;
+}
+
+function buildCommSummary() {
+  const {totalUsd,taxable,tax,net}=commTotals();
+  const gv=id=>(document.getElementById(id)?.value||"");
+  const fd=d=>{if(!d)return"-";const[y,m,dy]=d.split("-");const M=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];return dy+"-"+M[+m-1]+"-"+y;};
+  document.getElementById("csg").innerHTML=[
+    {t:"Invoice",h:`<p><strong>${gv("cInvNo")}</strong><br>Date: ${fd(gv("cInvDate"))}<br>USD Rate: ${gv("cUsdRate")}</p>`},
+    {t:"Bill To",h:`<p><strong>${gv("cToName")}</strong><br>${gv("cToAddr")}</p>`},
+    {t:"Shipments",h:`<p>${commRows.length} line(s)<br>Total USD: $${fmtC(totalUsd)}<br>Taxable: ₹${fmtC(taxable)}</p>`},
+    {t:"Tax",h:`<p>${document.getElementById("cTaxType")?.options[document.getElementById("cTaxType")?.selectedIndex]?.text||""}<br>Tax: ₹${fmtC(tax)}</p>`},
+  ].map(b=>`<div class="sb"><h4>${b.t}</h4>${b.h}</div>`).join("");
+  document.getElementById("cGrand").textContent="₹"+fmtCI(net);
+  document.getElementById("cCount").textContent=commRows.length+" shipment(s)";
+}
+
+
+
+
+
+function makeCommissionPDF() {
+  const btn = document.getElementById("genBtn");
+  btn.disabled = true; btn.textContent = "⏳ Generating...";
+  setTimeout(() => { try {
+
+    const {jsPDF} = window.jspdf;
+    // ── EXACT same page setup as tax invoice ────────────────────────
+    const doc = new jsPDF({orientation:"landscape", unit:"mm", format:"a4"});
+    const PW=297, PH=210, ML=8, MR=8, MT=7, CW=PW-ML-MR; // CW=281
+
+    // ── EXACT same colour palette as tax invoice ─────────────────────
+    const N=[10,36,99], O=[232,99,26], BK=[0,0,0], W=[255,255,255];
+    const LG=[244,244,244], MG=[190,190,190], MD=[110,110,110];
+
+    // ── EXACT same helpers as tax invoice ────────────────────────────
+    const fc = c => doc.setFillColor(...c);
+    const sc = c => doc.setDrawColor(...c);
+    const tc = c => doc.setTextColor(...c);
+    const fn = (s, st="normal") => { doc.setFontSize(s); doc.setFont("helvetica", st); };
+    const box = (x,y,w,h,f,s) => {
+      if(f){fc(f); doc.rect(x,y,w,h,"F");}
+      if(s){sc(s); doc.setLineWidth(.1); doc.rect(x,y,w,h,"S");}
+    };
+    const tx = (t,x,y,a="left",mw) => {
+      const sp = doc.splitTextToSize(String(t), mw||999);
+      doc.text(sp[0], x, y, {align:a});
+    };
+
+    // ── Collect form values ──────────────────────────────────────────
+    const gv  = id => (document.getElementById(id)?.value || "").trim();
+    const gU  = id => gv(id).toUpperCase();
+    const usdRate   = parseFloat(gv("cUsdRate")) || 94;
+    const invoiceNo = gv("cInvNo")   || "";
+    const invDate   = gv("cInvDate") || "";
+    const dueDate   = gv("cDueDate") || "";
+    const toName    = gU("cToName");
+    const toAddr    = gU("cToAddr");
+    const toState   = gU("cToState");
+    const toSC      = gv("cToStateCode");
+    const toGstin   = gU("cToGstin");
+    const toPan     = gU("cToPan");
+    const taxType   = gv("cTaxType") || "igst";
+    const SAC       = "998599";
+    const rows      = commRows;
+
+    // ── Totals ───────────────────────────────────────────────────────
+    const totalUsd = rows.reduce((s,r) => s + (parseFloat(r.usd)||0), 0);
+    const taxable  = parseFloat((totalUsd * usdRate).toFixed(2));
+    let tax1=0, tax2=0, lbl1="", lbl2="";
+    if (taxType === "igst") {
+      tax1 = parseFloat((taxable*0.18).toFixed(2)); lbl1 = "IGST @ 18%";
+    } else {
+      tax1 = tax2 = parseFloat((taxable*0.09).toFixed(2));
+      lbl1 = "CGST @ 9%"; lbl2 = "SGST @ 9%";
+    }
+    const totalTax = parseFloat((tax1+tax2).toFixed(2));
+    const raw  = taxable + totalTax;
+    const gt   = Math.round(raw);
+    const ro   = parseFloat((gt - raw).toFixed(2));
+
+    const fmtN = n => parseFloat(Math.abs(n).toFixed(2)).toLocaleString("en-IN",
+                      {minimumFractionDigits:2, maximumFractionDigits:2});
+    const fmtI = n => Math.abs(n).toLocaleString("en-IN");
+    const fd   = d => {
+      if(!d) return "-";
+      const [y,m,dy] = d.split("-");
+      const M=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+      return dy+"-"+M[+m-1]+"-"+y;
+    };
+
+    let Y = MT; // 7
+
+    // ════════════════════════════════════════════════════════════════════
+    // HEADER — identical to tax invoice
+    // ════════════════════════════════════════════════════════════════════
+    doc.addImage("data:image/jpeg;base64,"+LOGO, "JPEG", ML, Y, 26, 17);
+    fn(13,"bold"); tc(N); doc.text("TAX INVOICE", PW/2, Y+6,  {align:"center"});
+    fn(10,"bold"); tc(BK);doc.text("FREIGHTYSH LLP", PW/2, Y+11, {align:"center"});
+    fn(6.5,"normal"); tc(MD);
+    doc.text("C/308 KOELNAGAR, ROURKELA, ODISHA - 769014",    PW/2, Y+15,   {align:"center"});
+    doc.text("EMAIL: INFO@FREIGHTYSH.IN  |  MOB: 7000070408", PW/2, Y+18.5, {align:"center"});
+    // GSTIN block right — same as tax invoice
+    const rx = PW-MR-58;
+    [["GSTIN:","21AAKFF8134C1ZU"],["STATE:","[21] ODISHA"],["PAN:","AAKFF8134C"]].forEach(([l,v],i)=>{
+      fn(6,"bold"); tc(BK); doc.text(l, rx, Y+5+i*4.2);
+      fn(6,"normal");        doc.text(v, rx+13, Y+5+i*4.2);
+    });
+    Y += 21; // 28
+    sc(N); doc.setLineWidth(.8); doc.line(ML, Y, ML+CW, Y); Y += 3; // 31
+
+    // ════════════════════════════════════════════════════════════════════
+    // CUSTOMER + INVOICE META — same 2-column half-width block as tax invoice
+    // Left: customer details  |  Right: invoice meta
+    // ════════════════════════════════════════════════════════════════════
+    const hw = (CW-2)/2; // 139.5mm each
+    box(ML, Y, hw, 32, LG); box(ML+hw+2, Y, hw, 32, LG);
+
+    // Left — customer
+    fn(5.5,"normal"); tc(MD); doc.text("CUSTOMER -", ML+3, Y+4);
+    fn(8.5,"bold");   tc(BK); tx(toName, ML+3, Y+9, "left", hw-5);
+    fn(6,"normal");   tc(BK);
+    doc.splitTextToSize(toAddr, hw-6).slice(0,2).forEach((l,i) => doc.text(l, ML+3, Y+14+i*4));
+    fn(5.5,"normal");
+    doc.text("PAN: "+toPan+"    GSTIN: "+toGstin, ML+3, Y+27);
+
+    // Right — invoice meta (same style as tax invoice meta rows)
+    const rx2 = ML+hw+5;
+    const meta = [
+      ["INVOICE NO.",   invoiceNo],
+      ["DATE",          fd(invDate)],
+      ["DUE DATE",      fd(dueDate)],
+      ["PLACE OF SUPPLY","["+toSC+"] "+toState],
+      ["1 USD =",       "INR "+usdRate.toFixed(2)],
+      ["SHIPMENT TYPE", "SEA EXPORT"],
+      ["SAC / HSN",     SAC+"   TAX TYPE: "+(taxType==="igst"?"IGST @ 18%":"CGST+SGST @ 9%")],
+    ];
+    meta.forEach(([l,v],i) => {
+      fn(5.5,"bold");   tc(BK); doc.text(l+":", rx2,    Y+4+i*3.7);
+      fn(5.5,"normal");          tx(v,          rx2+28, Y+4+i*3.7, "left", hw-32);
+    });
+    Y += 33; // 64
+
+    // ════════════════════════════════════════════════════════════════════
+    // COMMISSION TABLE HEADER
+    // 12 cols summing exactly to CW=281:
+    // [6,32,21,11,24,50,26,28,13,18,14,38] = 281 ✓
+    // ════════════════════════════════════════════════════════════════════
+    const cc = [
+      {h:"SL",     w:6,  a:"center"},
+      {h:"INVOICE NUMBER", w:32, a:"left"},
+      {h:"INV DATE",       w:21, a:"center"},
+      {h:"LINER",          w:11, a:"center"},
+      {h:"BOOKING REF",    w:24, a:"left"},
+      {h:"VESSEL / VOYAGE",w:50, a:"left"},
+      {h:"PORT OF LOADING",w:26, a:"left"},
+      {h:"PORT OF DESTINATION",w:28,a:"left"},
+      {h:"CNTR",           w:13, a:"center"},
+      {h:"ETD",            w:18, a:"center"},
+      {h:"USD",            w:14, a:"right"},
+      {h:"INR",            w:38, a:"right"},
+    ];
+
+    const hrh = 5;
+    box(ML, Y, CW, hrh, N);
+    let cxh = ML;
+    cc.forEach(col => {
+      fn(5.5,"bold"); tc(W);
+      const px = col.a==="right" ? cxh+col.w-1.5 : col.a==="center" ? cxh+col.w/2 : cxh+1.5;
+      doc.text(col.h, px, Y+3.5, {align:col.a, maxWidth:col.w-1});
+      cxh += col.w;
+    });
+    Y += hrh; // 69
+
+    // Data rows
+    const drh = 4.6;
+    rows.forEach((r, ri) => {
+      const usdAmt = parseFloat(r.usd) || 0;
+      const inrAmt = parseFloat((usdAmt * usdRate).toFixed(2));
+      const ry = Y + ri*drh;
+      if (ri%2 !== 0) box(ML, ry, CW, drh, LG);
+      sc(MG); doc.setLineWidth(.08); doc.rect(ML, ry, CW, drh, "S");
+      const vs = [
+        String(ri+1),
+        r.invNo || "-",
+        fd(r.invDate),
+        r.liner  || "-",
+        r.booking|| "-",
+        (r.vessel||"-").toUpperCase(),
+        (r.pol||"-").toUpperCase(),
+        (r.pod||"-").toUpperCase(),
+        r.cntr   || "-",
+        r.etd    || "-",
+        "$"+usdAmt.toFixed(2),
+        "INR "+fmtN(inrAmt),
+      ];
+      let cxd = ML;
+      cc.forEach((col, ci) => {
+        fn(5.5,"normal"); tc(BK);
+        const px = col.a==="right" ? cxd+col.w-1.5 : col.a==="center" ? cxd+col.w/2 : cxd+1.5;
+        tx(vs[ci], px, ry+3.1, col.a, col.w-2);
+        cxd += col.w;
+      });
+    });
+    Y += rows.length * drh; // +rows×4.6
+
+    // Sub-total row — same style as tax invoice sub-total
+    box(ML, Y, CW, 4.8, LG);
+    sc(MG); doc.setLineWidth(.15); doc.rect(ML, Y, CW, 4.8, "S");
+    fn(6,"bold"); tc(BK);
+    doc.text("TOTAL — "+rows.length+" BOOKING(S)",  ML+2, Y+3.4);
+    doc.text("$"+fmtN(totalUsd),  ML+CW-cc[11].w-cc[10].w-1.5, Y+3.4, {align:"right"});
+    doc.text("INR "+fmtN(taxable), ML+CW-1.5,               Y+3.4, {align:"right"});
+    Y += 5.8; // sub-total
+
+    fn(6,"italic"); tc(MD); doc.text("E. & O.E", ML+CW, Y+2.5, {align:"right"});
+    Y += 4;
+
+    // ════════════════════════════════════════════════════════════════════
+    // BOTTOM SECTION — EXACT same structure as tax invoice
+    // c1=82 (SAC+payment)  c2=72 (totals)  c3=remainder (sig+T&C)
+    // ════════════════════════════════════════════════════════════════════
+    const c1=82, c2=72, c3=CW-c1-c2-4;
+    const bH = PH - Y - 9; // dynamic, same as tax invoice
+
+    // ── C1: SAC breakup + payment details ────────────────────────────
+    box(ML, Y, c1, bH, [248,249,255]);
+
+    fn(6,"bold"); tc(N);
+    doc.text("SAC/HSN BREAKUP", ML+c1/2, Y+4, {align:"center"});
+
+    // SAC mini-table
+    const sh=["SAC","IGST%","TAXABLE","TAX AMT"], sw=[20,13,26,20];
+    box(ML+1, Y+5.5, c1-2, 4.5, N);
+    let sx = ML+1;
+    sh.forEach((h,i) => {
+      fn(5.5,"bold"); tc(W);
+      doc.text(h, sx+sw[i]/2, Y+8.5, {align:"center"});
+      sx += sw[i];
+    });
+
+    // SAC data rows
+    const sacRows = taxType==="igst"
+      ? [[SAC, "18", fmtN(taxable), fmtN(tax1)]]
+      : [[SAC, "9 (C)", fmtN(taxable), fmtN(tax1)],
+         [SAC, "9 (S)", "-",            fmtN(tax2)]];
+    sacRows.forEach((row,ri) => {
+      const sry = Y+10+ri*4.5;
+      if (ri%2===0) box(ML+1, sry, c1-2, 4.5, LG);
+      sx = ML+1;
+      row.forEach((sv,ci) => {
+        fn(5.5,"normal"); tc(BK);
+        doc.text(sv, sx+sw[ci]/2, sry+3.2, {align:"center", maxWidth:sw[ci]-1});
+        sx += sw[ci];
+      });
+    });
+
+    // Payment details — positioned after SAC table (same pattern as tax invoice)
+    const sacBottom = Y+10+sacRows.length*4.5+4;
+    const bky = sacBottom + 2;
+    fn(6.5,"bold"); tc(N); doc.text("PAYMENT DETAILS:", ML+3, bky);
+    fn(6,"normal"); tc(BK);
+    doc.text("BENEFICIARY: FREIGHTYSH LLP", ML+3, bky+5);
+    doc.text("BANK: YES BANK",              ML+3, bky+9.5);
+    doc.text("A/C NO.: 008127000000642",    ML+3, bky+14);
+    doc.text("IFSC: YESB0000081",           ML+3, bky+18.5);
+    doc.text("BRANCH: ROURKELA",            ML+3, bky+22.5);
+    fn(5.5,"normal"); tc(MD);
+    doc.text("TAX ON REVERSE CHARGES: INR 0.00", ML+3, bky+27);
+    fn(5.5,"normal"); tc(MD);
+    doc.text("TDS @ 2%: INR "+fmtN(taxable*0.02), ML+3, bky+31.5);
+
+    // ── C2: Totals — identical structure to tax invoice ───────────────
+    const tx2 = ML+c1+2;
+    const tLines = [
+      ["TOTAL AMOUNT BEFORE TAX", fmtN(taxable)],
+      [lbl1,                      fmtN(tax1)   ],
+      ...(lbl2 ? [[lbl2,          fmtN(tax2)]] : []),
+      ["LESS : ADVANCE RECEIVED", "0.00"       ],
+      ["ROUND-OFF",               "("+fmtN(Math.abs(ro))+")"],
+    ];
+    tLines.forEach(([l,v], i) => {
+      const iy = Y+6+i*5.5;
+      fn(5.5,"normal"); tc(BK);
+      doc.text(l,              tx2+2,      iy);
+      doc.text("INR  "+v,     tx2+c2-1.5, iy, {align:"right"});
+    });
+    // Net payable box — identical to tax invoice
+    const npy = Y+6+tLines.length*5.5+3;
+    box(tx2, npy-4, c2, 7.5, N);
+    fn(7.5,"bold"); tc(W);
+    doc.text("NET PAYABLE",     tx2+2,      npy);
+    doc.text("INR  "+fmtI(gt), tx2+c2-1.5, npy, {align:"right"});
+    fn(5.5,"normal"); tc(MD);
+    doc.splitTextToSize("IN WORDS: "+n2w(gt)+" ONLY.", c2-3)
+       .forEach((w,i) => doc.text(w, tx2+2, npy+10+i*4));
+
+    // ── C3: Signature + T&C — identical to tax invoice ───────────────
+    const sigX = ML+c1+c2+4;
+    fn(6.5,"bold"); tc(N);
+    doc.text("FOR FREIGHTYSH LLP", sigX+c3/2, Y+5, {align:"center"});
+    doc.addImage("data:image/jpeg;base64,"+SIG, "JPEG", sigX+c3-44, Y+7, 42, 25);
+    sc(BK); doc.setLineWidth(.25); doc.line(sigX+2, Y+34, sigX+c3-2, Y+34);
+    fn(6.5,"bold"); tc(BK);
+    doc.text("AUTHORISED SIGNATORY", sigX+c3/2, Y+38, {align:"center"});
+
+    fn(5.5,"bold"); tc(BK); doc.text("TERMS & CONDITIONS:", sigX+2, Y+44);
+    fn(5.5,"normal"); tc(MD);
+    ["* DISCREPANCIES TO BE REPORTED WITHIN 7 DAYS.",
+     "* LATE PAYMENT ATTRACTS 24% P.A. INTEREST.",
+     "* GOVT. TAXES AS PER PREVAILING RATES.",
+     "* ALL DISPUTES: ROURKELA JURISDICTION."
+    ].forEach((t,i) => doc.text(t, sigX+2, Y+49+i*4, {maxWidth:c3-3}));
+
+    // ════════════════════════════════════════════════════════════════════
+    // FOOTER — identical to tax invoice
+    // ════════════════════════════════════════════════════════════════════
+    const fy = PH-5;
+    sc(N); doc.setLineWidth(.5); doc.line(ML, fy-2, ML+CW, fy-2);
+    fn(5.5,"normal"); tc(MD);
+    doc.text("E & O.E", ML, fy+1.5);
+    doc.text("** COMPUTER-GENERATED INVOICE **  |  ORIGINAL FOR RECIPIENT  |  PAGE: 1/1",
+             ML+CW, fy+1.5, {align:"right"});
+
+    // ── Save ─────────────────────────────────────────────────────────
+    const fname = (invoiceNo||"FSH-COMMISSION").replace(/\//g,"-")+".pdf";
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if (isMobile) {
+      const blob=doc.output("blob"), url=URL.createObjectURL(blob);
+      const a=document.createElement("a");
+      a.href=url; a.target="_blank"; a.rel="noopener";
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{URL.revokeObjectURL(url); document.body.removeChild(a);},3000);
+      toast("PDF opened — tap Share → Save to Files","ok");
+    } else {
+      doc.save(fname);
+      toast("PDF downloaded!","ok");
+    }
+
+  } catch(err) {
+    console.error(err); toast("Error: "+err.message,"err");
+  } finally {
+    btn.disabled=false;
+    btn.textContent="⬇ Download Commission Invoice (PDF)";
+  }}, 100);
+}
+
+
+
+
+
+
+
+function makePDF(){
+  if(invType==='commission') makeCommissionPDF();
+  else makeTaxInvoicePDF();
+}
 rebuildRows();
 </script>
 </body>
