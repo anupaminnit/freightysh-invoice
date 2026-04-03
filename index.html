@@ -603,6 +603,8 @@ function makeTaxInvoicePDF(){
       const sm={};
       comp.forEach(c=>{if(!sm[c.sac])sm[c.sac]={pct:c.igst,tx:0,ig:0};sm[c.sac].tx+=c.taxable;sm[c.sac].ig+=c.igstAmt;});
 
+      const custSC=(g("cSc")||"").trim();
+      const isIntraT=(custSC==="21");
       const cc=[
         {h:"SR",w:6,a:"center"},{h:"DESCRIPTION",w:36,a:"left"},{h:"SAC",w:13,a:"center"},
         {h:"CUR",w:8,a:"center"},{h:"RATE",w:15,a:"right"},{h:"QTY",w:7,a:"center"},
@@ -610,8 +612,6 @@ function makeTaxInvoicePDF(){
         {h:"TAXABLE",w:21,a:"right"},{h:isIntraT?"CGST/SGST%":"IGST%",w:9,a:"center"},{h:isIntraT?"CGST+SGST":"IGST AMT",w:17,a:"right"},
         {h:"TOTAL(INR)",w:CW-168,a:"right"},
       ];
-      const custSC=(g("cSc")||"").trim();
-      const isIntraT=(custSC==="21");
       const hrh=5;box(ML,Y,CW,hrh,N);
       let cx=ML;
       cc.forEach(col=>{fn(5.5,"bold");tc(W);const px=col.a==="right"?cx+col.w-1.5:col.a==="center"?cx+col.w/2:cx+1.5;doc.text(col.h,px,Y+3.5,{align:col.a,maxWidth:col.w-1});cx+=col.w;});
@@ -647,7 +647,7 @@ function makeTaxInvoicePDF(){
       fn(6,"bold");tc(N);doc.text("SAC/HSN BREAKUP",ML+c1/2,Y+4,{align:"center"});
       // Note intra vs inter for this invoice
       fn(5,"normal");tc(MD);
-      doc.text(isIntraState?"(CGST + SGST — Intra-State)":"(IGST — Inter-State)",ML+c1/2,Y+8,{align:"center"});
+      doc.text(isIntraT?"(CGST + SGST — Intra-State)":"(IGST — Inter-State)",ML+c1/2,Y+8,{align:"center"});
       const sh=["SAC",isIntraT?"CGST/SGST%":"IGST%","TAXABLE",isIntraT?"CGST+SGST":"IGST"],sw=[20,13,26,20];
       box(ML+1,Y+5.5,c1-2,4.5,N);
       let sx=ML+1;
