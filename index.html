@@ -616,7 +616,7 @@ function makeTaxInvoicePDF(){
       let cx=ML;
       cc.forEach(col=>{fn(5.5,"bold");tc(W);const px=col.a==="right"?cx+col.w-1.5:col.a==="center"?cx+col.w/2:cx+1.5;doc.text(col.h,px,Y+3.5,{align:col.a,maxWidth:col.w-1});cx+=col.w;});
       Y+=hrh;
-      const drh=4.6;
+      const drh=3.6;
       comp.forEach((c,ri)=>{
         const ry=Y+ri*drh;
         if(ri%2!==0)box(ML,ry,CW,drh,LG);
@@ -630,6 +630,18 @@ function makeTaxInvoicePDF(){
         });
       });
       Y+=comp.length*drh;
+
+      // FIX: page break if not enough space for bottom section
+      const remainingSpace=PH-Y-12;
+      const needsNewPage=remainingSpace<45;
+      if(needsNewPage){
+        doc.addPage();
+        Y=MT+2;
+        fn(10,"bold");tc(N);
+        doc.text("TAX INVOICE - CONTINUED",PW/2,Y,{align:"center"});
+        Y+=8;
+      }
+
       box(ML,Y,CW,4.8,LG);sc(MG);doc.setLineWidth(.15);doc.rect(ML,Y,CW,4.8,"S");
       fn(6,"bold");tc(BK);
       doc.text("SUB TOTAL",ML+CW-cc[12].w-cc[11].w-cc[10].w-1.5,Y+3.4,{align:"right"});
@@ -640,7 +652,7 @@ function makeTaxInvoicePDF(){
       // BOTTOM
       // c1: SAC+Bank block, c2: Totals, c3: Sig+Terms
       const c1=82,c2=72,c3=CW-c1-c2-4;
-      const bH=PH-Y-9;
+      const bH=Math.max(60,PH-Y-8);
 
       // SAC block background
       box(ML,Y,c1,bH,[248,249,255]);
@@ -661,15 +673,18 @@ function makeTaxInvoicePDF(){
       // Payment details — positioned strictly after SAC table, no overlap
       const sacTableBottom=Y+10+Object.keys(sm).length*4.5+4;
       const bky=sacTableBottom+2;
-      fn(6.5,"bold");tc(N);doc.text("PAYMENT DETAILS:",ML+3,bky);
-      fn(6,"normal");tc(BK);
-      doc.text("BENEFICIARY: FREIGHTYSH LLP",ML+3,bky+5);
-      doc.text("BANK: YES BANK",ML+3,bky+9.5);
-      doc.text("A/C NO.: 008127000000642",ML+3,bky+14);
-      doc.text("IFSC: YESB0000081",ML+3,bky+18.5);
-      doc.text("BRANCH: ROURKELA",ML+3,bky+22.5);
-      fn(5.5,"normal");tc(MD);
-      doc.text("TAX ON REVERSE CHARGES: INR 0.00",ML+3,bky+27);
+      // FIX: dynamic font so payment details never overflow
+      const spaceLow=PH-bky-8;
+      const adjFnt=spaceLow<30?5.5:6;
+      fn(adjFnt,"bold");tc(N);doc.text("PAYMENT DETAILS:",ML+3,bky);
+      fn(adjFnt-0.5,"normal");tc(BK);
+      doc.text("BENEFICIARY: FREIGHTYSH LLP",ML+3,bky+4);
+      doc.text("BANK: YES BANK",ML+3,bky+7.5);
+      doc.text("A/C NO.: 008127000000642",ML+3,bky+11);
+      doc.text("IFSC: YESB0000081",ML+3,bky+14.5);
+      doc.text("BRANCH: ROURKELA",ML+3,bky+18);
+      fn(adjFnt-1,"normal");tc(MD);
+      doc.text("TAX ON REVERSE CHARGES: INR 0.00",ML+3,bky+21);
 
       // Totals
       const tx2=ML+c1+2;
