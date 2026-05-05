@@ -633,7 +633,7 @@ function makeTaxInvoicePDF(){
 
       // FIX: page break if not enough space for bottom section
       const remainingSpace=PH-Y-12;
-      const needsNewPage=remainingSpace<45;
+      const needsNewPage=remainingSpace<60;
       if(needsNewPage){
         doc.addPage();
         Y=MT+2;
