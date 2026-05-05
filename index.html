@@ -636,10 +636,63 @@ function makeTaxInvoicePDF(){
       const needsNewPage=remainingSpace<60;
       if(needsNewPage){
         doc.addPage();
-        Y=MT+2;
-        fn(10,"bold");tc(N);
-        doc.text("TAX INVOICE - CONTINUED",PW/2,Y,{align:"center"});
-        Y+=8;
+        Y=MT;
+
+        // ── PAGE 2 HEADER: repeat full header ──────────────────────────
+        doc.addImage("data:image/jpeg;base64,"+LOGO,"JPEG",ML,Y,26,17);
+        fn(13,"bold");tc(N);doc.text("TAX INVOICE",PW/2,Y+6,{align:"center"});
+        fn(7,"bold");tc(N);doc.text("(CONTINUED — PAGE 2)",PW/2,Y+11,{align:"center"});
+        fn(6.5,"normal");tc(MD);
+        doc.text("C/308 KOELNAGAR, ROURKELA, ODISHA - 769014",PW/2,Y+15,{align:"center"});
+        doc.text("EMAIL: INFO@FREIGHTYSH.IN  |  MOB: 7000070408",PW/2,Y+18.5,{align:"center"});
+        const rx2h=PW-MR-58;
+        [["GSTIN:","21AAKFF8134C1ZU"],["STATE:","[21] ODISHA"],["PAN:","AAKFF8134C"]].forEach(([l,v],i)=>{
+          fn(6,"bold");tc(BK);doc.text(l,rx2h,Y+5+i*4.2);fn(6,"normal");doc.text(v,rx2h+13,Y+5+i*4.2);
+        });
+        Y+=21;sc(N);doc.setLineWidth(.8);doc.line(ML,Y,ML+CW,Y);Y+=3;
+
+        // Customer + meta block
+        const hw2=(CW-2)/2;
+        box(ML,Y,hw2,30,LG);box(ML+hw2+2,Y,hw2,30,LG);
+        fn(5.5,"normal");tc(MD);doc.text("CUSTOMER -",ML+3,Y+4);
+        fn(8.5,"bold");tc(BK);tx(g("cNm"),ML+3,Y+9,"left",hw2-5);
+        fn(6,"normal");tc(BK);
+        doc.splitTextToSize(g("cAd"),hw2-6).slice(0,2).forEach((l,i)=>doc.text(l,ML+3,Y+14+i*4));
+        fn(5.5,"normal");doc.text("PAN: "+g("cPn")+"   GSTIN: "+g("cGs"),ML+3,Y+25);
+        const rxm=ML+hw2+5;
+        [["INVOICE NO.",g("iNo")],["DATE",fd(gr("iDt"))],["DUE DATE",fd(gr("iDd"))],
+         ["PLACE OF SUPPLY","["+g("cSc")+"] "+g("cSt")],["SHIPPER REF",g("iSr")],
+         ["SHIPMENT TYPE",g("iSt")],["INCOTERMS",g("sIn")]
+        ].forEach(([l,v],i)=>{
+          fn(5.5,"bold");tc(BK);doc.text(l+":",rxm,Y+4+i*3.7);
+          fn(5.5,"normal");tx(v,rxm+26,Y+4+i*3.7,"left",hw2-30);
+        });
+        Y+=31;
+
+        // Shipment rows (compact, 2 per row)
+        const sRows2=[
+          ["CARGO TYPE",g("sCt"),"MBL NO.",g("sMb")+" (DATE: "+fd(gr("sMd"))+")"],
+          ["HBL NO.",g("sHb"),"SB NO.",g("sSb")],
+          ["SHIPPER",g("sSh"),"CONSIGNEE",g("sCn")],
+          ["VESSEL/VOY",g("sVs"),"SHIPPING LINE",g("sSl")],
+          ["LOADING PORT",g("sLp"),"DISCHARGE PORT",g("sDp")],
+          ["CONTAINERS",g("sCo"),"CARGO",g("sCg")],
+        ];
+        const scw2=[22,52,24,CW-98];const srh2=4.3;
+        sRows2.forEach((row,ri)=>{
+          const ry=Y+ri*srh2;
+          if(ri%2===0)box(ML,ry,CW,srh2,LG);
+          sc(MG);doc.setLineWidth(.08);doc.rect(ML,ry,CW,srh2,"S");
+          let cx2=ML;
+          row.forEach((cell,ci)=>{
+            const cw=scw2[Math.min(ci,3)];
+            if(ci%2===0){fn(5.5,"bold");tc(N);}else{fn(5.5,"normal");tc(BK);}
+            tx(cell,cx2+1.5,ry+srh2-1.3,"left",cw-2);
+            cx2+=cw;
+          });
+        });
+        Y+=sRows2.length*srh2+2;
+        // ───────────────────────────────────────────────────────────────
       }
 
       box(ML,Y,CW,4.8,LG);sc(MG);doc.setLineWidth(.15);doc.rect(ML,Y,CW,4.8,"S");
