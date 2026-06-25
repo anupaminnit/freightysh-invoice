@@ -4,116 +4,150 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Freightysh Invoice Generator</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-:root{--navy:#0A2463;--orange:#E8631A;--light:#F7F8FC;--border:#DDE1EE;--text:#1A1E2E;--muted:#6B7280;--r:10px;--sh:0 2px 16px rgba(10,36,99,.09)}
+:root{
+  --navy:#0A2463;--navy-2:#16357f;--navy-ink:#0c1d4a;
+  --orange:#E8631A;--orange-2:#cf550f;--soft:#FFF1E8;
+  --light:#EEF1F9;--panel:#F6F8FC;--border:#E2E7F2;--border-2:#D3DAEB;
+  --text:#161B33;--muted:#6E7691;--card:#FFFFFF;
+  --r:11px;--rs:8px;
+  --sh:0 1px 2px rgba(16,28,64,.04),0 6px 22px rgba(16,28,64,.06);
+  --sh-lg:0 8px 40px rgba(16,28,64,.12);
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"DM Sans",sans-serif;background:var(--light);color:var(--text)}
-nav{background:var(--navy);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:99;box-shadow:0 2px 16px rgba(10,36,99,.3)}
-.nl{display:flex;align-items:center;gap:10px}.nl img{height:36px;border-radius:4px}
-.nt{color:#fff;font-family:"DM Serif Display",serif;font-size:1.1rem}
-.nb{background:var(--orange);color:#fff;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase}
-.wrap{max-width:1040px;margin:0 auto;padding:28px 18px 56px}
-.prog{display:flex;background:#fff;border-radius:50px;padding:5px;box-shadow:var(--sh);margin-bottom:30px}
-.stp{flex:1;text-align:center;padding:9px 6px;border-radius:40px;font-size:.75rem;font-weight:500;color:var(--muted);cursor:pointer;transition:.2s}
-.stp.on{background:var(--navy);color:#fff;font-weight:600}
-.stp.dn{color:var(--navy);font-weight:600}
-.stp.dn::after{content:"✓";margin-left:4px;color:var(--orange)}
-.card{background:#fff;border-radius:12px;box-shadow:var(--sh);overflow:hidden;margin-bottom:18px}
-.ch{background:var(--navy);padding:15px 24px;display:flex;align-items:center;gap:10px}
-.ch h2{color:#fff;font-family:"DM Serif Display",serif;font-size:1.1rem;font-weight:400}
-.ci{background:rgba(255,255,255,.15);border-radius:7px;width:30px;height:30px;display:flex;align-items:center;justify-content:center}
-.cb{padding:22px 24px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:11px}
+html{-webkit-text-size-adjust:100%}
+body{font-family:"DM Sans",sans-serif;background:var(--light);color:var(--text);-webkit-font-smoothing:antialiased;letter-spacing:-.005em;
+  background-image:radial-gradient(1200px 600px at 50% -200px,rgba(10,36,99,.06),transparent 70%);}
+::selection{background:rgba(232,99,26,.18)}
+
+nav{background:var(--navy);background-image:linear-gradient(120deg,#0A2463 0%,#0d2a73 60%,#123484 100%);
+  padding:0 30px;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0;z-index:99;
+  box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 6px 24px rgba(8,22,68,.28);border-bottom:1px solid rgba(255,255,255,.06)}
+.nl{display:flex;align-items:center;gap:13px}
+.nl img{height:34px;border-radius:7px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.nt{color:#fff;font-family:"DM Serif Display",serif;font-size:1.16rem;letter-spacing:.01em}
+.nt small{display:block;font-family:"DM Sans",sans-serif;font-size:.6rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:1px}
+.nb{background:var(--orange);color:#fff;font-size:.64rem;font-weight:700;padding:5px 11px;border-radius:20px;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 2px 8px rgba(232,99,26,.35)}
+.wrap{max-width:1060px;margin:0 auto;padding:34px 20px 70px}
+
+.prog{display:flex;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:50px;padding:6px;box-shadow:var(--sh);margin-bottom:28px}
+.stp{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;text-align:center;padding:10px 8px;border-radius:40px;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;transition:.22s cubic-bezier(.4,0,.2,1);white-space:nowrap}
+.stp:hover{color:var(--navy);background:var(--panel)}
+.stp.on{background:var(--navy);color:#fff;box-shadow:0 4px 14px rgba(10,36,99,.28)}
+.stp.on:hover{background:var(--navy)}
+.stp.dn{color:var(--navy)}
+.stp.dn::after{content:"✓";margin-left:2px;color:var(--orange);font-weight:700}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:var(--sh);overflow:hidden;margin-bottom:18px}
+.ch{padding:18px 26px 16px;display:flex;align-items:center;gap:13px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#fbfcfe,#f6f8fc)}
+.ch h2{color:var(--navy-ink);font-family:"DM Serif Display",serif;font-size:1.16rem;font-weight:400;letter-spacing:.005em}
+.ci{background:var(--navy);color:#fff;border-radius:9px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 3px 10px rgba(10,36,99,.3)}
+.cb{padding:24px 26px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px}
 .s2{grid-column:span 2}
 @media(max-width:680px){.g2,.g3,.g4{grid-template-columns:1fr}.s2{grid-column:span 1}}
-.f{display:flex;flex-direction:column;gap:5px}
-.f label{font-size:.72rem;font-weight:600;color:var(--navy);text-transform:uppercase;letter-spacing:.05em}
+
+.f{display:flex;flex-direction:column;gap:7px}
+.f label{font-size:.7rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em}
 .f label span{color:var(--orange)}
-.f input,.f select,.f textarea{border:1.5px solid var(--border);border-radius:var(--r);padding:9px 12px;font-family:"DM Sans",sans-serif;font-size:.86rem;color:var(--text);background:#fff;transition:.2s;width:100%}
-.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(10,36,99,.07)}
-.f textarea{resize:vertical;min-height:60px}
-.mono{font-family:"JetBrains Mono",monospace!important;font-size:.83rem!important}
-.sl{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--orange);margin:18px 0 10px;border-bottom:1px solid var(--border);padding-bottom:5px}
-.ct{width:100%;border-collapse:collapse;font-size:.81rem}
-.ct th{background:var(--navy);color:#fff;padding:8px 9px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;text-align:left}
-.ct td{padding:7px 9px;border-bottom:1px solid var(--border);vertical-align:middle}
-.ct tr:nth-child(even) td{background:#F9FAFC}
-.ct input,.ct select{border:1.5px solid var(--border);border-radius:5px;padding:5px 7px;font-family:"DM Sans",sans-serif;font-size:.8rem;width:100%;background:#fff}
-.ct input:focus,.ct select:focus{outline:none;border-color:var(--navy)}
+.f input,.f select,.f textarea{border:1.5px solid var(--border-2);border-radius:var(--r);padding:11px 13px;font-family:"DM Sans",sans-serif;font-size:.88rem;font-weight:500;color:var(--text);background:#fff;transition:.18s;width:100%}
+.f input::placeholder,.f textarea::placeholder{color:#aab0c4;font-weight:400}
+.f input:hover,.f select:hover,.f textarea:hover{border-color:#b9c2db}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3.5px rgba(10,36,99,.1)}
+.f textarea{resize:vertical;min-height:62px;line-height:1.5}
+.f select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236E7691' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.mono{font-family:"JetBrains Mono",monospace!important;font-size:.83rem!important;letter-spacing:-.01em}
+
+.sl{display:flex;align-items:center;gap:9px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.13em;color:var(--orange);margin:24px 0 13px}
+.sl::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--border-2),transparent)}
+
+.ct{width:100%;border-collapse:separate;border-spacing:0;font-size:.81rem;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.ct th{background:var(--navy);color:#fff;padding:10px 9px;font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;text-align:left}
+.ct td{padding:7px 9px;border-bottom:1px solid var(--border);vertical-align:middle;background:#fff}
+.ct tr:last-child td{border-bottom:none}
+.ct tbody tr:nth-child(even) td{background:#F8FAFD}
+.ct tbody tr:hover td{background:var(--soft)}
+.ct input,.ct select{border:1.5px solid var(--border-2);border-radius:7px;padding:6px 8px;font-family:"DM Sans",sans-serif;font-size:.8rem;font-weight:500;width:100%;background:#fff;transition:.15s}
+.ct input:focus,.ct select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 2.5px rgba(10,36,99,.1)}
 .mc{font-family:"JetBrains Mono",monospace;font-size:.78rem}
-.db{background:none;border:none;cursor:pointer;color:#EF4444;font-size:1rem;padding:2px 5px;border-radius:4px;transition:.15s}
-.db:hover{background:#FEE2E2}
-.ab{display:flex;align-items:center;gap:7px;background:none;border:1.5px dashed var(--border);border-radius:var(--r);padding:9px 14px;font-family:"DM Sans",sans-serif;font-size:.83rem;color:var(--navy);cursor:pointer;width:100%;margin-top:9px;transition:.2s;font-weight:500}
-.ab:hover{background:var(--light);border-color:var(--navy)}
-.tp{background:var(--light);border:1.5px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-top:14px}
-.tp h4{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
-.tr{display:flex;justify-content:space-between;padding:4px 0;font-size:.83rem;border-bottom:1px dashed var(--border)}
+.db{background:none;border:none;cursor:pointer;color:#E0524A;font-size:.95rem;padding:4px 7px;border-radius:7px;transition:.15s;line-height:1}
+.db:hover{background:#FDECEA}
+.ab{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--panel);border:1.5px dashed var(--border-2);border-radius:var(--r);padding:12px 14px;font-family:"DM Sans",sans-serif;font-size:.83rem;color:var(--navy);cursor:pointer;width:100%;margin-top:12px;transition:.2s;font-weight:600}
+.ab:hover{background:var(--soft);border-color:var(--orange);color:var(--orange-2)}
+
+.tp{background:linear-gradient(180deg,#fbfcfe,#f4f7fc);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-top:18px}
+.tp h4{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px}
+.tr{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:.84rem;border-bottom:1px dashed var(--border-2)}
 .tr:last-child{border:none}
-.tr.gd{font-weight:700;font-size:.92rem;color:var(--navy);background:rgba(10,36,99,.06);margin:-2px -5px;padding:9px 5px;border-radius:5px}
-.tr .lb{color:var(--muted)}.tr.gd .lb{color:var(--navy)}
-.tr .vl{font-family:"JetBrains Mono",monospace;font-size:.8rem}
-.br{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:10px}
-.btn{padding:11px 26px;border-radius:50px;font-family:"DM Sans",sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;transition:.2s;border:none;display:flex;align-items:center;gap:7px}
-.bp{background:var(--navy);color:#fff}.bp:hover{background:#0d2d7a;box-shadow:0 4px 14px rgba(10,36,99,.25)}
-.bs{background:#fff;color:var(--navy);border:1.5px solid var(--border)}.bs:hover{border-color:var(--navy);background:var(--light)}
-.bg{background:var(--orange);color:#fff;font-size:.92rem;padding:13px 32px}.bg:hover{background:#d45a14;box-shadow:0 4px 18px rgba(232,99,26,.35)}
-.bg:disabled{opacity:.6;cursor:not-allowed}
-.toast{position:fixed;bottom:24px;right:24px;color:#fff;padding:12px 20px;border-radius:9px;font-size:.85rem;font-weight:500;box-shadow:0 8px 22px rgba(0,0,0,.2);transform:translateY(70px);opacity:0;transition:.3s;z-index:999;display:flex;align-items:center;gap:9px}
+.tr.gd{font-weight:700;font-size:.96rem;color:#fff;background:var(--navy);margin:8px -8px 0;padding:13px 14px;border-radius:11px;border:none;box-shadow:0 6px 18px rgba(10,36,99,.25)}
+.tr .lb{color:var(--muted);font-weight:500}.tr.gd .lb{color:rgba(255,255,255,.8)}
+.tr .vl{font-family:"JetBrains Mono",monospace;font-size:.82rem;font-weight:500;color:var(--text)}
+.tr.gd .vl{color:#fff;font-size:1rem;font-weight:600}
+
+.br{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:12px;flex-wrap:wrap}
+.btn{padding:12px 28px;border-radius:50px;font-family:"DM Sans",sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;transition:.2s;border:none;display:flex;align-items:center;gap:8px;letter-spacing:.005em}
+.bp{background:var(--navy);color:#fff;box-shadow:0 4px 14px rgba(10,36,99,.22)}.bp:hover{background:var(--navy-2);box-shadow:0 6px 20px rgba(10,36,99,.32);transform:translateY(-1px)}
+.bs{background:#fff;color:var(--navy);border:1.5px solid var(--border-2)}.bs:hover{border-color:var(--navy);background:var(--panel)}
+.bg{background:var(--orange);color:#fff;font-size:.92rem;padding:14px 34px;box-shadow:0 4px 16px rgba(232,99,26,.3)}.bg:hover{background:var(--orange-2);box-shadow:0 8px 24px rgba(232,99,26,.42);transform:translateY(-1px)}
+.bg:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+.toast{position:fixed;bottom:26px;right:26px;color:#fff;padding:13px 22px;border-radius:12px;font-size:.85rem;font-weight:600;box-shadow:0 12px 30px rgba(0,0,0,.25);transform:translateY(80px);opacity:0;transition:.32s cubic-bezier(.4,0,.2,1);z-index:9999;display:flex;align-items:center;gap:10px}
 .toast.show{transform:translateY(0);opacity:1}
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.sb{background:var(--light);border-radius:9px;padding:12px 14px}
-.sb h4{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--orange);margin-bottom:7px}
-.sb p{font-size:.81rem;line-height:1.6}
-.gb{background:var(--navy);color:#fff;border-radius:9px;padding:18px 22px;display:flex;justify-content:space-between;align-items:center}
-.ga{font-family:"DM Serif Display",serif;font-size:1.9rem;color:var(--orange)}
 
-.type-card{background:#fff;border:2px solid var(--border);border-radius:12px;padding:22px 18px;cursor:pointer;transition:all .2s;text-align:center;font-family:"DM Sans",sans-serif}
-.type-card:hover{border-color:var(--org);box-shadow:0 4px 16px rgba(214,90,13,.15)}
-.type-card.active{border-color:var(--org);background:var(--lorg);box-shadow:0 4px 16px rgba(214,90,13,.2)}
-.type-icon{font-size:2rem;margin-bottom:8px}
-.type-title{font-weight:700;font-size:.95rem;color:var(--blk);margin-bottom:6px}
-.type-desc{font-size:.75rem;color:var(--muted);line-height:1.5}
-.ct{width:100%;border-collapse:collapse;font-size:.81rem}
-.ct th{background:var(--blk);color:#fff;padding:8px 9px;font-size:.69rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;text-align:left}
-.ct td{padding:7px 9px;border-bottom:1px solid var(--border);vertical-align:middle}
-.ct tr:nth-child(even) td{background:var(--lorg)}
-.ct input,.ct select{border:1.5px solid var(--border);border-radius:5px;padding:5px 7px;font-family:"DM Sans",sans-serif;font-size:.8rem;width:100%;background:#fff}
-.ct input:focus,.ct select:focus{outline:none;border-color:var(--org)}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.sb{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:16px 18px}
+.sb h4{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--orange);margin-bottom:9px}
+.sb p{font-size:.84rem;line-height:1.65;color:var(--text)}
+.sb strong{color:var(--navy-ink)}
+.gb,.grand-box{background:var(--navy);background-image:linear-gradient(120deg,#0A2463,#15357d);color:#fff;border-radius:15px;padding:22px 26px;display:flex;justify-content:space-between;align-items:center;gap:16px;box-shadow:0 10px 30px rgba(10,36,99,.3)}
+.ga{font-family:"DM Serif Display",serif;font-size:2.1rem;color:#fff;line-height:1.1;letter-spacing:.01em}
 
-/* ── New UI elements ─────────────────────────────── */
-.draft-banner{background:#1e40af;color:#fff;padding:10px 18px;border-radius:9px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;font-size:.84rem;gap:10px}
-.draft-banner button{background:rgba(255,255,255,.2);border:none;color:#fff;padding:4px 12px;border-radius:20px;cursor:pointer;font-size:.78rem;font-weight:600}
-.draft-banner button:hover{background:rgba(255,255,255,.35)}
-.addr-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.addr-row select{flex:1;border:1.5px solid var(--border);border-radius:var(--r);padding:8px 10px;font-family:"DM Sans",sans-serif;font-size:.83rem;background:#fff}
-.addr-row button{white-space:nowrap;background:var(--navy);color:#fff;border:none;border-radius:var(--r);padding:8px 14px;font-size:.78rem;font-weight:600;cursor:pointer}
-.addr-row button:hover{background:#0d2d7a}
-.hist-btn{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:4px 14px;font-size:.74rem;font-weight:600;cursor:pointer;font-family:"DM Sans",sans-serif;transition:.2s;margin-right:8px}
-.hist-btn:hover{background:rgba(255,255,255,.22)}
-#histModal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);overflow:auto}
-.hist-inner{background:#fff;border-radius:14px;max-width:880px;margin:40px auto;padding:28px;box-shadow:0 16px 48px rgba(0,0,0,.3)}
-.hist-inner h3{font-family:"DM Serif Display",serif;color:var(--navy);font-size:1.15rem;margin-bottom:16px}
-.hist-table{width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:16px}
-.hist-table th{background:var(--navy);color:#fff;padding:7px 10px;text-align:left;font-size:.71rem;font-weight:600;letter-spacing:.04em}
-.hist-table td{padding:7px 10px;border-bottom:1px solid var(--border)}
-.hist-table tr:nth-child(even) td{background:#f9fafc}
-.hist-close{float:right;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted)}
-.hist-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
-.reset-link{font-size:.72rem;color:var(--muted);cursor:pointer;text-decoration:underline;margin-left:8px;background:none;border:none;font-family:"DM Sans",sans-serif}
-.reset-link:hover{color:var(--orange)}
+.type-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:24px 20px;cursor:pointer;transition:.22s cubic-bezier(.4,0,.2,1);text-align:center;font-family:"DM Sans",sans-serif;position:relative}
+.type-card:hover{border-color:var(--border-2);box-shadow:var(--sh);transform:translateY(-2px)}
+.type-card.active{border-color:var(--navy);background:linear-gradient(180deg,#fff,#fbfcff);box-shadow:0 8px 26px rgba(10,36,99,.16)}
+.type-card.active::after{content:"✓";position:absolute;top:12px;right:12px;width:22px;height:22px;background:var(--orange);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;box-shadow:0 2px 8px rgba(232,99,26,.4)}
+.type-icon{font-size:1.9rem;margin-bottom:11px}
+.type-title{font-weight:700;font-size:1rem;color:var(--navy-ink);margin-bottom:7px;font-family:"DM Serif Display",serif}
+.type-desc{font-size:.76rem;color:var(--muted);line-height:1.55}
+
+.draft-banner{background:var(--navy);color:#fff;padding:12px 18px;border-radius:12px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;font-size:.84rem;gap:10px;box-shadow:0 6px 18px rgba(10,36,99,.2)}
+.draft-banner button{background:rgba(255,255,255,.18);border:none;color:#fff;padding:5px 14px;border-radius:20px;cursor:pointer;font-size:.76rem;font-weight:600;transition:.15s}
+.draft-banner button:hover{background:rgba(255,255,255,.32)}
+.addr-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.addr-row select{flex:1;border:1.5px solid var(--border-2);border-radius:var(--r);padding:10px 12px;font-family:"DM Sans",sans-serif;font-size:.85rem;font-weight:500;background:#fff}
+.addr-row select:focus{outline:none;border-color:var(--navy)}
+.addr-row button{white-space:nowrap;background:var(--navy);color:#fff;border:none;border-radius:var(--r);padding:10px 16px;font-size:.79rem;font-weight:600;cursor:pointer;transition:.15s}
+.addr-row button:hover{background:var(--navy-2)}
+.hist-btn{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:6px 15px;font-size:.74rem;font-weight:600;cursor:pointer;font-family:"DM Sans",sans-serif;transition:.18s;margin-right:10px}
+.hist-btn:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.4)}
+#histModal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(8,16,40,.55);backdrop-filter:blur(3px);overflow:auto}
+.hist-inner{background:#fff;border-radius:18px;max-width:880px;margin:46px auto;padding:30px;box-shadow:var(--sh-lg)}
+.hist-inner h3{font-family:"DM Serif Display",serif;color:var(--navy-ink);font-size:1.3rem;margin-bottom:18px}
+.hist-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.8rem;margin-bottom:16px;border:1px solid var(--border);border-radius:11px;overflow:hidden}
+.hist-table th{background:var(--navy);color:#fff;padding:9px 11px;text-align:left;font-size:.68rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.hist-table td{padding:9px 11px;border-bottom:1px solid var(--border)}
+.hist-table tr:last-child td{border-bottom:none}
+.hist-table tbody tr:nth-child(even) td{background:#f8fafd}
+.hist-close{float:right;background:var(--panel);border:1px solid var(--border);width:32px;height:32px;border-radius:9px;font-size:1.05rem;cursor:pointer;color:var(--muted);transition:.15s}
+.hist-close:hover{background:var(--soft);color:var(--orange)}
+.hist-footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.reset-link{font-size:.72rem;color:var(--muted);cursor:pointer;text-decoration:none;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-family:"DM Sans",sans-serif;font-weight:600;transition:.15s}
+.reset-link:hover{color:var(--orange);border-color:var(--orange)}
 </style>
 </head>
 <body>
 <nav>
   <div class="nl">
     <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCADIAMgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD06iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKADtRR2ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAO1FHaigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA7UUdqKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKADtRQelFABRRRQAUVTvdUtLJtkzkvjOxRk1HZ6xaXkwhj8wOegZetZ+1hzct9TRUqjjzW0NCiiitDMKKKpXmq2lnMI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a25TA6CiudvNWuyk8SNEkhjnIQKweMp93J6HPX+WetWJb6/W9jtzLbIRMYyTGQrkxhlHXg5yPf8ASjlYG1UUkbyceaUX/Y4P51jSa5PsSbZFFCWKPv5fcuNwC5GcEkcZPHQ1Y026u/OjjuCjxytPtODuXa+Bk9+D6Dp3ocQTNCG1ggJaOMBj1Y8sfqTzU1FFSklsNtvcD0ooPSimIKKKKACiiigAwKYIYxMZQg8wqF3ew5x+tPooAKKKKACiiigBk0KTxGOQZU+hI/UUkEEVvEI4UCrkn1yT1JPc1JRQAUYFFFADIYo4IljiQIijAA7U+iigAooooAgjs7eO4M6x/vDnkknGeuM9M+1SuiujIw4YYPOKdRQBHDDHBEsUSBUXoKkoooAKKKKAA9KKD0ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAD0ooPSigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAPSig9KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAA9KKD0ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAD0ooooA//2Q==" alt="Freightysh"/>
-    <span class="nt">Invoice Generator</span>
+    <span class="nt">Freightysh<small>Invoice Generator</small></span>
   </div>
   <div style="display:flex;align-items:center;gap:6px">
     <button class="hist-btn" onclick="openHistory()">📋 History</button>
@@ -124,9 +158,10 @@ nav{background:var(--navy);padding:0 32px;display:flex;align-items:center;justif
 <div class="wrap">
   
   <!-- ═══ INVOICE TYPE SELECTOR ═══ -->
-  <div id="typeSelector" style="margin-bottom:24px">
-    <div style="text-align:center;margin-bottom:16px">
-      <span style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Select Invoice Type</span>
+  <div id="typeSelector" style="margin-bottom:28px">
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="font-family:'DM Serif Display',serif;font-size:1.45rem;color:var(--navy-ink);margin-bottom:4px">Create a new invoice</div>
+      <span style="font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)">Select a document type to begin</span>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;max-width:860px;margin:0 auto">
       <button class="type-card active" id="btnTax" onclick="setInvType('tax')">
@@ -611,358 +646,272 @@ function n2w(n){
 
 function makeTaxInvoicePDF(proforma=false,returnDoc=false,onDoc=null){
   const btn=document.getElementById(returnDoc?"previewBtn":"genBtn");
-  btn.disabled=true;btn.textContent="⏳ Generating...";
+  if(btn){btn.disabled=true;btn.textContent="Generating...";}
   setTimeout(()=>{
-    try{
-      const {jsPDF}=window.jspdf;
-      const doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
-      const PW=297,PH=210,ML=8,MR=8,MT=7,CW=PW-ML-MR;
-      const usd=parseFloat(gr("iUr"))||94.29;
-      const N=[10,36,99],O=[232,99,26],BK=[0,0,0],W=[255,255,255],LG=[244,244,244],MG=[190,190,190],MD=[110,110,110];
-      const taxTypeVal=(document.getElementById("iTaxType")?.value)||"igst";
-      const printType=(document.getElementById("iPrintType")?.value)||"original";
-      const adv=parseFloat(document.getElementById("iAdv")?.value||0)||0;
-      const tds=parseFloat(document.getElementById("iTds")?.value||0)||0;
+   try{
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
+    const PW=297,PH=210,ML=12,MR=12,CW=PW-ML-MR;
+    const usd=parseFloat(gr("iUr"))||94.29;
+    const NAVY=[10,36,99],ORANGE=[232,99,26],INK=[24,28,52],MUTED=[112,120,146],
+          LINE=[221,226,238],PANEL=[244,247,252],SOFT=[255,242,233],W=[255,255,255],SUB=[235,225,210];
+    const taxTypeVal=(document.getElementById("iTaxType")?.value)||"igst";
+    const printType=(document.getElementById("iPrintType")?.value)||"original";
+    const adv=parseFloat(document.getElementById("iAdv")?.value||0)||0;
+    const tds=parseFloat(document.getElementById("iTds")?.value||0)||0;
+    const fc=c=>doc.setFillColor(c[0],c[1],c[2]), sc=c=>doc.setDrawColor(c[0],c[1],c[2]), tc=c=>doc.setTextColor(c[0],c[1],c[2]);
+    const fn=(s,st)=>{doc.setFontSize(s);doc.setFont("helvetica",st||"normal");};
+    const rect=(x,y,w,h,f,strokeC,lw)=>{if(f){fc(f);doc.rect(x,y,w,h,"F");} if(strokeC){sc(strokeC);doc.setLineWidth(lw||0.2);doc.rect(x,y,w,h,"S");}};
+    const hline=(x1,y,x2,c,lw)=>{sc(c);doc.setLineWidth(lw||0.2);doc.line(x1,y,x2,y);};
+    const vline=(x,y1,y2,c,lw)=>{sc(c);doc.setLineWidth(lw||0.2);doc.line(x,y1,x,y2);};
+    const clip=(t,x,y,a,mw)=>{const s=doc.splitTextToSize(String(t==null?"":t),mw||999);doc.text(s[0],x,y,{align:a||"left"});};
+    const fmt=n=>Math.abs(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+    const fmtI=n=>Math.abs(n).toLocaleString("en-IN");
+    const title=proforma?"PROFORMA INVOICE":"TAX INVOICE";
 
-      const fc=(c)=>doc.setFillColor(...c);
-      const sc=(c)=>doc.setDrawColor(...c);
-      const tc=(c)=>doc.setTextColor(...c);
-      const fn=(s,st="normal")=>{doc.setFontSize(s);doc.setFont("helvetica",st);};
-      const box=(x,y,w,h,f,s)=>{if(f){fc(f);doc.rect(x,y,w,h,"F");}if(s){sc(s);doc.setLineWidth(.1);doc.rect(x,y,w,h,"S");}};
-      const tx=(t,x,y,a="left",mw)=>{const s=doc.splitTextToSize(String(t),mw||999);doc.text(s[0],x,y,{align:a});};
-
-      const invoiceTitle=proforma?"PROFORMA INVOICE":"TAX INVOICE";
-      let Y=MT;
-
-      // HEADER
-      doc.addImage("data:image/jpeg;base64,"+LOGO,"JPEG",ML,Y,22,22);
-      fn(13,"bold");tc(N);doc.text(invoiceTitle,PW/2,Y+6,{align:"center"});
-      fn(10,"bold");tc(BK);doc.text("FREIGHTYSH LLP",PW/2,Y+11,{align:"center"});
-      fn(6.5,"normal");tc(MD);
-      doc.text("C/308 KOELNAGAR, ROURKELA, ODISHA - 769014",PW/2,Y+15,{align:"center"});
-      doc.text("EMAIL: INFO@FREIGHTYSH.IN  |  MOB: 7000070408",PW/2,Y+18.5,{align:"center"});
-      const rx=PW-MR-58;
-      [["GSTIN:","21AAKFF8134C1ZU"],["STATE:","[21] ODISHA"],["PAN:","AAKFF8134C"]].forEach(([l,v],i)=>{
-        fn(6,"bold");tc(BK);doc.text(l,rx,Y+5+i*4.2);fn(6,"normal");doc.text(v,rx+13,Y+5+i*4.2);
-      });
-      Y+=21;sc(N);doc.setLineWidth(.8);doc.line(ML,Y,ML+CW,Y);Y+=3;
-
-      // CUSTOMER + META block
-      const hw=(CW-2)/2;
-      box(ML,Y,hw,30,LG);box(ML+hw+2,Y,hw,30,LG);
-      fn(5.5,"normal");tc(MD);doc.text("CUSTOMER -",ML+3,Y+4);
-      fn(8.5,"bold");tc(BK);tx(g("cNm"),ML+3,Y+9,"left",hw-5);
-      fn(6,"normal");tc(BK);
-      doc.splitTextToSize(g("cAd"),hw-6).slice(0,2).forEach((l,i)=>doc.text(l,ML+3,Y+14+i*4));
-      fn(5.5,"normal");doc.text("PAN: "+g("cPn")+"   GSTIN: "+g("cGs"),ML+3,Y+25);
-      const rx2=ML+hw+5;
-      const meta=[["INVOICE NO.",g("iNo")],["DATE",fd(gr("iDt"))],["DUE DATE",fd(gr("iDd"))],
-        ["PLACE OF SUPPLY","["+g("cSc")+"] "+g("cSt")],["SHIPPER REF",g("iSr")],
-        ["SHIPMENT TYPE",g("iSt")],["INCOTERMS",g("sIn")]];
-      meta.forEach(([l,v],i)=>{
-        fn(5.5,"bold");tc(BK);doc.text(l+":",rx2,Y+4+i*3.7);
-        fn(5.5,"normal");tx(v,rx2+26,Y+4+i*3.7,"left",hw-30);
-      });
-      Y+=31;
-
-      // SHIPMENT ROWS
-      const sRows=[
-        ["CARGO TYPE",g("sCt"),"MBL NO.",g("sMb")+" (DATE: "+fd(gr("sMd"))+")"],
-        ["HBL NO.",g("sHb"),"SB NO.",g("sSb")],
-        ["SHIPPER",g("sSh"),"CONSIGNEE",g("sCn")],
-        ["PACKAGES",g("sPk"),"GROSS WT.",g("sGw")],
-        ["VOLUME",g("sVl"),"NET WT.",g("sNw")],
-        ["VESSEL/VOY",g("sVs"),"SHIPPING LINE",g("sSl")],
-        ["LOADING PORT",g("sLp"),"DISCHARGE PORT",g("sDp")],
-        ["PLACE OF RECEIPT",g("sPr"),"PLACE OF DELIVERY",g("sPd")],
-        ["CONTAINERS",g("sCo"),"CARGO",g("sCg")],
-      ];
-      const scw=[22,52,24,CW-98];const srh=4.3;
-      sRows.forEach((row,ri)=>{
-        const ry=Y+ri*srh;
-        if(ri%2===0)box(ML,ry,CW,srh,LG);
-        sc(MG);doc.setLineWidth(.08);doc.rect(ML,ry,CW,srh,"S");
-        let cx=ML;
-        row.forEach((cell,ci)=>{
-          const cw=scw[Math.min(ci,3)];
-          if(ci%2===0){fn(5.5,"bold");tc(N);}else{fn(5.5,"normal");tc(BK);}
-          tx(cell,cx+1.5,ry+srh-1.3,"left",cw-2);
-          cx+=cw;
-        });
-      });
-      Y+=sRows.length*srh+1;
-
-      // CHARGES
-      const comp=calc();
-      const st=parseFloat(comp.reduce((s,c)=>s+c.taxable,0).toFixed(2));
-      const si=proforma?0:parseFloat(comp.reduce((s,c)=>s+c.igstAmt,0).toFixed(2));
-      const rg=st+si,roundedInv=Math.round(rg),ro=parseFloat((roundedInv-rg).toFixed(2));
-      const gt=Math.round(roundedInv-adv-tds);
-      const usdTotalAmt=parseFloat(comp.filter(r=>r.cur==="USD").reduce((s,r)=>s+r.amtCur,0).toFixed(2));
-      const sm={};
-      if(!proforma){
-        comp.forEach(c=>{if(!sm[c.sac])sm[c.sac]={pct:c.igst,tx:0,ig:0};sm[c.sac].tx+=c.taxable;sm[c.sac].ig+=c.igstAmt;});
-      }
-
-      const gstHdr=taxTypeVal==="cgst_sgst"?"GST%":"IGST%";
-      const gstAmtHdr=taxTypeVal==="cgst_sgst"?"GST AMT":"IGST AMT";
-      const cc=[
-        {h:"SR",w:6,a:"center"},{h:"DESCRIPTION",w:36,a:"left"},{h:"SAC",w:13,a:"center"},
-        {h:"CUR",w:8,a:"center"},{h:"RATE",w:15,a:"right"},{h:"QTY",w:7,a:"center"},
-        {h:"AMT(CUR)",w:15,a:"right"},{h:"EX.RATE",w:13,a:"right"},{h:"TYPE",w:8,a:"center"},
-        {h:"TAXABLE",w:21,a:"right"},{h:gstHdr,w:9,a:"center"},{h:gstAmtHdr,w:17,a:"right"},
-        {h:"TOTAL(INR)",w:CW-168,a:"right"},
-      ];
-      const hrh=5;box(ML,Y,CW,hrh,N);
-      let cx=ML;
-      cc.forEach(col=>{fn(5.5,"bold");tc(W);const px=col.a==="right"?cx+col.w-1.5:col.a==="center"?cx+col.w/2:cx+1.5;doc.text(col.h,px,Y+3.5,{align:col.a,maxWidth:col.w-1});cx+=col.w;});
-      Y+=hrh;
-      const drh=4.6;
-      comp.forEach((c,ri)=>{
-        const ry=Y+ri*drh;
-        if(ri%2!==0)box(ML,ry,CW,drh,LG);
-        sc(MG);doc.setLineWidth(.08);doc.rect(ML,ry,CW,drh,"S");
-        const igstAmt=proforma?0:c.igstAmt;
-        const rowTotal=proforma?c.taxable:(c.taxable+igstAmt);
-        const vs=[String(ri+1),c.desc,c.sac,c.cur,fmt(c.rate),String(c.qty),fmt(c.amtCur),String(c.ex),c.type,fmt(c.taxable),proforma?"—":String(c.igst),fmt(igstAmt),fmt(rowTotal)];
-        cx=ML;
-        cc.forEach((col,ci)=>{
-          fn(ci===1?6:5.5,"normal");tc(BK);
-          const px=col.a==="right"?cx+col.w-1.5:col.a==="center"?cx+col.w/2:cx+1.5;
-          tx(vs[ci],px,ry+3.1,col.a,col.w-2);cx+=col.w;
-        });
-      });
-      Y+=comp.length*drh;
-      box(ML,Y,CW,4.8,LG);sc(MG);doc.setLineWidth(.15);doc.rect(ML,Y,CW,4.8,"S");
-      fn(6,"bold");tc(BK);
-      if(usdTotalAmt>0){
-        fn(5,"normal");tc(MD);
-        doc.text("USD charges: $"+fmt(usdTotalAmt)+" @ ₹"+usd,ML+2,Y+3.4);
-      }
-      doc.text("SUB TOTAL",ML+CW-cc[12].w-cc[11].w-cc[10].w-1.5,Y+3.4,{align:"right"});
-      fn(6,"bold");tc(BK);
-      doc.text(fmt(si),ML+CW-cc[12].w-1.5,Y+3.4,{align:"right"});
-      doc.text(fmt(st+si),ML+CW-1.5,Y+3.4,{align:"right"});
-      Y+=5.8;
-
-      // PAGE BREAK CHECK
-      const MIN_BOTTOM=65;
-      let onPage2=false;
-      if(PH-Y-9<MIN_BOTTOM){
-        onPage2=true;
-        const fy1=PH-5;sc(N);doc.setLineWidth(.5);doc.line(ML,fy1-2,ML+CW,fy1-2);
-        fn(5.5,"normal");tc(MD);
-        doc.text("E & O.E",ML,fy1+1.5);
-        doc.text("** COMPUTER-GENERATED INVOICE **  |  ORIGINAL FOR RECIPIENT  |  PAGE: 1/2",ML+CW,fy1+1.5,{align:"right"});
-        doc.addPage();
-        Y=MT;
-        doc.addImage("data:image/jpeg;base64,"+LOGO,"JPEG",ML,Y,22,22);
-        fn(13,"bold");tc(N);doc.text(invoiceTitle,PW/2,Y+6,{align:"center"});
-        fn(7.5,"bold");tc(O);doc.text("(CONTINUED — PAGE 2)",PW/2,Y+11,{align:"center"});
-        fn(6.5,"normal");tc(MD);
-        doc.text("C/308 KOELNAGAR, ROURKELA, ODISHA - 769014",PW/2,Y+15,{align:"center"});
-        doc.text("EMAIL: INFO@FREIGHTYSH.IN  |  MOB: 7000070408",PW/2,Y+18.5,{align:"center"});
-        [["GSTIN:","21AAKFF8134C1ZU"],["STATE:","[21] ODISHA"],["PAN:","AAKFF8134C"]].forEach(([l,v],i)=>{
-          fn(6,"bold");tc(BK);doc.text(l,rx,Y+5+i*4.2);fn(6,"normal");doc.text(v,rx+13,Y+5+i*4.2);
-        });
-        Y+=21;sc(N);doc.setLineWidth(.8);doc.line(ML,Y,ML+CW,Y);Y+=3;
-        box(ML,Y,hw,30,LG);box(ML+hw+2,Y,hw,30,LG);
-        fn(5.5,"normal");tc(MD);doc.text("CUSTOMER -",ML+3,Y+4);
-        fn(8.5,"bold");tc(BK);tx(g("cNm"),ML+3,Y+9,"left",hw-5);
-        fn(6,"normal");tc(BK);
-        doc.splitTextToSize(g("cAd"),hw-6).slice(0,2).forEach((l,i)=>doc.text(l,ML+3,Y+14+i*4));
-        fn(5.5,"normal");doc.text("PAN: "+g("cPn")+"   GSTIN: "+g("cGs"),ML+3,Y+25);
-        meta.forEach(([l,v],i)=>{
-          fn(5.5,"bold");tc(BK);doc.text(l+":",rx2,Y+4+i*3.7);
-          fn(5.5,"normal");tx(v,rx2+26,Y+4+i*3.7,"left",hw-30);
-        });
-        Y+=31;
-        const sRowsP2=[
-          ["CARGO TYPE",g("sCt"),"MBL NO.",g("sMb")+" (DATE: "+fd(gr("sMd"))+")"],
-          ["HBL NO.",g("sHb"),"SB NO.",g("sSb")],
-          ["SHIPPER",g("sSh"),"CONSIGNEE",g("sCn")],
-          ["VESSEL/VOY",g("sVs"),"SHIPPING LINE",g("sSl")],
-          ["LOADING PORT",g("sLp"),"DISCHARGE PORT",g("sDp")],
-          ["CONTAINERS",g("sCo"),"CARGO",g("sCg")],
-        ];
-        sRowsP2.forEach((row,ri)=>{
-          const ry=Y+ri*srh;
-          if(ri%2===0)box(ML,ry,CW,srh,LG);
-          sc(MG);doc.setLineWidth(.08);doc.rect(ML,ry,CW,srh,"S");
-          let cxp=ML;
-          row.forEach((cell,ci)=>{
-            const cw=scw[Math.min(ci,3)];
-            if(ci%2===0){fn(5.5,"bold");tc(N);}else{fn(5.5,"normal");tc(BK);}
-            tx(cell,cxp+1.5,ry+srh-1.3,"left",cw-2);
-            cxp+=cw;
-          });
-        });
-        Y+=sRowsP2.length*srh+1;
-        box(ML,Y,CW,4.8,LG);sc(MG);doc.setLineWidth(.15);doc.rect(ML,Y,CW,4.8,"S");
-        fn(6,"bold");tc(BK);
-        doc.text("SUB TOTAL",ML+CW-cc[12].w-cc[11].w-cc[10].w-1.5,Y+3.4,{align:"right"});
-        doc.text(fmt(si),ML+CW-cc[12].w-1.5,Y+3.4,{align:"right"});
-        doc.text(fmt(st+si),ML+CW-1.5,Y+3.4,{align:"right"});
-        Y+=5.8;
-      }
-
-      // BOTTOM
-      const c1=82,c2=72,c3=CW-c1-c2-4;
-      const bH=PH-Y-9;
-
-      // SAC block
-      box(ML,Y,c1,bH,[248,249,255]);
-      fn(6,"bold");tc(N);doc.text("SAC/HSN BREAKUP",ML+c1/2,Y+4,{align:"center"});
-      if(!proforma&&taxTypeVal==="cgst_sgst"){
-        const sh2=["SAC","GST%","TAXABLE","CGST","SGST"],sw2=[16,11,22,16,16];
-        box(ML+1,Y+5.5,c1-2,4.5,N);
-        let sx2=ML+1;
-        sh2.forEach((h,i)=>{fn(5,"bold");tc(W);doc.text(h,sx2+sw2[i]/2,Y+8.5,{align:"center"});sx2+=sw2[i];});
-        Object.entries(sm).forEach(([sac,v],ri)=>{
-          const sry=Y+10+ri*4.5;if(ri%2===0)box(ML+1,sry,c1-2,4.5,LG);
-          sx2=ML+1;
-          const half=parseFloat((v.ig/2).toFixed(2));
-          [sac,String(v.pct),fmt(v.tx),fmt(half),fmt(half)].forEach((sv,ci)=>{
-            fn(5,"normal");tc(BK);doc.text(sv,sx2+sw2[ci]/2,sry+3.2,{align:"center",maxWidth:sw2[ci]-1});sx2+=sw2[ci];
-          });
-        });
-      } else if(!proforma){
-        const sh=["SAC","IGST%","TAXABLE","IGST"],sw=[20,13,26,20];
-        box(ML+1,Y+5.5,c1-2,4.5,N);
-        let sx=ML+1;
-        sh.forEach((h,i)=>{fn(5.5,"bold");tc(W);doc.text(h,sx+sw[i]/2,Y+8.5,{align:"center"});sx+=sw[i];});
-        Object.entries(sm).forEach(([sac,v],ri)=>{
-          const sry=Y+10+ri*4.5;if(ri%2===0)box(ML+1,sry,c1-2,4.5,LG);
-          sx=ML+1;[sac,String(v.pct),fmt(v.tx),fmt(v.ig)].forEach((sv,ci)=>{
-            fn(5.5,"normal");tc(BK);doc.text(sv,sx+sw[ci]/2,sry+3.2,{align:"center",maxWidth:sw[ci]-1});sx+=sw[ci];
-          });
-        });
-      }
-
-      // Payment details
-      const sacTableBottom=Y+10+Object.keys(sm).length*4.5+4;
-      const bky=sacTableBottom+2;
-      fn(6.5,"bold");tc(N);doc.text("PAYMENT DETAILS:",ML+3,bky);
-      fn(6,"normal");tc(BK);
-      doc.text("BENEFICIARY: FREIGHTYSH LLP",ML+3,bky+5);
-      doc.text("BANK: YES BANK",ML+3,bky+9.5);
-      doc.text("A/C NO.: 008127000000642",ML+3,bky+14);
-      doc.text("IFSC: YESB0000081",ML+3,bky+18.5);
-      doc.text("BRANCH: ROURKELA",ML+3,bky+22.5);
-      fn(5.5,"normal");tc(MD);
-      doc.text("TAX ON REVERSE CHARGES: INR 0.00",ML+3,bky+27);
-
-      // QR code
-      try{
-        const qrData=JSON.stringify({inv:g("iNo"),dt:gr("iDt"),gstin:"21AAKFF8134C1ZU",amt:gt});
-        const qrCanvas=document.getElementById("qrCanvas");
-        qrCanvas.width=200;qrCanvas.height=200;
-        const ctx=qrCanvas.getContext("2d");ctx.clearRect(0,0,200,200);
-        new QRCode(qrCanvas,{text:qrData,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});
-        const qrY=bky+32;
-        if(qrY+21<Y+bH-2)doc.addImage(qrCanvas.toDataURL("image/png"),"PNG",ML+2,qrY,20,20);
-      }catch(qrErr){/* QR optional */}
-
-      // Totals
-      const tx2=ML+c1+2;
-      const totLines=[];
-      totLines.push(["TOTAL AMOUNT BEFORE TAX",fmt(st)]);
-      if(!proforma){
-        if(taxTypeVal==="cgst_sgst"){
-          const half=parseFloat((si/2).toFixed(2));
-          totLines.push(["ADD : CGST",fmt(half)]);
-          totLines.push(["ADD : SGST",fmt(half)]);
-        } else {
-          totLines.push(["ADD : IGST",fmt(si)]);
-        }
-      }
-      totLines.push(["TOTAL INVOICE VALUE",fmt(rg)]);
-      totLines.push(["LESS : ADVANCE RECEIVED",fmt(adv)]);
-      if(tds>0)totLines.push(["LESS : TDS DEDUCTION",fmt(tds)]);
-      totLines.push(["ROUND-OFF","("+fmtI(Math.abs(ro))+")"]);
-      const totalRow=["TOTAL INVOICE VALUE",fmt(rg)];
-      const totalIdx=totLines.findIndex(l=>l[0]==="TOTAL INVOICE VALUE");
-      totLines.forEach(([l,v],i)=>{
-        const iy=Y+6+i*5.5;const isBold=(l==="TOTAL INVOICE VALUE");
-        fn(isBold?6.2:5.5,isBold?"bold":"normal");tc(isBold?N:BK);
-        doc.text(l,tx2+2,iy);doc.text("INR  "+v,tx2+c2-1.5,iy,{align:"right"});
-      });
-      const npy=Y+6+totLines.length*5.5+3;
-      box(tx2,npy-4,c2,7.5,N);fn(7.5,"bold");tc(W);
-      doc.text("NET PAYABLE",tx2+2,npy);doc.text("INR  "+fmtI(gt),tx2+c2-1.5,npy,{align:"right"});
-      fn(5.5,"normal");tc(MD);
-      doc.splitTextToSize("IN WORDS: "+n2w(Math.abs(gt))+" ONLY.",c2-3).forEach((w,i)=>doc.text(w,tx2+2,npy+10+i*4));
-
-      // Sig + Terms
-      const sigX=ML+c1+c2+4;
-      fn(6.5,"bold");tc(N);doc.text("FOR FREIGHTYSH LLP",sigX+c3/2,Y+5,{align:"center"});
-      if(!proforma){
-        doc.addImage("data:image/jpeg;base64,"+SIG,"JPEG",sigX+c3-44,Y+7,42,25);
-        sc(BK);doc.setLineWidth(.25);doc.line(sigX+2,Y+34,sigX+c3-2,Y+34);
-        fn(6.5,"bold");tc(BK);doc.text("AUTHORISED SIGNATORY",sigX+c3/2,Y+38,{align:"center"});
-      }
-      fn(5.5,"bold");tc(BK);doc.text("TERMS & CONDITIONS:",sigX+2,Y+44);
-      fn(5.5,"normal");tc(MD);
-      ["* DISCREPANCIES TO BE REPORTED WITHIN 7 DAYS.",
-       "* LATE PAYMENT ATTRACTS 24% P.A. INTEREST.",
-       "* GOVT. TAXES AS PER PREVAILING RATES.",
-       "* ALL DISPUTES: ROURKELA JURISDICTION."
-      ].forEach((t,i)=>doc.text(t,sigX+2,Y+49+i*4,{maxWidth:c3-3}));
-      if(proforma){
-        fn(6,"bold");tc([180,0,0]);
-        doc.text("THIS IS A PROFORMA INVOICE — NOT A TAX DOCUMENT",sigX+c3/2,Y+bH-4,{align:"center",maxWidth:c3-2});
-      }
-
-      // Watermark
-      if(printType!=="original"){
-        const wm=printType.toUpperCase();
-        const totalPages=doc.internal.getNumberOfPages();
-        for(let pg=1;pg<=totalPages;pg++){
-          doc.setPage(pg);
-          fn(48,"bold");doc.setTextColor(210,210,210);
-          doc.text(wm,PW/2,PH/2,{angle:45,align:"center"});
-        }
-        tc(BK);
-      }
-
-      // Footer
-      const fy=PH-5;sc(N);doc.setLineWidth(.5);doc.line(ML,fy-2,ML+CW,fy-2);
-      fn(5.5,"normal");tc(MD);
-      doc.text("E & O.E",ML,fy+1.5);
-      const pageLabel=onPage2?"PAGE: 2/2":"PAGE: 1/1";
-      const footerRight=proforma
-        ?"** PROFORMA INVOICE — NOT A TAX DOCUMENT **  |  "+pageLabel
-        :"** COMPUTER-GENERATED INVOICE **  |  ORIGINAL FOR RECIPIENT  |  "+pageLabel;
-      doc.text(footerRight,ML+CW,fy+1.5,{align:"right"});
-
-      if(returnDoc&&onDoc){onDoc(doc);return;}
-
-      const fname=(g("iNo")||"FSH-INVOICE").replace(/\//g,"-")+".pdf";
-      const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if(isMobile){
-        const blob=doc.output("blob");
-        const url=URL.createObjectURL(blob);
-        const a=document.createElement("a");
-        a.href=url; a.target="_blank"; a.rel="noopener";
-        document.body.appendChild(a); a.click();
-        setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},3000);
-        toast("PDF opened — tap Share → Save to Files","ok");
-      } else {
-        doc.save(fname);
-        toast("PDF downloaded!","ok");
-      }
-
-      if(!proforma){
-        LS.set("lastInvNo",g("iNo"));
-        pushToRegister({invNo:g("iNo"),customer:g("cNm"),amount:gt,date:gr("iDt"),type:"Tax Invoice"});
-        LS.set("taxDraft",null);
-      }
-    }catch(e){console.error(e);toast("Error: "+e.message,"err");}
-    finally{
-      btn.disabled=false;
-      btn.textContent=returnDoc?"👁 Preview":"⬇ Download Invoice (PDF)";
-      if(!returnDoc)btn.onclick=makePDF;
+    function drawFooter(pg,total){
+      const fy=PH-6;hline(ML,fy-2.4,ML+CW,NAVY,0.5);hline(ML,fy-1.8,ML+CW,ORANGE,0.22);
+      fn(5.6,"normal");tc(MUTED);
+      doc.text("E & O.E   |   Computer-generated invoice",ML,fy+1.4);
+      doc.text("Keep it moving. Keep it Freightysh.",PW/2,fy+1.4,{align:"center"});
+      const lab=proforma?"Proforma - Not a Tax Document":"Original for Recipient";
+      doc.text(lab+"   |   Page "+pg+" / "+total,PW-MR,fy+1.4,{align:"right"});
     }
+
+    rect(0,0,PW,3.2,NAVY); rect(0,3.2,PW,1.1,ORANGE);
+
+    let Y=10;
+    doc.addImage("data:image/jpeg;base64,"+LOGO,"JPEG",ML,Y,19,19);
+    const ix=ML+24;
+    fn(13.5,"bold");tc(NAVY);doc.text("FREIGHTYSH LLP",ix,Y+5.4);
+    fn(6,"bold");tc(ORANGE);doc.text("FREIGHT FORWARDING  -  LOGISTICS SOLUTIONS",ix,Y+9.4);
+    fn(6.6,"normal");tc(MUTED);
+    doc.text("C/308 Koelnagar, Rourkela, Odisha - 769014",ix,Y+13.4);
+    doc.text("info@freightysh.in    |    +91 70000 70408",ix,Y+16.9);
+    fn(17,"bold");tc(NAVY);doc.text(title,PW-MR,Y+5,{align:"right"});
+    const tw=doc.getTextWidth(title);
+    hline(PW-MR-tw,Y+7.2,PW-MR,ORANGE,0.7);
+    fn(6.3,"normal");tc(MUTED);
+    doc.text("GSTIN: 21AAKFF8134C1ZU",PW-MR,Y+11.6,{align:"right"});
+    doc.text("PAN: AAKFF8134C    |    SAC: 9965 / 9967",PW-MR,Y+15.1,{align:"right"});
+    doc.text("State: [21] Odisha",PW-MR,Y+18.6,{align:"right"});
+    Y+=22; hline(ML,Y,ML+CW,NAVY,0.5); hline(ML,Y+0.6,ML+CW,ORANGE,0.22); Y+=4;
+
+    const gap=4, halfW=(CW-gap)/2, blX=ML, mtX=ML+halfW+gap, blockH=26;
+    rect(blX,Y,halfW,blockH,W,LINE,0.3);
+    rect(blX,Y,halfW,6,NAVY);
+    fn(6.4,"bold");tc(W);doc.text("BILL TO",blX+3,Y+4.1);
+    fn(5.8,"normal");tc([196,206,232]);clip("GSTIN  "+g("cGs"),blX+halfW-3,Y+4.1,"right",halfW*0.55);
+    fn(9,"bold");tc(INK);clip(g("cNm"),blX+3,Y+11.2,"left",halfW-6);
+    fn(6.5,"normal");tc(INK);
+    doc.splitTextToSize(g("cAd"),halfW-6).slice(0,2).forEach((l,i)=>doc.text(l,blX+3,Y+15.4+i*3.6));
+    fn(6.1,"normal");tc(MUTED);
+    doc.text("State: "+g("cSt")+"  ["+g("cSc")+"]      PAN: "+g("cPn"),blX+3,Y+23.6);
+
+    rect(mtX,Y,halfW,blockH,W,LINE,0.3);
+    rect(mtX,Y,halfW,6,NAVY);
+    fn(6.4,"bold");tc(W);doc.text("INVOICE DETAILS",mtX+3,Y+4.1);
+    const meta=[["Invoice No.",g("iNo")],["Invoice Date",fd(gr("iDt"))],
+      ["Due Date",fd(gr("iDd"))],["Place of Supply","["+g("cSc")+"] "+g("cSt")],
+      ["Shipment Type",g("iSt")],["Shipper Ref",g("iSr")],
+      ["Incoterms",g("sIn")],["1 USD =","INR "+usd.toFixed(2)]];
+    const mcw=halfW/2, mrh=(blockH-6)/4;
+    meta.forEach((m,i)=>{
+      const col=i%2,row=Math.floor(i/2),cx=mtX+col*mcw,cy=Y+6+row*mrh;
+      if(row%2===0)rect(cx,cy,mcw,mrh,PANEL);
+      fn(5.2,"bold");tc(MUTED);doc.text(m[0].toUpperCase(),cx+2.6,cy+2.4);
+      fn(6.5,"bold");tc(INK);clip(m[1],cx+2.6,cy+4.7,"left",mcw-4);
+    });
+    vline(mtX+mcw,Y+6,Y+blockH,LINE,0.3);
+    Y+=blockH+4.5;
+
+    fn(6.4,"bold");tc(NAVY);doc.text("SHIPMENT & ROUTING DETAILS",ML,Y);
+    hline(ML+doc.getTextWidth("SHIPMENT & ROUTING DETAILS")+4,Y-1,ML+CW,LINE,0.3);
+    Y+=2.5;
+    const sRows=[
+      ["Cargo Type",g("sCt"),"MBL No.",g("sMb")+"  ("+fd(gr("sMd"))+")"],
+      ["HBL No.",g("sHb"),"SB No.",g("sSb")],
+      ["Shipper",g("sSh"),"Consignee",g("sCn")],
+      ["Packages",g("sPk"),"Gross Wt.",g("sGw")],
+      ["Volume",g("sVl"),"Net Wt.",g("sNw")],
+      ["Vessel / Voyage",g("sVs"),"Shipping Line",g("sSl")],
+      ["Loading Port",g("sLp"),"Discharge Port",g("sDp")],
+      ["Place of Receipt",g("sPr"),"Place of Delivery",g("sPd")],
+      ["Container No.",g("sCo"),"Cargo",g("sCg")]];
+    const srh=3.9, halfC=CW/2, scol=[27,halfC-27,27,halfC-27];
+    const sTop=Y;
+    sRows.forEach((row,ri)=>{
+      const ry=Y+ri*srh;
+      if(ri%2===1)rect(ML,ry,CW,srh,PANEL);
+      let cx=ML;
+      row.forEach((cell,ci)=>{
+        const cw=scol[ci];
+        if(ci%2===0){fn(5.4,"bold");tc(MUTED);clip(cell.toUpperCase(),cx+2.2,ry+srh-1.3,"left",cw-3);}
+        else{fn(6.2,"normal");tc(INK);clip(cell,cx+1.5,ry+srh-1.3,"left",cw-3);}
+        cx+=cw;
+      });
+    });
+    rect(ML,sTop,CW,srh*sRows.length,null,LINE,0.3);
+    vline(ML+halfC,sTop,sTop+srh*sRows.length,LINE,0.3);
+    Y+=srh*sRows.length+4.5;
+
+    const comp=calc();
+    const st=parseFloat(comp.reduce((s,c)=>s+c.taxable,0).toFixed(2));
+    const sigst=proforma?0:parseFloat(comp.reduce((s,c)=>s+c.igstAmt,0).toFixed(2));
+    const rg=st+sigst, roundedInv=Math.round(rg), ro=parseFloat((roundedInv-rg).toFixed(2));
+    const gt=Math.round(roundedInv-adv-tds);
+    const usdTotalAmt=parseFloat(comp.filter(r=>r.cur==="USD").reduce((s,r)=>s+r.amtCur,0).toFixed(2));
+    const sm={};
+    if(!proforma)comp.forEach(c=>{if(!sm[c.sac])sm[c.sac]={pct:c.igst,tx:0,ig:0};sm[c.sac].tx+=c.taxable;sm[c.sac].ig+=c.igstAmt;});
+    const cg=taxTypeVal==="cgst_sgst";
+    const gstHdr=cg?"GST %":"IGST %", gstAmtHdr=cg?"GST AMT":"IGST AMT";
+
+    fn(6.4,"bold");tc(NAVY);doc.text("CHARGES",ML,Y);
+    hline(ML+doc.getTextWidth("CHARGES")+4,Y-1,ML+CW,LINE,0.3);
+    Y+=2.5;
+    const cols=[{h:"#",w:8,a:"center"},{h:"DESCRIPTION",w:54,a:"left"},{h:"SAC",w:16,a:"center"},
+      {h:"CUR",w:11,a:"center"},{h:"RATE",w:22,a:"right"},{h:"QTY",w:10,a:"center"},
+      {h:"AMOUNT",w:22,a:"right"},{h:"EX.RATE",w:16,a:"right"},{h:"TYPE",w:10,a:"center"},
+      {h:"TAXABLE (INR)",w:28,a:"right"},{h:gstHdr,w:13,a:"center"},{h:gstAmtHdr,w:22,a:"right"},{h:"TOTAL (INR)",w:0,a:"right"}];
+    cols[12].w=CW-cols.slice(0,12).reduce((s,c)=>s+c.w,0);
+    const hh=6.2;
+    rect(ML,Y,CW,hh,NAVY);
+    let cx=ML;
+    cols.forEach(c=>{fn(5.6,"bold");tc(W);const px=c.a==="right"?cx+c.w-2:c.a==="center"?cx+c.w/2:cx+2;doc.text(c.h,px,Y+4,{align:c.a});cx+=c.w;});
+    Y+=hh;
+    const drh=5.2, chTop=Y;
+    comp.forEach((c,ri)=>{
+      const ry=Y+ri*drh;
+      if(ri%2===1)rect(ML,ry,CW,drh,PANEL);
+      const igstAmt=proforma?0:c.igstAmt;
+      const rowTotal=proforma?c.taxable:(c.taxable+igstAmt);
+      const vals=[String(ri+1),c.desc,c.sac,c.cur,fmt(c.rate),String(c.qty),fmt(c.amtCur),Number(c.ex).toFixed(2),c.type,fmt(c.taxable),proforma?"-":String(c.igst),fmt(igstAmt),fmt(rowTotal)];
+      cx=ML;
+      cols.forEach((col,ci)=>{
+        if(ci===1){fn(6.5,"bold");tc(INK);}else if(ci===12){fn(6.3,"bold");tc(NAVY);}else{fn(6.1,"normal");tc(INK);}
+        const px=col.a==="right"?cx+col.w-2:col.a==="center"?cx+col.w/2:cx+2;
+        clip(vals[ci],px,ry+drh-1.9,col.a,col.w-3);
+        cx+=col.w;
+      });
+    });
+    Y+=comp.length*drh;
+    rect(ML,chTop,CW,comp.length*drh,null,LINE,0.3);
+    rect(ML,Y,CW,6,SOFT,LINE,0.3);
+    const xTaxR=ML+cols.slice(0,10).reduce((s,c)=>s+c.w,0), xTotR=ML+CW;
+    fn(6.3,"bold");tc(NAVY);
+    doc.text("SUB TOTAL",xTaxR-cols[9].w-3,Y+4,{align:"right"});
+    doc.text(fmt(st),xTaxR-2,Y+4,{align:"right"});
+    doc.text(fmt(rg),xTotR-2,Y+4,{align:"right"});
+    if(usdTotalAmt>0){fn(5.3,"normal");tc(MUTED);doc.text("Incl. USD charges $"+fmt(usdTotalAmt)+" @ INR "+usd.toFixed(2),ML+3,Y+4);}
+    Y+=6+4.5;
+
+    const need=47;
+    let pageBroke=false;
+    if(PH-Y-9<need){
+      pageBroke=true;
+      doc.addPage();
+      rect(0,0,PW,3.2,NAVY); rect(0,3.2,PW,1.1,ORANGE);
+      Y=12;
+      doc.addImage("data:image/jpeg;base64,"+LOGO,"JPEG",ML,Y,15,15);
+      fn(12,"bold");tc(NAVY);doc.text("FREIGHTYSH LLP",ML+19,Y+6);
+      fn(6.5,"bold");tc(ORANGE);doc.text(title+"  -  CONTINUED",PW-MR,Y+6,{align:"right"});
+      Y+=17;hline(ML,Y,ML+CW,NAVY,0.5);Y+=5;
+    }
+
+    const by=Y, w1=92, c2X=ML+96, w2=78, c3X=ML+178, w3=CW-178;
+
+    fn(6.4,"bold");tc(NAVY);doc.text(proforma?"CHARGE SUMMARY":"SAC / HSN SUMMARY",ML,by+1);
+    let sy=by+3.5;
+    if(!proforma){
+      const sh=cg?["SAC","%","TAXABLE","CGST","SGST"]:["SAC","%","TAXABLE","IGST"];
+      const base=cg?[18,9,27,19,19]:[22,11,33,26];
+      const tot=base.reduce((a,b)=>a+b,0), sw=base.map(x=>x/tot*w1);
+      rect(ML,sy,w1,5,NAVY);let hx=ML;
+      sh.forEach((h,i)=>{fn(5.2,"bold");tc(W);doc.text(h,i===0?hx+2:hx+sw[i]/2,sy+3.4,{align:i===0?"left":"center"});hx+=sw[i];});
+      const sBodyTop=sy+5;sy=sBodyTop;
+      Object.entries(sm).forEach((e,ri)=>{
+        const sac=e[0],v=e[1];
+        if(ri%2===1)rect(ML,sy,w1,4.5,PANEL);
+        let vx=ML;const half=parseFloat((v.ig/2).toFixed(2));
+        const cells=cg?[sac,String(v.pct),fmt(v.tx),fmt(half),fmt(half)]:[sac,String(v.pct),fmt(v.tx),fmt(v.ig)];
+        cells.forEach((cv,ci)=>{fn(5.4,"normal");tc(INK);doc.text(cv,ci===0?vx+2:vx+sw[ci]/2,sy+3.1,{align:ci===0?"left":"center"});vx+=sw[ci];});
+        sy+=4.5;
+      });
+      rect(ML,by+3.5,w1,sy-(by+3.5),null,LINE,0.3);
+    }
+    const payTop=sy+3.5;
+    fn(6.4,"bold");tc(NAVY);doc.text("PAYMENT DETAILS",ML,payTop);
+    let py=payTop+4;
+    [["Beneficiary","FREIGHTYSH LLP"],["Bank","YES BANK"],["A/C No.","008127000000642"],["IFSC","YESB0000081"],["Branch","ROURKELA"]].forEach(p=>{
+      fn(5.8,"bold");tc(MUTED);doc.text(p[0],ML,py);fn(6,"normal");tc(INK);doc.text(p[1],ML+23,py);py+=3.8;
+    });
+    try{
+      const qrData=JSON.stringify({inv:g("iNo"),dt:gr("iDt"),gstin:"21AAKFF8134C1ZU",amt:gt});
+      const qc=document.getElementById("qrCanvas");qc.width=200;qc.height=200;qc.getContext("2d").clearRect(0,0,200,200);
+      new QRCode(qc,{text:qrData,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});
+      doc.addImage(qc.toDataURL("image/png"),"PNG",ML+w1-19,payTop+1,18,18);
+      fn(4.8,"normal");tc(MUTED);doc.text("Scan to verify",ML+w1-10,payTop+21.5,{align:"center"});
+    }catch(e){}
+
+    let ty=by;
+    const totLines=[["Total Amount Before Tax",fmt(st)]];
+    if(!proforma){
+      if(cg){const half=parseFloat((sigst/2).toFixed(2));totLines.push(["Add : CGST",fmt(half)],["Add : SGST",fmt(half)]);}
+      else totLines.push(["Add : IGST",fmt(sigst)]);
+    }
+    totLines.push(["Total Invoice Value",fmt(rg)]);
+    if(adv>0)totLines.push(["Less : Advance Received",fmt(adv)]);
+    if(tds>0)totLines.push(["Less : TDS Deduction",fmt(tds)]);
+    totLines.push(["Round-Off","( "+fmt(Math.abs(ro))+" )"]);
+    totLines.forEach((l,i)=>{
+      const ly=ty+4.5+i*4.8, strong=l[0]==="Total Invoice Value";
+      if(strong){hline(c2X,ly-3.2,c2X+w2,LINE,0.3);}
+      fn(strong?6.4:6,strong?"bold":"normal");tc(strong?NAVY:INK);
+      doc.text(l[0],c2X+1,ly);doc.text("INR  "+l[1],c2X+w2-1,ly,{align:"right"});
+      if(strong)hline(c2X,ly+1.6,c2X+w2,LINE,0.3);
+    });
+    const npy=ty+4.5+totLines.length*4.8+1.5;
+    rect(c2X,npy,w2,9,NAVY);
+    fn(7.6,"bold");tc(W);doc.text("NET PAYABLE",c2X+3,npy+5.8);
+    fn(8.6,"bold");doc.text("INR  "+fmtI(gt),c2X+w2-3,npy+5.8,{align:"right"});
+    fn(5.6,"italic");tc(MUTED);
+    doc.splitTextToSize("In words : "+n2w(Math.abs(gt))+" Only.",w2).forEach((wl,i)=>doc.text(wl,c2X+1,npy+13.6+i*3.6));
+
+    fn(6.4,"bold");tc(NAVY);doc.text("FOR FREIGHTYSH LLP",c3X+w3,by+5,{align:"right"});
+    if(!proforma)doc.addImage("data:image/jpeg;base64,"+SIG,"JPEG",c3X+w3-44,by+7,42,23);
+    hline(c3X+w3-48,by+32,c3X+w3,INK,0.3);
+    fn(6.3,"bold");tc(INK);doc.text("AUTHORISED SIGNATORY",c3X+w3,by+36,{align:"right"});
+    fn(5.6,"bold");tc(NAVY);doc.text("TERMS & CONDITIONS",c3X,by+42);
+    fn(5.3,"normal");tc(MUTED);
+    doc.splitTextToSize("Discrepancies within 7 days  -  24% p.a. on late payment  -  Govt. taxes as applicable  -  All disputes subject to Rourkela jurisdiction.",w3).slice(0,2).forEach((t,i)=>doc.text(t,c3X,by+46+i*3.4));
+
+    if(proforma){fn(6,"bold");tc([176,28,28]);doc.text("THIS IS A PROFORMA INVOICE - NOT A TAX DOCUMENT",PW/2,PH-12,{align:"center"});}
+
+    const tp=doc.internal.getNumberOfPages();
+    for(let p=1;p<=tp;p++){doc.setPage(p);drawFooter(p,tp);}
+    if(printType!=="original"){
+      for(let p=1;p<=tp;p++){doc.setPage(p);fn(54,"bold");doc.setTextColor(225,228,238);doc.text(printType.toUpperCase(),PW/2,PH/2,{angle:30,align:"center"});}
+      tc(INK);
+    }
+
+    if(returnDoc&&onDoc){onDoc(doc);if(btn){btn.disabled=false;btn.textContent="Preview";btn.onclick=makePDF;}return;}
+
+    const fname=(g("iNo")||"FSH-INVOICE").split("/").join("-")+".pdf";
+    const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if(isMobile){
+      const blob=doc.output("blob"),url=URL.createObjectURL(blob);
+      const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener";
+      document.body.appendChild(a);a.click();
+      setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},3000);
+      toast("PDF opened - tap Share to Save to Files","ok");
+    }else{doc.save(fname);toast("PDF downloaded!","ok");}
+    if(!proforma){
+      LS.set("lastInvNo",g("iNo"));
+      pushToRegister({invNo:g("iNo"),customer:g("cNm"),amount:gt,date:gr("iDt"),type:"Tax Invoice"});
+      LS.set("taxDraft",null);
+    }
+   }catch(e){console.error(e);toast("Error: "+e.message,"err");}
+   finally{if(btn){btn.disabled=false;btn.textContent=returnDoc?"Preview":"Download Invoice (PDF)";if(!returnDoc)btn.onclick=makePDF;}}
   },100);
 }
 
@@ -983,7 +932,6 @@ function closePreview(){
 rebuildRows();
 
 
-// ── Invoice Type State ────────────────────────────────────────────────────
 let invType = 'tax';
 function setInvType(type) {
   invType = type;
@@ -1108,185 +1056,217 @@ function buildCommSummary() {
 }
 
 
-function makeCommissionPDF() {
+function makeCommissionPDF(returnDoc,onDoc){
   const btn=document.getElementById("genBtn");
-  btn.disabled=true;btn.textContent="⏳ Generating...";
-  setTimeout(()=>{try{
+  if(btn&&!returnDoc){btn.disabled=true;btn.textContent="Generating...";}
+  setTimeout(()=>{
+   try{
     const {jsPDF}=window.jspdf;
-    const doc=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
-    const PW=210,PH=297,ML=10,MR=10,CW=190;
-    const usdRate=parseFloat(document.getElementById("cUsdRate")?.value||94)||94;
-    const invoiceNo=document.getElementById("cInvNo")?.value||"";
-    const invDate=document.getElementById("cInvDate")?.value||"";
-    const dueDate=document.getElementById("cDueDate")?.value||"";
-    const toName=(document.getElementById("cToName")?.value||"").toUpperCase();
-    const toAddr=(document.getElementById("cToAddr")?.value||"").toUpperCase();
-    const toState=(document.getElementById("cToState")?.value||"").toUpperCase();
-    const toStateCode=document.getElementById("cToStateCode")?.value||"";
-    const toGstin=(document.getElementById("cToGstin")?.value||"").toUpperCase();
-    const toPan=(document.getElementById("cToPan")?.value||"").toUpperCase();
-    const taxType=document.getElementById("cTaxType")?.value||"igst";
+    const doc=new jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
+    const PW=297,PH=210,ML=12,MR=12,CW=PW-ML-MR;
+    const NAVY=[10,36,99],ORANGE=[232,99,26],INK=[24,28,52],MUTED=[112,120,146],
+          LINE=[221,226,238],PANEL=[244,247,252],SOFT=[255,242,233],W=[255,255,255];
+    const usd=parseFloat(gr("cUsdRate"))||94;
+    const taxType=(document.getElementById("cTaxType")?.value)||"igst";
+    const cg=taxType==="cgst_sgst";
     const SAC="998599";
-    const rows=commRows;
-    const totalUsd=rows.reduce((s,r)=>s+(parseFloat(r.usd)||0),0);
-    const taxable=parseFloat((totalUsd*usdRate).toFixed(2));
-    let tax1=0,tax2=0,lbl1="",lbl2="";
-    if(taxType==="igst"){tax1=parseFloat((taxable*0.18).toFixed(2));lbl1="IGST @ 18%";}
-    else{tax1=tax2=parseFloat((taxable*0.09).toFixed(2));lbl1="CGST @ 9%";lbl2="SGST @ 9%";}
-    const totalTax=parseFloat((tax1+tax2).toFixed(2));
-    const raw=taxable+totalTax;
-    const net=Math.round(raw);
-    const roff=parseFloat((net-raw).toFixed(2));
-    const fc=c=>doc.setFillColor(...c),sc=c=>doc.setDrawColor(...c),tc=c=>doc.setTextColor(...c);
-    const fn=(s,st="normal")=>{doc.setFontSize(s);doc.setFont("helvetica",st);};
-    const bx=(x,y,w,h,f,b,lw)=>{if(f){fc(f);doc.rect(x,y,w,h,"F");}sc(b||[210,210,210]);doc.setLineWidth(lw||0.15);doc.rect(x,y,w,h,"S");};
-    const hl=(x1,y1,x2,y2,c,w)=>{sc(c||[210,210,210]);doc.setLineWidth(w||0.2);doc.line(x1,y1,x2,y2);};
-    const ORG=[214,90,13],NAVY=[10,36,99],BK=[20,20,20],WHITE=[255,255,255];
-    const LGRAY=[249,249,249],MGRAY=[180,180,180],DGRAY=[80,80,80],BRD=[210,210,210];
+    const fc=c=>doc.setFillColor(c[0],c[1],c[2]), sc=c=>doc.setDrawColor(c[0],c[1],c[2]), tc=c=>doc.setTextColor(c[0],c[1],c[2]);
+    const fn=(s,st)=>{doc.setFontSize(s);doc.setFont("helvetica",st||"normal");};
+    const rect=(x,y,w,h,f,strokeC,lw)=>{if(f){fc(f);doc.rect(x,y,w,h,"F");} if(strokeC){sc(strokeC);doc.setLineWidth(lw||0.2);doc.rect(x,y,w,h,"S");}};
+    const hline=(x1,y,x2,c,lw)=>{sc(c);doc.setLineWidth(lw||0.2);doc.line(x1,y,x2,y);};
+    const vline=(x,y1,y2,c,lw)=>{sc(c);doc.setLineWidth(lw||0.2);doc.line(x,y1,x,y2);};
+    const clip=(t,x,y,a,mw)=>{const s=doc.splitTextToSize(String(t==null?"":t),mw||999);doc.text(s[0],x,y,{align:a||"left"});};
     const fmt=n=>Math.abs(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
     const fmtI=n=>Math.abs(n).toLocaleString("en-IN");
-    const fd=d=>{if(!d)return"-";const[y,m,dy]=d.split("-");const M=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];return dy+"-"+M[+m-1]+"-"+y;};
-    let Y=8;
-    // HEADER
-    doc.addImage("data:image/jpeg;base64,"+LOGO,"JPEG",ML,Y,24,24);
-    fn(13,"bold");tc(NAVY);doc.text("TAX INVOICE",PW/2,Y+8,{align:"center"});
-    fn(10,"bold");tc(BK);doc.text("FREIGHTYSH LLP",PW/2,Y+14,{align:"center"});
-    fn(7,"normal");tc(DGRAY);
-    doc.text("C/308 KOELNAGAR, ROURKELA, ODISHA - 769014",PW/2,Y+19.5,{align:"center"});
-    doc.text("EMAIL: INFO@FREIGHTYSH.IN  |  MOB: 7000070408",PW/2,Y+24,{align:"center"});
-    fn(6,"normal");tc(DGRAY);
-    doc.text("GSTIN: 21AAKFF8134C1ZU  |  PAN: AAKFF8134C  |  SAC: "+SAC,PW-MR,Y+10,{align:"right"});
-    Y+=27;hl(ML,Y,ML+CW,Y,ORG,0.8);Y+=1;hl(ML,Y,ML+CW,Y,NAVY,0.4);Y+=4;
-    fn(9,"bold");tc(ORG);doc.text("Commission Invoice",PW/2,Y+6,{align:"center"});
-    const tw=doc.getTextWidth("Commission Invoice");
-    hl(PW/2-tw/2-1,Y+7.5,PW/2+tw/2+1,Y+7.5,ORG,0.5);Y+=12;
-    // CUSTOMER + META
-    const LW=90,RW=CW-LW,RX=ML+LW;
-    bx(ML,Y,LW,6,BK,null);fn(6,"bold");tc(WHITE);doc.text("CUSTOMER",ML+2,Y+4.3);Y+=6;
-    const tnL=doc.splitTextToSize(toName,LW-4);
-    const tnH=Math.max(8,tnL.length*4+4);
-    bx(ML,Y,LW,tnH,[255,255,255],BRD,0.1);
-    fn(7,"bold");tc(BK);tnL.forEach((l,i)=>doc.text(l,ML+2,Y+5+i*4));Y+=tnH;
-    const adL=doc.splitTextToSize(toAddr,LW-4);
-    const adH=Math.max(7,adL.length*3.5+4);
-    bx(ML,Y,LW,adH,LGRAY,BRD,0.1);
-    fn(6,"normal");tc(BK);adL.forEach((l,i)=>doc.text(l,ML+2,Y+4+i*3.5));Y+=adH;
-    bx(ML,Y,LW,7,[255,255,255],BRD,0.1);
-    fn(5.5,"normal");tc(BK);doc.text("PAN: "+toPan+"  GSTIN: "+toGstin,ML+2,Y+4.5);Y+=7;
-    const leftBot=Y;
-    let RY=leftBot-tnH-adH-7-6;
-    bx(RX,RY,RW,7,ORG,null);fn(6.5,"bold");tc(WHITE);
-    doc.text("INVOICE NO: "+invoiceNo,RX+2,RY+5,{maxWidth:RW-3});RY+=7;
-    const rmeta=[["INVOICE DATE",fd(invDate),false],["DUE DATE",fd(dueDate),true],
-      ["PLACE OF SUPPLY","["+toStateCode+"] "+toState,false],["1 USD =","INR "+usdRate.toFixed(2),true],
-      ["SHIPMENT TYPE","SEA EXPORT",false],["SAC/HSN",SAC,true],
-      ["TAX TYPE",taxType==="igst"?"IGST @ 18%":"CGST + SGST @ 9% EACH",false],
-      ["NATURE","FREIGHT FORWARDING COMMISSION",true]];
-    rmeta.forEach(([l,v,sh])=>{
-      const rh=5.5;bx(RX,RY,RW,rh,sh?[255,237,213]:LGRAY,BRD,0.1);
-      fn(5.5,"bold");tc(BK);doc.text(l+" :",RX+2,RY+4);
-      fn(5.5,"normal");tc(BK);
-      doc.text(v,RX+2+doc.getTextWidth(l+" :")+1.5,RY+4,{maxWidth:RW-doc.getTextWidth(l+" :")-5});
-      RY+=rh;
+    const up=s=>String(s==null?"":s).toUpperCase();
+
+    function drawFooter(pg,total){
+      const fy=PH-6;hline(ML,fy-2.4,ML+CW,NAVY,0.5);hline(ML,fy-1.8,ML+CW,ORANGE,0.22);
+      fn(5.6,"normal");tc(MUTED);
+      doc.text("E & O.E   |   Computer-generated invoice",ML,fy+1.4);
+      doc.text("Keep it moving. Keep it Freightysh.",PW/2,fy+1.4,{align:"center"});
+      doc.text("Original for Recipient   |   Page "+pg+" / "+total,PW-MR,fy+1.4,{align:"right"});
+    }
+
+    rect(0,0,PW,3.2,NAVY); rect(0,3.2,PW,1.1,ORANGE);
+    let Y=10;
+    doc.addImage("data:image/jpeg;base64,"+LOGO,"JPEG",ML,Y,19,19);
+    const ix=ML+24;
+    fn(13.5,"bold");tc(NAVY);doc.text("FREIGHTYSH LLP",ix,Y+5.4);
+    fn(6,"bold");tc(ORANGE);doc.text("FREIGHT FORWARDING  -  LOGISTICS SOLUTIONS",ix,Y+9.4);
+    fn(6.6,"normal");tc(MUTED);
+    doc.text("C/308 Koelnagar, Rourkela, Odisha - 769014",ix,Y+13.4);
+    doc.text("info@freightysh.in    |    +91 70000 70408",ix,Y+16.9);
+    fn(17,"bold");tc(NAVY);doc.text("TAX INVOICE",PW-MR,Y+5,{align:"right"});
+    const tw=doc.getTextWidth("TAX INVOICE");
+    hline(PW-MR-tw,Y+7.2,PW-MR,ORANGE,0.7);
+    fn(6.2,"bold");tc(W);
+    const badge="COMMISSION INVOICE", bw=doc.getTextWidth(badge)+5;
+    rect(PW-MR-bw,Y+9.1,bw,5,ORANGE);doc.text(badge,PW-MR-bw/2,Y+12.6,{align:"center"});
+    fn(6.3,"normal");tc(MUTED);
+    doc.text("GSTIN: 21AAKFF8134C1ZU    |    PAN: AAKFF8134C",PW-MR,Y+18.6,{align:"right"});
+    Y+=22; hline(ML,Y,ML+CW,NAVY,0.5); hline(ML,Y+0.6,ML+CW,ORANGE,0.22); Y+=4;
+
+    const gap=4, halfW=(CW-gap)/2, blX=ML, mtX=ML+halfW+gap, blockH=26;
+    rect(blX,Y,halfW,blockH,W,LINE,0.3); rect(blX,Y,halfW,6,NAVY);
+    fn(6.4,"bold");tc(W);doc.text("BILL TO",blX+3,Y+4.1);
+    fn(5.8,"normal");tc([196,206,232]);clip("GSTIN  "+g("cToGstin"),blX+halfW-3,Y+4.1,"right",halfW*0.55);
+    fn(9,"bold");tc(INK);clip(g("cToName"),blX+3,Y+11.2,"left",halfW-6);
+    fn(6.5,"normal");tc(INK);
+    doc.splitTextToSize(g("cToAddr"),halfW-6).slice(0,2).forEach((l,i)=>doc.text(l,blX+3,Y+15.4+i*3.6));
+    fn(6.1,"normal");tc(MUTED);
+    doc.text("State: "+g("cToState")+"  ["+g("cToStateCode")+"]      PAN: "+g("cToPan"),blX+3,Y+23.6);
+
+    rect(mtX,Y,halfW,blockH,W,LINE,0.3); rect(mtX,Y,halfW,6,NAVY);
+    fn(6.4,"bold");tc(W);doc.text("INVOICE DETAILS",mtX+3,Y+4.1);
+    const meta=[["Invoice No.",g("cInvNo")],["Invoice Date",fd(gr("cInvDate"))],
+      ["Due Date",fd(gr("cDueDate"))],["Place of Supply","["+g("cToStateCode")+"] "+g("cToState")],
+      ["SAC / HSN",SAC],["1 USD =","INR "+usd.toFixed(2)],
+      ["Tax Type",cg?"CGST + SGST":"IGST @ 18%"],["Nature","FREIGHT FWDG. COMMISSION"]];
+    const mcw=halfW/2, mrh=(blockH-6)/4;
+    meta.forEach((m,i)=>{
+      const col=i%2,row=Math.floor(i/2),cx=mtX+col*mcw,cy=Y+6+row*mrh;
+      if(row%2===0)rect(cx,cy,mcw,mrh,PANEL);
+      fn(5.2,"bold");tc(MUTED);doc.text(m[0].toUpperCase(),cx+2.6,cy+2.4);
+      fn(6.5,"bold");tc(INK);clip(m[1],cx+2.6,cy+4.7,"left",mcw-4);
     });
-    Y=Math.max(leftBot,RY)+3;
-    // SHIPMENTS TABLE
-    const CWS=[7,22,17,11,22,35,22,22,11,12,12,CW-195];
-    const hdrs=["SL","INVOICE NUMBER","INV DATE","LINER","BOOKING REF","VESSEL / VOYAGE","PORT OF LOADING","PORT OF DESTINATION","CNTR","ETD","USD","INR"];
-    bx(ML,Y,CW,7,BK,null);let cx=ML;
-    hdrs.forEach((h,i)=>{
-      fn(5.5,"bold");tc(WHITE);
-      const isR=i>=10,isCtr=i===0||i===3||i===8||i===9;
-      const px=isR?cx+CWS[i]-1.5:isCtr?cx+CWS[i]/2:cx+1.5;
-      doc.text(h,px,Y+5,{align:isR?"right":isCtr?"center":"left",maxWidth:CWS[i]-2});
-      if(i<hdrs.length-1){sc([40,55,160]);doc.setLineWidth(0.08);doc.line(cx+CWS[i],Y+1,cx+CWS[i],Y+6);}
-      cx+=CWS[i];
-    });
-    Y+=7;
+    vline(mtX+mcw,Y+6,Y+blockH,LINE,0.3);
+    Y+=blockH+4.5;
+
+    fn(6.4,"bold");tc(NAVY);doc.text("COMMISSION - SHIPMENT WISE",ML,Y);
+    hline(ML+doc.getTextWidth("COMMISSION - SHIPMENT WISE")+4,Y-1,ML+CW,LINE,0.3);
+    Y+=2.5;
+    const cols=[{h:"#",w:10,a:"center"},{h:"INVOICE NUMBER",w:30,a:"left"},{h:"INV DATE",w:22,a:"center"},
+      {h:"LINER",w:16,a:"center"},{h:"BOOKING REF",w:26,a:"left"},{h:"VESSEL / VOYAGE",w:38,a:"left"},
+      {h:"PORT OF LOADING",w:28,a:"left"},{h:"PORT OF DEST.",w:28,a:"left"},{h:"CNTR",w:16,a:"center"},
+      {h:"ETD",w:18,a:"center"},{h:"USD",w:17,a:"right"},{h:"INR",w:0,a:"right"}];
+    cols[11].w=CW-cols.slice(0,11).reduce((s,c)=>s+c.w,0);
+    const hh=6.2;
+    rect(ML,Y,CW,hh,NAVY);let cx=ML;
+    cols.forEach(c=>{fn(5.5,"bold");tc(W);const px=c.a==="right"?cx+c.w-2:c.a==="center"?cx+c.w/2:cx+2;doc.text(c.h,px,Y+4,{align:c.a});cx+=c.w;});
+    Y+=hh;
+    const rows=commRows;
+    const drh=6, chTop=Y;
+    let totalUsd=0;
     rows.forEach((r,ri)=>{
-      const shade=ri%2!==0;
-      const inr=parseFloat(((parseFloat(r.usd)||0)*usdRate).toFixed(2));
-      const vL=doc.splitTextToSize((r.vessel||"-").toUpperCase(),CWS[5]-2);
-      const rh=Math.max(8,vL.length*3.5+4);
-      bx(ML,Y,CW,rh,shade?[255,237,213]:[255,255,255],BRD,0.1);
-      fn(6,"normal");tc(BK);cx=ML;
-      const vals=[String(ri+1),r.invNo||"-",fd(r.invDate),r.liner||"-",r.booking||"-",
-        (r.vessel||"-").toUpperCase(),(r.pol||"-").toUpperCase(),
-        (r.pod||"-").toUpperCase(),r.cntr||"-",r.etd||"-",
-        "$"+(parseFloat(r.usd)||0).toFixed(2),"₹"+fmt(inr)];
-      vals.forEach((v,vi)=>{
-        const isR=vi>=10,isCtr=vi===0||vi===3||vi===8||vi===9;
-        const px=isR?cx+CWS[vi]-1.5:isCtr?cx+CWS[vi]/2:cx+1.5;
-        doc.splitTextToSize(v,CWS[vi]-2).forEach((l,li)=>
-          doc.text(l,px,Y+4.5+li*3.5,{align:isR?"right":isCtr?"center":"left"}));
-        cx+=CWS[vi];
+      const ry=Y+ri*drh;
+      if(ri%2===1)rect(ML,ry,CW,drh,PANEL);
+      const u=parseFloat(r.usd)||0; totalUsd+=u;
+      const inr=parseFloat((u*usd).toFixed(2));
+      const vals=[String(ri+1),up(r.invNo)||"-",fd(r.invDate),up(r.liner)||"-",up(r.booking)||"-",
+        up(r.vessel)||"-",up(r.pol)||"-",up(r.pod)||"-",up(r.cntr)||"-",r.etd||"-",
+        "$"+u.toFixed(2),fmt(inr)];
+      cx=ML;
+      cols.forEach((col,ci)=>{
+        if(ci===1){fn(6.4,"bold");tc(INK);}else if(ci===11){fn(6.3,"bold");tc(NAVY);}else{fn(6,"normal");tc(INK);}
+        const px=col.a==="right"?cx+col.w-2:col.a==="center"?cx+col.w/2:cx+2;
+        clip(vals[ci],px,ry+drh-2.1,col.a,col.w-3);
+        cx+=col.w;
       });
-      Y+=rh;
     });
-    bx(ML,Y,CW,7,NAVY,null);fn(6,"bold");tc(WHITE);
-    doc.text("TOTAL — "+rows.length+" BOOKING(S)",ML+2,Y+4.8);
-    doc.text("$"+fmt(totalUsd),ML+CW-CWS[11]-1.5,Y+4.8,{align:"right"});
-    doc.text("₹"+fmt(taxable),ML+CW-1.5,Y+4.8,{align:"right"});
-    Y+=8;fn(6,"italic");tc(DGRAY);doc.text("E. & O.E",ML+CW,Y+4,{align:"right"});Y+=7;
-    hl(ML,Y,ML+CW,Y,MGRAY,0.2);Y+=3;
-    // BOTTOM
-    const BW=88,SW=CW-BW-3,SX=ML+BW+3,botY=Y;
-    bx(ML,Y,BW,6,BK,null);fn(6.5,"bold");tc(WHITE);doc.text("PAYMENT DETAILS",ML+2,Y+4.3);Y+=6;
-    [["BENEFICIARY","FREIGHTYSH LLP"],["BANK","YES BANK"],
-     ["A/C NO.","008127000000642"],["IFSC","YESB0000081  |  BRANCH: ROURKELA"]
-    ].forEach(([l,v],i)=>{
-      const rh=5.5;bx(ML,Y,BW,rh,i%2===0?LGRAY:[255,255,255],BRD,0.1);
-      fn(5.5,"bold");tc(BK);doc.text(l+" :",ML+2,Y+3.8);
-      fn(5.5,"normal");tc(DGRAY);
-      doc.text(v,ML+2+doc.getTextWidth(l+" :")+1.5,Y+3.8,{maxWidth:BW-doc.getTextWidth(l+" :")-4});
-      Y+=rh;
+    Y+=rows.length*drh;
+    rect(ML,chTop,CW,rows.length*drh,null,LINE,0.3);
+    const taxable=parseFloat((totalUsd*usd).toFixed(2));
+    let tax1=0,tax2=0,lbl1="",lbl2="";
+    if(cg){tax1=tax2=parseFloat((taxable*0.09).toFixed(2));lbl1="Add : CGST @ 9%";lbl2="Add : SGST @ 9%";}
+    else{tax1=parseFloat((taxable*0.18).toFixed(2));lbl1="Add : IGST @ 18%";}
+    const totalTax=parseFloat((tax1+tax2).toFixed(2));
+    const rg=taxable+totalTax, net=Math.round(rg), ro=parseFloat((net-rg).toFixed(2));
+    rect(ML,Y,CW,6,SOFT,LINE,0.3);
+    const xUsdR=ML+cols.slice(0,11).reduce((s,c)=>s+c.w,0), xInrR=ML+CW;
+    fn(6.3,"bold");tc(NAVY);
+    doc.text("TOTAL  -  "+rows.length+" SHIPMENT(S)",ML+3,Y+4);
+    doc.text("$"+fmt(totalUsd),xUsdR-2,Y+4,{align:"right"});
+    doc.text(fmt(taxable),xInrR-2,Y+4,{align:"right"});
+    Y+=6+4.5;
+
+    const need=47;
+    if(PH-Y-9<need){
+      doc.addPage();
+      rect(0,0,PW,3.2,NAVY); rect(0,3.2,PW,1.1,ORANGE);
+      Y=12;
+      doc.addImage("data:image/jpeg;base64,"+LOGO,"JPEG",ML,Y,15,15);
+      fn(12,"bold");tc(NAVY);doc.text("FREIGHTYSH LLP",ML+19,Y+6);
+      fn(6.5,"bold");tc(ORANGE);doc.text("COMMISSION INVOICE  -  CONTINUED",PW-MR,Y+6,{align:"right"});
+      Y+=17;hline(ML,Y,ML+CW,NAVY,0.5);Y+=5;
+    }
+
+    const by=Y, w1=92, c2X=ML+96, w2=78, c3X=ML+178, w3=CW-178;
+
+    fn(6.4,"bold");tc(NAVY);doc.text("SAC / HSN SUMMARY",ML,by+1);
+    let sy=by+3.5;
+    const sh=cg?["SAC","%","TAXABLE","CGST","SGST"]:["SAC","%","TAXABLE","IGST"];
+    const base=cg?[20,9,27,18,18]:[24,11,33,24];
+    const tot=base.reduce((a,b)=>a+b,0), sw=base.map(x=>x/tot*w1);
+    rect(ML,sy,w1,5,NAVY);let hx=ML;
+    sh.forEach((h,i)=>{fn(5.2,"bold");tc(W);doc.text(h,i===0?hx+2:hx+sw[i]/2,sy+3.4,{align:i===0?"left":"center"});hx+=sw[i];});
+    sy+=5;
+    rect(ML,sy,w1,4.6,PANEL);
+    let vx=ML;
+    const srow=cg?[SAC,"9",fmt(taxable),fmt(tax1),fmt(tax2)]:[SAC,"18",fmt(taxable),fmt(tax1)];
+    srow.forEach((cv,ci)=>{fn(5.4,"normal");tc(INK);doc.text(cv,ci===0?vx+2:vx+sw[ci]/2,sy+3.1,{align:ci===0?"left":"center"});vx+=sw[ci];});
+    rect(ML,by+3.5,w1,(sy+4.6)-(by+3.5),null,LINE,0.3);
+    sy+=4.6+3.5;
+
+    fn(6.4,"bold");tc(NAVY);doc.text("PAYMENT DETAILS",ML,sy);
+    let py=sy+4;
+    [["Beneficiary","FREIGHTYSH LLP"],["Bank","YES BANK"],["A/C No.","008127000000642"],["IFSC","YESB0000081"],["Branch","ROURKELA"]].forEach(p=>{
+      fn(5.8,"bold");tc(MUTED);doc.text(p[0],ML,py);fn(6,"normal");tc(INK);doc.text(p[1],ML+23,py);py+=3.8;
     });
-    Y+=3;fn(6,"bold");tc(NAVY);doc.text("SAC/HSN BREAKUP",ML+2,Y+4);Y+=7;
-    fn(5.5,"normal");tc(BK);
-    doc.text("SAC: "+SAC+"  |  "+lbl1+": ₹"+fmt(tax1),ML+2,Y);
-    if(lbl2)doc.text(lbl2+": ₹"+fmt(tax2),ML+2,Y+4.5);
-    doc.text("Taxable: ₹"+fmt(taxable)+"  |  Tax on Reverse Charges: NIL",ML+2,Y+(lbl2?9:4.5));
-    Y+=lbl2?14:9;fn(5.5,"normal");tc(DGRAY);doc.text("TDS @ 2% (If Applicable): ₹"+fmt(taxable*0.02),ML+2,Y);
-    // Totals + signature
-    let TY=botY;
-    const totLines=[["TOTAL AMOUNT BEFORE TAX","INR "+fmt(taxable)],
-      [lbl1,"INR "+fmt(tax1)],
-      ...(lbl2?[[lbl2,"INR "+fmt(tax2)]]:[]),
-      ["LESS: ADVANCE RECEIVED","INR 0.00"],
-      ["ROUND-OFF","INR ("+fmt(Math.abs(roff))+")"]];
-    totLines.forEach(([l,v])=>{
-      fn(6,"normal");tc(BK);
-      doc.text(v,SX+SW,TY+4,{align:"right"});doc.text(l,SX+2,TY+4);TY+=5.5;
+    fn(5.4,"italic");tc(MUTED);doc.text("Tax on reverse charges: NIL    |    TDS @ 2% if applicable: INR "+fmt(taxable*0.02),ML,py+1.5);
+    try{
+      const qrData=JSON.stringify({inv:g("cInvNo"),dt:gr("cInvDate"),gstin:"21AAKFF8134C1ZU",amt:net});
+      const qc=document.getElementById("qrCanvas");qc.width=200;qc.height=200;qc.getContext("2d").clearRect(0,0,200,200);
+      new QRCode(qc,{text:qrData,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});
+      doc.addImage(qc.toDataURL("image/png"),"PNG",ML+w1-19,by+3.5,18,18);
+    }catch(e){}
+
+    let ty=by;
+    const totLines=[["Total Amount Before Tax",fmt(taxable)],[lbl1,fmt(tax1)]];
+    if(cg)totLines.push([lbl2,fmt(tax2)]);
+    totLines.push(["Total Invoice Value",fmt(rg)]);
+    totLines.push(["Round-Off","( "+fmt(Math.abs(ro))+" )"]);
+    totLines.forEach((l,i)=>{
+      const ly=ty+4.5+i*4.8, strong=l[0]==="Total Invoice Value";
+      if(strong)hline(c2X,ly-3.2,c2X+w2,LINE,0.3);
+      fn(strong?6.4:6,strong?"bold":"normal");tc(strong?NAVY:INK);
+      doc.text(l[0],c2X+1,ly);doc.text("INR  "+l[1],c2X+w2-1,ly,{align:"right"});
+      if(strong)hline(c2X,ly+1.6,c2X+w2,LINE,0.3);
     });
-    bx(SX,TY,SW,8,NAVY,null);fn(7.5,"bold");tc(WHITE);
-    doc.text("NET PAYABLE",SX+2,TY+5.5);doc.text("INR "+fmtI(net),SX+SW-1.5,TY+5.5,{align:"right"});TY+=9;
-    fn(5.5,"normal");tc(DGRAY);
-    doc.splitTextToSize("IN WORDS: "+n2w(net)+" ONLY.",SW-2).forEach((w,i)=>doc.text(w,SX+2,TY+i*3.8));TY+=8;
-    fn(7,"bold");tc(NAVY);doc.text("FOR FREIGHTYSH LLP",SX+SW,TY+5,{align:"right"});
-    doc.addImage("data:image/jpeg;base64,"+SIG,"JPEG",SX+SW-58,TY+7,58,30);
-    hl(SX+2,TY+39,SX+SW,TY+39,MGRAY,0.35);
-    fn(6.5,"bold");tc(BK);doc.text("AUTHORISED SIGNATORY",SX+SW,TY+43.5,{align:"right"});
-    const fY=PH-8;hl(ML,fY-1,ML+CW,fY-1,ORG,0.8);
-    fn(5.5,"normal");tc(DGRAY);
-    doc.text("** COMPUTER-GENERATED INVOICE **  |  KEEP IT MOVING. KEEP IT FREIGHTYSH  |  info@freightysh.in",PW/2,fY+3,{align:"center"});
-    const tcY=fY-20;hl(ML,tcY,ML+CW,tcY,MGRAY,0.15);
-    fn(5.5,"bold");tc(BK);doc.text("TERMS & CONDITIONS",ML,tcY+4);fn(5,"normal");tc(DGRAY);
-    ["* DISCREPANCIES TO BE REPORTED WITHIN 7 DAYS.","* LATE PAYMENT ATTRACTS 24% P.A. INTEREST.",
-     "* GOVT. TAXES AS PER PREVAILING RATES.","* ALL DISPUTES: ROURKELA JURISDICTION."
-    ].forEach((t,i)=>doc.text(t,ML,tcY+8+i*3.5));
-    doc.text("E & O.E",ML,fY-1);
-    const fname=(invoiceNo||"FSH-COMMISSION").replace(/\//g,"-")+".pdf";
+    const npy=ty+4.5+totLines.length*4.8+1.5;
+    rect(c2X,npy,w2,9,NAVY);
+    fn(7.6,"bold");tc(W);doc.text("NET PAYABLE",c2X+3,npy+5.8);
+    fn(8.6,"bold");doc.text("INR  "+fmtI(net),c2X+w2-3,npy+5.8,{align:"right"});
+    fn(5.6,"italic");tc(MUTED);
+    doc.splitTextToSize("In words : "+n2w(Math.abs(net))+" Only.",w2).forEach((wl,i)=>doc.text(wl,c2X+1,npy+13.6+i*3.6));
+
+    fn(6.4,"bold");tc(NAVY);doc.text("FOR FREIGHTYSH LLP",c3X+w3,by+5,{align:"right"});
+    doc.addImage("data:image/jpeg;base64,"+SIG,"JPEG",c3X+w3-44,by+7,42,23);
+    hline(c3X+w3-48,by+32,c3X+w3,INK,0.3);
+    fn(6.3,"bold");tc(INK);doc.text("AUTHORISED SIGNATORY",c3X+w3,by+36,{align:"right"});
+    fn(5.6,"bold");tc(NAVY);doc.text("TERMS & CONDITIONS",c3X,by+42);
+    fn(5.3,"normal");tc(MUTED);
+    doc.splitTextToSize("Discrepancies within 7 days  -  24% p.a. on late payment  -  Govt. taxes as applicable  -  All disputes subject to Rourkela jurisdiction.",w3).slice(0,2).forEach((t,i)=>doc.text(t,c3X,by+46+i*3.4));
+
+    const tp=doc.internal.getNumberOfPages();
+    for(let p=1;p<=tp;p++){doc.setPage(p);drawFooter(p,tp);}
+
+    if(returnDoc&&onDoc){onDoc(doc);if(btn)btn.textContent="Download Commission Invoice (PDF)";return;}
+
+    const fname=(g("cInvNo")||"FSH-COMMISSION").split("/").join("-")+".pdf";
     const isMobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    if(isMobile){const blob=doc.output("blob"),url=URL.createObjectURL(blob);
+    if(isMobile){
+      const blob=doc.output("blob"),url=URL.createObjectURL(blob);
       const a=document.createElement("a");a.href=url;a.target="_blank";a.rel="noopener";
       document.body.appendChild(a);a.click();
       setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},3000);
-      toast("PDF opened — tap Share → Save to Files","ok");
+      toast("PDF opened - tap Share to Save to Files","ok");
     }else{doc.save(fname);toast("PDF downloaded!","ok");}
-    LS.set("lastInvNo",invoiceNo);
-    pushToRegister({invNo:invoiceNo,customer:toName,amount:net,date:invDate,type:"Commission Invoice"});
-  }catch(e){console.error(e);toast("Error: "+e.message,"err");}
-  finally{btn.disabled=false;btn.textContent="⬇ Download Commission Invoice (PDF)";}},100);
+    LS.set("lastInvNo",g("cInvNo"));
+    pushToRegister({invNo:g("cInvNo"),customer:g("cToName"),amount:net,date:gr("cInvDate"),type:"Commission Invoice"});
+   }catch(e){console.error(e);toast("Error: "+e.message,"err");}
+   finally{if(btn&&!returnDoc){btn.disabled=false;btn.textContent="Download Commission Invoice (PDF)";}}
+  },100);
 }
 
 // ── Invoice Number Auto-increment ──────────────────────────────────────
