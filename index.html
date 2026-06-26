@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Freightysh Invoice Generator</title>
+<title>Freightysh | Invoice Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -11,637 +11,1229 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
+
 :root{
-  --navy:#0A2463;--navy-2:#16357f;--navy-ink:#0c1d4a;
-  --orange:#E8631A;--orange-2:#cf550f;--soft:#FFF1E8;
-  --light:#EEF1F9;--panel:#F6F8FC;--border:#E2E7F2;--border-2:#D3DAEB;
-  --text:#161B33;--muted:#6E7691;--card:#FFFFFF;
-  --r:11px;--rs:8px;
-  --sh:0 1px 2px rgba(16,28,64,.04),0 6px 22px rgba(16,28,64,.06);
-  --sh-lg:0 8px 40px rgba(16,28,64,.12);
+  --bg:#E4EAF7;--bg2:#D9E0F2;--card:#fff;--card2:#F3F6FC;
+  --border:#D1DBED;--border2:#C4D0E8;
+  --navy:#0A2463;--navy2:#163490;--navy3:#060F28;
+  --orange:#E8631A;--orange2:#CF560F;--oglow:rgba(232,99,26,.22);--osoft:#FFF0E8;
+  --text:#0C1228;--text2:#3D4E7A;--muted:#7A8BB0;
+  --success:#16A34A;--info:#2563EB;
+  --r:13px;--rsm:8px;--rlg:20px;
+  --sh:0 1px 3px rgba(8,18,55,.05),0 6px 20px rgba(8,18,55,.08);
+  --shlg:0 16px 60px rgba(8,18,55,.15);
+  --tr:.22s cubic-bezier(.4,0,.2,1);
 }
-*{box-sizing:border-box;margin:0;padding:0}
+[data-theme=dark]{
+  --bg:#07101E;--bg2:#0A1729;--card:#0D1C38;--card2:#112040;
+  --border:#1A3264;--border2:#22407A;
+  --navy:#112350;--navy2:#1A3370;--navy3:#040C1A;
+  --orange:#FF7830;--orange2:#E8631A;--oglow:rgba(255,120,48,.18);--osoft:rgba(255,120,48,.08);
+  --text:#E2EAF8;--text2:#86A0C8;--muted:#4E6490;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
-body{font-family:"DM Sans",sans-serif;background:var(--light);color:var(--text);-webkit-font-smoothing:antialiased;letter-spacing:-.005em;
-  background-image:radial-gradient(1200px 600px at 50% -200px,rgba(10,36,99,.06),transparent 70%);}
-::selection{background:rgba(232,99,26,.18)}
-
-nav{background:var(--navy);background-image:linear-gradient(120deg,#0A2463 0%,#0d2a73 60%,#123484 100%);
-  padding:0 30px;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0;z-index:99;
-  box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 6px 24px rgba(8,22,68,.28);border-bottom:1px solid rgba(255,255,255,.06)}
-.nl{display:flex;align-items:center;gap:13px}
-.nl img{height:34px;border-radius:7px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
-.nt{color:#fff;font-family:"DM Serif Display",serif;font-size:1.16rem;letter-spacing:.01em}
-.nt small{display:block;font-family:"DM Sans",sans-serif;font-size:.6rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:1px}
-.nb{background:var(--orange);color:#fff;font-size:.64rem;font-weight:700;padding:5px 11px;border-radius:20px;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 2px 8px rgba(232,99,26,.35)}
-.wrap{max-width:1060px;margin:0 auto;padding:34px 20px 70px}
-
-.prog{display:flex;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:50px;padding:6px;box-shadow:var(--sh);margin-bottom:28px}
-.stp{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;text-align:center;padding:10px 8px;border-radius:40px;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer;transition:.22s cubic-bezier(.4,0,.2,1);white-space:nowrap}
-.stp:hover{color:var(--navy);background:var(--panel)}
-.stp.on{background:var(--navy);color:#fff;box-shadow:0 4px 14px rgba(10,36,99,.28)}
-.stp.on:hover{background:var(--navy)}
-.stp.dn{color:var(--navy)}
-.stp.dn::after{content:"✓";margin-left:2px;color:var(--orange);font-weight:700}
-
-.card{background:var(--card);border:1px solid var(--border);border-radius:18px;box-shadow:var(--sh);overflow:hidden;margin-bottom:18px}
-.ch{padding:18px 26px 16px;display:flex;align-items:center;gap:13px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#fbfcfe,#f6f8fc)}
-.ch h2{color:var(--navy-ink);font-family:"DM Serif Display",serif;font-size:1.16rem;font-weight:400;letter-spacing:.005em}
-.ci{background:var(--navy);color:#fff;border-radius:9px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 3px 10px rgba(10,36,99,.3)}
-.cb{padding:24px 26px}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
-.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;transition:background var(--tr),color var(--tr)}
+::selection{background:var(--oglow)}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:"DM Sans",sans-serif}
+input,select,textarea{font-family:"DM Sans",sans-serif}
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:900;height:60px;background:var(--navy3);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;padding:0 22px;box-shadow:0 2px 20px rgba(0,0,0,.28)}
+.nav-l{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.nav-logo{height:30px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.nav-brand{color:#fff;font-family:"DM Serif Display",serif;font-size:1.08rem;line-height:1.1}
+.nav-tag{color:var(--orange);font-size:.56rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-top:1px}
+.nav-c{display:flex;align-items:center;gap:2px;flex:1;justify-content:center}
+.nl{color:rgba(255,255,255,.6);font-size:.82rem;font-weight:600;padding:7px 13px;border-radius:50px;transition:var(--tr);cursor:pointer;border:none;background:none;white-space:nowrap}
+.nl:hover{color:#fff;background:rgba(255,255,255,.1)}
+.nl.on{color:#fff;background:rgba(255,255,255,.15)}
+.nav-r{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.ttgl{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:1.05rem;display:flex;align-items:center;justify-content:center;transition:var(--tr)}
+.ttgl:hover{background:rgba(255,255,255,.2)}
+.btn-nav{background:var(--orange);color:#fff;border:none;border-radius:50px;padding:8px 18px;font-size:.81rem;font-weight:700;transition:var(--tr);box-shadow:0 3px 12px var(--oglow)}
+.btn-nav:hover{background:var(--orange2);transform:translateY(-1px)}
+/* SCREENS */
+.screen{display:none;min-height:100vh;padding-top:60px}
+.screen.on{display:block}
+/* HERO */
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#050D1C 0%,#081530 45%,#0A2463 100%);min-height:310px;display:flex;align-items:center;justify-content:center}
+.hero-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.route-svg{position:absolute;inset:0;width:100%;height:100%;opacity:.5}
+.ship-wrap{position:absolute;bottom:16px;left:-220px;animation:shipSail 24s linear infinite}
+@keyframes shipSail{from{transform:translateX(-220px)}to{transform:translateX(calc(100vw + 220px))}}
+.hero-content{position:relative;z-index:2;padding:44px 32px;text-align:center;max-width:640px;margin:0 auto}
+.hero-over{color:var(--orange);font-size:.7rem;font-weight:700;letter-spacing:.24em;text-transform:uppercase;margin-bottom:12px}
+.hero-title{font-family:"DM Serif Display",serif;font-size:3.2rem;line-height:1.1;color:#fff;margin-bottom:14px;text-wrap:balance}
+.hero-sub{color:rgba(255,255,255,.58);font-size:.92rem;line-height:1.7;margin-bottom:26px;max-width:440px;margin-left:auto;margin-right:auto}
+.hero-acts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-hp{background:var(--orange);color:#fff;border:none;border-radius:50px;padding:13px 30px;font-size:.93rem;font-weight:700;transition:var(--tr);box-shadow:0 6px 24px var(--oglow)}
+.btn-hp:hover{background:var(--orange2);transform:translateY(-2px);box-shadow:0 10px 32px var(--oglow)}
+.btn-hs{background:rgba(255,255,255,.1);color:#fff;border:1.5px solid rgba(255,255,255,.28);border-radius:50px;padding:13px 30px;font-size:.93rem;font-weight:600;transition:var(--tr);backdrop-filter:blur(4px)}
+.btn-hs:hover{background:rgba(255,255,255,.2);transform:translateY(-2px)}
+/* DASH BODY */
+.dbody{padding:28px 28px 60px;max-width:1180px;margin:0 auto}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px}
+@media(max-width:800px){.stats-grid{grid-template-columns:1fr 1fr}}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--sh);position:relative;overflow:hidden;transition:var(--tr)}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shlg)}
+.stat-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--orange)}
+.stat-icon{font-size:1.5rem;margin-bottom:9px;opacity:.8}
+.stat-val{font-family:"DM Serif Display",serif;font-size:1.8rem;color:var(--navy2);margin-bottom:3px;line-height:1;transition:color var(--tr);word-break:break-all}
+[data-theme=dark] .stat-val{color:var(--text)}
+.stat-lbl{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-hd h2{font-family:"DM Serif Display",serif;font-size:1.35rem;color:var(--text);font-weight:400}
+.sec-link{font-size:.81rem;color:var(--orange);font-weight:700;background:none;border:none;cursor:pointer}
+.act-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:30px}
+@media(max-width:800px){.act-grid{grid-template-columns:1fr 1fr}}
+.act-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--rlg);padding:22px 16px;text-align:center;cursor:pointer;transition:var(--tr);box-shadow:var(--sh);display:flex;flex-direction:column;align-items:center;gap:7px}
+.act-card:hover{border-color:var(--orange);box-shadow:0 8px 32px var(--oglow);transform:translateY(-3px)}
+.act-ico{font-size:2.1rem;margin-bottom:1px}
+.act-title{font-family:"DM Serif Display",serif;font-size:.98rem;color:var(--text);font-weight:400}
+.act-desc{font-size:.72rem;color:var(--muted);line-height:1.5;max-width:140px}
+/* TABLES */
+.dt{width:100%;border-collapse:separate;border-spacing:0;font-size:.83rem;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;background:var(--card);box-shadow:var(--sh)}
+.dt th{background:var(--navy3);color:#fff;padding:10px 13px;font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;text-align:left;white-space:nowrap}
+.dt td{padding:10px 13px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text);transition:background var(--tr)}
+.dt tr:last-child td{border-bottom:none}
+.dt tbody tr:hover td{background:var(--card2)}
+.mono{font-family:"JetBrains Mono",monospace;font-size:.76rem}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.badge-tax{background:rgba(37,99,235,.1);color:#2563EB}
+.badge-comm{background:rgba(232,99,26,.1);color:var(--orange2)}
+.badge-pro{background:rgba(122,139,176,.12);color:var(--muted)}
+/* PAGE WRAPPER */
+.pw{padding:26px 28px 60px;max-width:1200px;margin:0 auto}
+.ptitle{font-family:"DM Serif Display",serif;font-size:1.9rem;color:var(--text);margin-bottom:4px}
+.psub{font-size:.87rem;color:var(--muted);margin-bottom:24px}
+/* CREATE LAYOUT */
+.create-shell{display:flex;height:calc(100vh - 60px);overflow:hidden}
+.form-col{flex:1;overflow-y:auto;padding:22px 24px;border-right:1px solid var(--border)}
+.prev-col{width:410px;flex-shrink:0;overflow-y:auto;background:var(--bg2)}
+@media(max-width:1050px){.prev-col{display:none}}
+.prev-sticky{padding:16px 18px;min-height:calc(100vh - 60px);display:flex;flex-direction:column}
+.prev-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-shrink:0}
+.prev-bar-lbl{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);display:flex;align-items:center;gap:7px}
+.pdot{width:8px;height:8px;border-radius:50%;background:var(--orange);animation:ppulse 2s ease infinite}
+@keyframes ppulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.8)}}
+/* LIVE PREVIEW CARD */
+.prev-card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;overflow:hidden;font-family:"DM Sans",sans-serif;font-size:9px;line-height:1.4;box-shadow:var(--sh)}
+.iph{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:7px;border-bottom:2px solid var(--navy);margin-bottom:7px}
+.iph-co{font-size:12px;font-weight:700;color:var(--navy);font-family:"DM Serif Display",serif;line-height:1.2}
+.iph-type{font-size:13px;font-weight:700;color:var(--navy);font-family:"DM Serif Display",serif;text-align:right}
+.iph-sub{font-size:7.5px;color:var(--muted);line-height:1.5;margin-top:2px}
+.iph-org{color:var(--orange);font-size:7.5px;font-weight:700;margin-top:1px}
+.ipbt{background:var(--navy);color:#fff;padding:7px 8px;border-radius:5px;margin:6px 0}
+.ipbt-lbl{font-size:7px;opacity:.6;margin-bottom:1px}
+.ipbt-val{font-size:10px;font-weight:700;line-height:1.3}
+.ipbt-gstin{font-size:6.5px;opacity:.5;margin-top:1px}
+.ipt{width:100%;border-collapse:collapse;font-size:7px;margin:6px 0}
+.ipt th{background:var(--navy);color:#fff;padding:2.5px 4px;text-align:left}
+.ipt td{padding:2.5px 4px;border-bottom:1px solid var(--border)}
+.ipt tr:nth-child(even) td{background:var(--bg)}
+.ip-total{background:var(--navy);color:#fff;padding:7px 9px;border-radius:5px;display:flex;justify-content:space-between;align-items:center;margin-top:7px}
+.ip-tl{font-size:8px;font-weight:700}
+.ip-tv{font-size:12px;font-weight:700;font-family:"DM Serif Display",serif;color:var(--orange)}
+/* TYPE TABS */
+.type-bar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.type-btn{flex:1;min-width:130px;background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:13px 12px;text-align:center;cursor:pointer;transition:var(--tr)}
+.type-btn.on{border-color:var(--orange);background:var(--osoft);box-shadow:0 4px 18px var(--oglow)}
+.type-ico{font-size:1.7rem;margin-bottom:5px}
+.type-name{font-weight:700;font-size:.9rem;color:var(--text);font-family:"DM Serif Display",serif}
+.type-desc{font-size:.7rem;color:var(--muted);line-height:1.4;margin-top:3px}
+/* STEP BAR */
+.stpbar{display:flex;background:var(--card);border:1px solid var(--border);border-radius:50px;padding:5px;box-shadow:var(--sh);margin-bottom:18px;gap:3px}
+.si{flex:1;text-align:center;padding:9px 6px;border-radius:40px;font-size:.74rem;font-weight:600;color:var(--muted);cursor:pointer;transition:var(--tr);white-space:nowrap}
+.si:hover{color:var(--text);background:var(--card2)}
+.si.on{background:var(--navy);color:#fff;box-shadow:0 4px 14px rgba(10,36,99,.28)}
+.si.dn{color:var(--navy)}
+.si.dn::after{content:"checkmark";content:"✓";color:var(--orange);font-weight:700;margin-left:3px}
+/* FORM CARDS */
+.fc{background:var(--card);border:1px solid var(--border);border-radius:var(--rlg);box-shadow:var(--sh);overflow:hidden;margin-bottom:14px}
+.fch{padding:15px 20px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:11px;background:linear-gradient(180deg,var(--card),var(--card2))}
+.fch-ico{background:var(--navy);color:#fff;border-radius:9px;width:33px;height:33px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;box-shadow:0 3px 10px rgba(10,36,99,.3)}
+.fch-title{font-family:"DM Serif Display",serif;font-size:1.08rem;color:var(--text);font-weight:400}
+.fcb{padding:20px}
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:11px}
 .s2{grid-column:span 2}
-@media(max-width:680px){.g2,.g3,.g4{grid-template-columns:1fr}.s2{grid-column:span 1}}
-
-.f{display:flex;flex-direction:column;gap:7px}
-.f label{font-size:.7rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.07em}
+@media(max-width:660px){.g2,.g3,.g4{grid-template-columns:1fr}.s2{grid-column:span 1}}
+/* FIELD */
+.f{display:flex;flex-direction:column;gap:6px}
+.f label{font-size:.67rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.08em}
+[data-theme=dark] .f label{color:#9BB4F0}
 .f label span{color:var(--orange)}
-.f input,.f select,.f textarea{border:1.5px solid var(--border-2);border-radius:var(--r);padding:11px 13px;font-family:"DM Sans",sans-serif;font-size:.88rem;font-weight:500;color:var(--text);background:#fff;transition:.18s;width:100%}
-.f input::placeholder,.f textarea::placeholder{color:#aab0c4;font-weight:400}
-.f input:hover,.f select:hover,.f textarea:hover{border-color:#b9c2db}
-.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3.5px rgba(10,36,99,.1)}
-.f textarea{resize:vertical;min-height:62px;line-height:1.5}
-.f select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236E7691' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
-.mono{font-family:"JetBrains Mono",monospace!important;font-size:.83rem!important;letter-spacing:-.01em}
-
-.sl{display:flex;align-items:center;gap:9px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.13em;color:var(--orange);margin:24px 0 13px}
-.sl::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--border-2),transparent)}
-
-.ct{width:100%;border-collapse:separate;border-spacing:0;font-size:.81rem;border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.ct th{background:var(--navy);color:#fff;padding:10px 9px;font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;text-align:left}
-.ct td{padding:7px 9px;border-bottom:1px solid var(--border);vertical-align:middle;background:#fff}
+.f input,.f select,.f textarea{border:1.5px solid var(--border2);border-radius:var(--r);padding:10px 12px;font-size:.86rem;font-weight:500;color:var(--text);background:var(--card);transition:var(--tr);width:100%}
+.f input::placeholder,.f textarea::placeholder{color:var(--muted);font-weight:400}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(10,36,99,.1)}
+[data-theme=dark] .f input:focus,[data-theme=dark] .f select:focus{box-shadow:0 0 0 3px rgba(26,51,112,.3)}
+.f textarea{resize:vertical;min-height:60px;line-height:1.5}
+.f select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236E7691' stroke-width='2.5'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
+/* SECTION LABEL */
+.sl{display:flex;align-items:center;gap:8px;font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.13em;color:var(--orange);margin:20px 0 11px}
+.sl::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
+/* CHARGE TABLE */
+.ct{width:100%;border-collapse:separate;border-spacing:0;font-size:.79rem;border:1px solid var(--border);border-radius:11px;overflow:hidden;background:var(--card)}
+.ct th{background:var(--navy3);color:#fff;padding:9px 8px;font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;text-align:left;white-space:nowrap}
+.ct td{padding:6px 8px;border-bottom:1px solid var(--border);vertical-align:middle;background:var(--card)}
 .ct tr:last-child td{border-bottom:none}
-.ct tbody tr:nth-child(even) td{background:#F8FAFD}
-.ct tbody tr:hover td{background:var(--soft)}
-.ct input,.ct select{border:1.5px solid var(--border-2);border-radius:7px;padding:6px 8px;font-family:"DM Sans",sans-serif;font-size:.8rem;font-weight:500;width:100%;background:#fff;transition:.15s}
-.ct input:focus,.ct select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 2.5px rgba(10,36,99,.1)}
-.mc{font-family:"JetBrains Mono",monospace;font-size:.78rem}
-.db{background:none;border:none;cursor:pointer;color:#E0524A;font-size:.95rem;padding:4px 7px;border-radius:7px;transition:.15s;line-height:1}
+.ct tbody tr:nth-child(even) td{background:var(--card2)}
+.ct tbody tr:hover td{background:var(--osoft)}
+.ct input,.ct select{border:1.5px solid var(--border2);border-radius:6px;padding:5px 7px;font-size:.79rem;font-weight:500;width:100%;background:var(--card);color:var(--text);transition:var(--tr)}
+.ct input:focus,.ct select:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 2px rgba(10,36,99,.1)}
+.db{background:none;border:none;cursor:pointer;color:#E05050;font-size:.88rem;padding:4px 6px;border-radius:6px;transition:var(--tr)}
 .db:hover{background:#FDECEA}
-.ab{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--panel);border:1.5px dashed var(--border-2);border-radius:var(--r);padding:12px 14px;font-family:"DM Sans",sans-serif;font-size:.83rem;color:var(--navy);cursor:pointer;width:100%;margin-top:12px;transition:.2s;font-weight:600}
-.ab:hover{background:var(--soft);border-color:var(--orange);color:var(--orange-2)}
-
-.tp{background:linear-gradient(180deg,#fbfcfe,#f4f7fc);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-top:18px}
-.tp h4{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px}
-.tr{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:.84rem;border-bottom:1px dashed var(--border-2)}
+.ab{display:flex;align-items:center;justify-content:center;gap:7px;background:var(--card2);border:1.5px dashed var(--border2);border-radius:var(--r);padding:11px;font-size:.83rem;color:var(--navy);cursor:pointer;width:100%;margin-top:11px;transition:var(--tr);font-weight:600}
+.ab:hover{background:var(--osoft);border-color:var(--orange);color:var(--orange)}
+/* TOTALS PANEL */
+.tp{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--border);border-radius:var(--rlg);padding:16px 18px;margin-top:16px}
+.tp h4{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px}
+.tr{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:.85rem;border-bottom:1px dashed var(--border2)}
 .tr:last-child{border:none}
-.tr.gd{font-weight:700;font-size:.96rem;color:#fff;background:var(--navy);margin:8px -8px 0;padding:13px 14px;border-radius:11px;border:none;box-shadow:0 6px 18px rgba(10,36,99,.25)}
-.tr .lb{color:var(--muted);font-weight:500}.tr.gd .lb{color:rgba(255,255,255,.8)}
-.tr .vl{font-family:"JetBrains Mono",monospace;font-size:.82rem;font-weight:500;color:var(--text)}
-.tr.gd .vl{color:#fff;font-size:1rem;font-weight:600}
-
-.br{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:12px;flex-wrap:wrap}
-.btn{padding:12px 28px;border-radius:50px;font-family:"DM Sans",sans-serif;font-size:.86rem;font-weight:600;cursor:pointer;transition:.2s;border:none;display:flex;align-items:center;gap:8px;letter-spacing:.005em}
-.bp{background:var(--navy);color:#fff;box-shadow:0 4px 14px rgba(10,36,99,.22)}.bp:hover{background:var(--navy-2);box-shadow:0 6px 20px rgba(10,36,99,.32);transform:translateY(-1px)}
-.bs{background:#fff;color:var(--navy);border:1.5px solid var(--border-2)}.bs:hover{border-color:var(--navy);background:var(--panel)}
-.bg{background:var(--orange);color:#fff;font-size:.92rem;padding:14px 34px;box-shadow:0 4px 16px rgba(232,99,26,.3)}.bg:hover{background:var(--orange-2);box-shadow:0 8px 24px rgba(232,99,26,.42);transform:translateY(-1px)}
-.bg:disabled{opacity:.6;cursor:not-allowed;transform:none}
-
-.toast{position:fixed;bottom:26px;right:26px;color:#fff;padding:13px 22px;border-radius:12px;font-size:.85rem;font-weight:600;box-shadow:0 12px 30px rgba(0,0,0,.25);transform:translateY(80px);opacity:0;transition:.32s cubic-bezier(.4,0,.2,1);z-index:9999;display:flex;align-items:center;gap:10px}
-.toast.show{transform:translateY(0);opacity:1}
-
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
-.sb{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:16px 18px}
-.sb h4{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--orange);margin-bottom:9px}
+.tr.gd{font-weight:700;font-size:.98rem;color:#fff;background:var(--navy);margin:8px -8px 0;padding:13px 12px;border-radius:11px;border:none;box-shadow:0 6px 20px rgba(10,36,99,.25)}
+.tr .lb{color:var(--muted);font-weight:500}
+.tr.gd .lb{color:rgba(255,255,255,.75)}
+.tr .vl{font-family:"JetBrains Mono",monospace;font-size:.82rem}
+.tr.gd .vl{font-size:1rem;color:#fff;font-weight:700}
+/* BUTTONS */
+.step-foot{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:10px;flex-wrap:wrap}
+.btn{padding:11px 26px;border-radius:50px;font-size:.85rem;font-weight:700;cursor:pointer;transition:var(--tr);border:none;display:flex;align-items:center;gap:7px}
+.bp{background:var(--navy);color:#fff;box-shadow:0 4px 14px rgba(10,36,99,.2)}
+.bp:hover{background:var(--navy2);transform:translateY(-1px)}
+.bs{background:var(--card);color:var(--navy);border:1.5px solid var(--border2)}
+.bs:hover{border-color:var(--navy);background:var(--card2)}
+.bg{background:var(--orange);color:#fff;font-size:.92rem;padding:13px 32px;box-shadow:0 4px 16px var(--oglow)}
+.bg:hover{background:var(--orange2);box-shadow:0 8px 28px var(--oglow);transform:translateY(-1px)}
+.bg:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.bsm{padding:7px 16px;font-size:.76rem}
+.bdang{color:#DC2626;background:none;border:1.5px solid #FCA5A5}
+.bdang:hover{background:#FEF2F2}
+/* ADDRESS ROW */
+.ar{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+.ar select{flex:1;border:1.5px solid var(--border2);border-radius:var(--r);padding:9px 11px;font-size:.84rem;font-weight:500;background:var(--card);color:var(--text)}
+.ar select:focus{outline:none;border-color:var(--navy)}
+.ar button{white-space:nowrap;background:var(--navy);color:#fff;border:none;border-radius:var(--r);padding:9px 15px;font-size:.77rem;font-weight:700;transition:var(--tr)}
+.ar button:hover{background:var(--navy2)}
+/* SUMMARY */
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-bottom:16px}
+.sb{background:var(--card2);border:1px solid var(--border);border-radius:13px;padding:14px 16px}
+.sb h4{font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--orange);margin-bottom:7px}
 .sb p{font-size:.84rem;line-height:1.65;color:var(--text)}
-.sb strong{color:var(--navy-ink)}
-.gb,.grand-box{background:var(--navy);background-image:linear-gradient(120deg,#0A2463,#15357d);color:#fff;border-radius:15px;padding:22px 26px;display:flex;justify-content:space-between;align-items:center;gap:16px;box-shadow:0 10px 30px rgba(10,36,99,.3)}
-.ga{font-family:"DM Serif Display",serif;font-size:2.1rem;color:#fff;line-height:1.1;letter-spacing:.01em}
-
-.type-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;padding:24px 20px;cursor:pointer;transition:.22s cubic-bezier(.4,0,.2,1);text-align:center;font-family:"DM Sans",sans-serif;position:relative}
-.type-card:hover{border-color:var(--border-2);box-shadow:var(--sh);transform:translateY(-2px)}
-.type-card.active{border-color:var(--navy);background:linear-gradient(180deg,#fff,#fbfcff);box-shadow:0 8px 26px rgba(10,36,99,.16)}
-.type-card.active::after{content:"✓";position:absolute;top:12px;right:12px;width:22px;height:22px;background:var(--orange);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;box-shadow:0 2px 8px rgba(232,99,26,.4)}
-.type-icon{font-size:1.9rem;margin-bottom:11px}
-.type-title{font-weight:700;font-size:1rem;color:var(--navy-ink);margin-bottom:7px;font-family:"DM Serif Display",serif}
-.type-desc{font-size:.76rem;color:var(--muted);line-height:1.55}
-
-.draft-banner{background:var(--navy);color:#fff;padding:12px 18px;border-radius:12px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;font-size:.84rem;gap:10px;box-shadow:0 6px 18px rgba(10,36,99,.2)}
-.draft-banner button{background:rgba(255,255,255,.18);border:none;color:#fff;padding:5px 14px;border-radius:20px;cursor:pointer;font-size:.76rem;font-weight:600;transition:.15s}
-.draft-banner button:hover{background:rgba(255,255,255,.32)}
-.addr-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.addr-row select{flex:1;border:1.5px solid var(--border-2);border-radius:var(--r);padding:10px 12px;font-family:"DM Sans",sans-serif;font-size:.85rem;font-weight:500;background:#fff}
-.addr-row select:focus{outline:none;border-color:var(--navy)}
-.addr-row button{white-space:nowrap;background:var(--navy);color:#fff;border:none;border-radius:var(--r);padding:10px 16px;font-size:.79rem;font-weight:600;cursor:pointer;transition:.15s}
-.addr-row button:hover{background:var(--navy-2)}
-.hist-btn{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:6px 15px;font-size:.74rem;font-weight:600;cursor:pointer;font-family:"DM Sans",sans-serif;transition:.18s;margin-right:10px}
-.hist-btn:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.4)}
-#histModal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(8,16,40,.55);backdrop-filter:blur(3px);overflow:auto}
-.hist-inner{background:#fff;border-radius:18px;max-width:880px;margin:46px auto;padding:30px;box-shadow:var(--sh-lg)}
-.hist-inner h3{font-family:"DM Serif Display",serif;color:var(--navy-ink);font-size:1.3rem;margin-bottom:18px}
-.hist-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.8rem;margin-bottom:16px;border:1px solid var(--border);border-radius:11px;overflow:hidden}
-.hist-table th{background:var(--navy);color:#fff;padding:9px 11px;text-align:left;font-size:.68rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
-.hist-table td{padding:9px 11px;border-bottom:1px solid var(--border)}
+.gb,.grand-box{background:var(--navy);background-image:linear-gradient(120deg,var(--navy3),var(--navy));color:#fff;border-radius:15px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;gap:14px;box-shadow:0 10px 30px rgba(10,36,99,.28)}
+.ga{font-family:"DM Serif Display",serif;font-size:2rem;color:var(--orange);line-height:1.1}
+/* REGISTER */
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.srch{flex:1;min-width:220px;border:1.5px solid var(--border2);border-radius:50px;padding:10px 18px 10px 40px;font-size:.85rem;background:var(--card);color:var(--text);background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24' stroke='%237A8BB0' stroke-width='2'><circle cx='11' cy='11' r='8'/><path d='m21 21-4.35-4.35'/></svg>");background-repeat:no-repeat;background-position:14px center;transition:var(--tr)}
+.srch:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(10,36,99,.1)}
+.fsel{border:1.5px solid var(--border2);border-radius:50px;padding:10px 32px 10px 15px;font-size:.83rem;background:var(--card);color:var(--text);appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236E7691' stroke-width='2.5'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 10px center;cursor:pointer}
+.exp-btn{background:var(--navy);color:#fff;border:none;border-radius:50px;padding:10px 18px;font-size:.81rem;font-weight:700;transition:var(--tr);flex-shrink:0}
+.exp-btn:hover{background:var(--navy2)}
+.empty{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty-ico{font-size:2.8rem;margin-bottom:12px;opacity:.45}
+.empty h3{font-family:"DM Serif Display",serif;font-size:1.25rem;color:var(--text2);margin-bottom:7px}
+.empty p{font-size:.85rem;line-height:1.6}
+/* RATE CARD */
+.rc-grid{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+@media(max-width:800px){.rc-grid{grid-template-columns:1fr}}
+.rc-item{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 15px;margin-bottom:9px;transition:var(--tr)}
+.rc-item:hover{border-color:var(--border2);box-shadow:var(--sh)}
+.rc-info{flex:1;min-width:0}
+.rc-name{font-weight:700;font-size:.89rem;color:var(--text);margin-bottom:2px}
+.rc-meta{font-size:.74rem;color:var(--muted);font-family:"JetBrains Mono",monospace}
+.rc-use{background:var(--orange);color:#fff;border:none;border-radius:7px;padding:6px 13px;font-size:.74rem;font-weight:700;flex-shrink:0;transition:var(--tr)}
+.rc-use:hover{background:var(--orange2)}
+/* TEMPLATES */
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.tpl-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--rlg);padding:18px;cursor:pointer;transition:var(--tr)}
+.tpl-card:hover{border-color:var(--orange);box-shadow:0 8px 28px var(--oglow);transform:translateY(-2px)}
+.tpl-title{font-family:"DM Serif Display",serif;font-size:1.05rem;color:var(--text);margin-bottom:5px}
+.tpl-meta{font-size:.74rem;color:var(--muted);margin-bottom:12px}
+.tpl-acts{display:flex;gap:7px}
+/* LOADING */
+#loadingOv{display:none;position:fixed;inset:0;z-index:99999;background:rgba(4,10,28,.9);backdrop-filter:blur(8px);flex-direction:column;align-items:center;justify-content:center;gap:18px}
+#loadingOv.on{display:flex}
+.ld-ship{animation:ldBob 1.8s ease-in-out infinite}
+@keyframes ldBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.ld-bar-wrap{width:260px;height:3px;background:rgba(255,255,255,.12);border-radius:3px;overflow:hidden}
+.ld-bar{height:100%;background:var(--orange);border-radius:3px;animation:ldBar 2.2s ease-in-out infinite}
+@keyframes ldBar{0%{width:0%;opacity:1}80%{width:95%;opacity:1}100%{width:100%;opacity:0}}
+.ld-txt{color:#fff;font-family:"DM Serif Display",serif;font-size:1.5rem}
+.ld-sub{color:rgba(255,255,255,.45);font-size:.79rem;font-family:"JetBrains Mono",monospace;letter-spacing:.06em}
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;color:#fff;padding:12px 20px;border-radius:13px;font-size:.85rem;font-weight:600;box-shadow:0 14px 36px rgba(0,0,0,.3);transform:translateY(80px) scale(.95);opacity:0;transition:.3s cubic-bezier(.4,0,.2,1);z-index:99998;display:flex;align-items:center;gap:9px;max-width:340px}
+.toast.on{transform:translateY(0) scale(1);opacity:1}
+/* MODAL */
+.modal-bd{display:none;position:fixed;inset:0;z-index:9999;background:rgba(4,10,28,.6);backdrop-filter:blur(4px);overflow:auto;align-items:center;justify-content:center}
+.modal-bd.on{display:flex}
+.modal-box{background:var(--card);border-radius:20px;width:min(95vw,860px);max-height:90vh;overflow:auto;box-shadow:var(--shlg)}
+.modal-hd{background:var(--navy3);padding:16px 22px;display:flex;align-items:center;justify-content:space-between;border-radius:20px 20px 0 0;position:sticky;top:0}
+.modal-hd h3{font-family:"DM Serif Display",serif;color:#fff;font-size:1.15rem;font-weight:400}
+.modal-close{background:rgba(255,255,255,.1);border:none;color:#fff;width:30px;height:30px;border-radius:8px;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--tr)}
+.modal-close:hover{background:rgba(255,255,255,.2)}
+.modal-body{padding:22px}
+.hist-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.79rem;border:1px solid var(--border);border-radius:11px;overflow:hidden}
+.hist-table th{background:var(--navy3);color:#fff;padding:8px 11px;text-align:left;font-size:.66rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.hist-table td{padding:8px 11px;border-bottom:1px solid var(--border);color:var(--text)}
 .hist-table tr:last-child td{border-bottom:none}
-.hist-table tbody tr:nth-child(even) td{background:#f8fafd}
-.hist-close{float:right;background:var(--panel);border:1px solid var(--border);width:32px;height:32px;border-radius:9px;font-size:1.05rem;cursor:pointer;color:var(--muted);transition:.15s}
-.hist-close:hover{background:var(--soft);color:var(--orange)}
-.hist-footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
-.reset-link{font-size:.72rem;color:var(--muted);cursor:pointer;text-decoration:none;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:6px 9px;font-family:"DM Sans",sans-serif;font-weight:600;transition:.15s}
+.hist-table tbody tr:nth-child(even) td{background:var(--card2)}
+/* MISC */
+.draft-banner{background:var(--navy);color:#fff;padding:11px 16px;border-radius:11px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;font-size:.83rem;gap:9px;box-shadow:0 6px 18px rgba(10,36,99,.18)}
+.draft-banner button{background:rgba(255,255,255,.16);border:none;color:#fff;padding:4px 13px;border-radius:20px;font-size:.74rem;font-weight:700;transition:var(--tr)}
+.draft-banner button:hover{background:rgba(255,255,255,.3)}
+.print-sel-wrap{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-top:14px}
+.reset-link{font-size:.7rem;color:var(--muted);background:var(--card2);border:1px solid var(--border);border-radius:7px;padding:5px 8px;font-weight:600;cursor:pointer;transition:var(--tr)}
 .reset-link:hover{color:var(--orange);border-color:var(--orange)}
+
 </style>
 </head>
 <body>
-<nav>
-  <div class="nl">
-    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCADIAMgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD06iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKADtRR2ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAO1FHaigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA7UUdqKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKADtRQelFABRRRQAUVTvdUtLJtkzkvjOxRk1HZ6xaXkwhj8wOegZetZ+1hzct9TRUqjjzW0NCiiitDMKKKpXmq2lnMI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a25TA6CiudvNWuyk8SNEkhjnIQKweMp93J6HPX+WetWJb6/W9jtzLbIRMYyTGQrkxhlHXg5yPf8ASjlYG1UUkbyceaUX/Y4P51jSa5PsSbZFFCWKPv5fcuNwC5GcEkcZPHQ1Y026u/OjjuCjxytPtODuXa+Bk9+D6Dp3ocQTNCG1ggJaOMBj1Y8sfqTzU1FFSklsNtvcD0ooPSimIKKKKACiiigAwKYIYxMZQg8wqF3ew5x+tPooAKKKKACiiigBk0KTxGOQZU+hI/UUkEEVvEI4UCrkn1yT1JPc1JRQAUYFFFADIYo4IljiQIijAA7U+iigAooooAgjs7eO4M6x/vDnkknGeuM9M+1SuiujIw4YYPOKdRQBHDDHBEsUSBUXoKkoooAKKKKAA9KKD0ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAD0ooPSigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAPSig9KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAA9KKD0ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAD0ooooA//2Q==" alt="Freightysh"/>
-    <span class="nt">Freightysh<small>Invoice Generator</small></span>
+<nav class="nav">
+  <div class="nav-l">
+    <img id="navLogo" class="nav-logo" alt="Freightysh" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCADIAMgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD06iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKADtRR2ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAO1FHaigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA7UUdqKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKADtRQelFABRRRQAUVTvdUtLJtkzkvjOxRk1HZ6xaXkwhj8wOegZetZ+1hzct9TRUqjjzW0NCiiitDMKKKpXmq2lnMI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a25TA6CiudvNWuyk8SNEkhjnIQKweMp93J6HPX+WetWJb6/W9jtzLbIRMYyTGQrkxhlHXg5yPf8ASjlYG1UUkbyceaUX/Y4P51jSa5PsSbZFFCWKPv5fcuNwC5GcEkcZPHQ1Y026u/OjjuCjxytPtODuXa+Bk9+D6Dp3ocQTNCG1ggJaOMBj1Y8sfqTzU1FFSklsNtvcD0ooPSimIKKKKACiiigAwKYIYxMZQg8wqF3ew5x+tPooAKKKKACiiigBk0KTxGOQZU+hI/UUkEEVvEI4UCrkn1yT1JPc1JRQAUYFFFADIYo4IljiQIijAA7U+iigAooooAgjs7eO4M6x/vDnkknGeuM9M+1SuiujIw4YYPOKdRQBHDDHBEsUSBUXoKkoooAKKKKAA9KKD0ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAD0ooPSigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAPSig9KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAA9KKD0ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAD0ooooA//2Q=="/>
+    <div><div class="nav-brand">Freightysh</div><div class="nav-tag">Invoice Generator</div></div>
   </div>
-  <div style="display:flex;align-items:center;gap:6px">
-    <button class="hist-btn" onclick="openHistory()">📋 History</button>
-    <span class="nb" id="invTypeBadge">Tax Invoice</span>
+  <div class="nav-c">
+    <button class="nl on" data-screen="dashboard" onclick="showScreen('dashboard')">Dashboard</button>
+    <button class="nl" data-screen="create" onclick="showScreen('create')">Create Invoice</button>
+    <button class="nl" data-screen="register" onclick="showScreen('register')">Register</button>
+    <button class="nl" data-screen="ratecard" onclick="showScreen('ratecard')">Rate Card</button>
+    <button class="nl" data-screen="templates" onclick="showScreen('templates')">Templates</button>
+  </div>
+  <div class="nav-r">
+    <button class="ttgl" id="themeToggle" onclick="toggleTheme()" title="Toggle theme">🌙</button>
+    <button class="btn-nav" onclick="startInvoice('tax')">+ New Invoice</button>
+    <span id="invTypeBadge" style="display:none;background:var(--orange);color:#fff;font-size:.6rem;font-weight:700;padding:5px 11px;border-radius:20px;text-transform:uppercase;letter-spacing:.08em">Tax Invoice</span>
   </div>
 </nav>
 
-<div class="wrap">
-  
-  <!-- ═══ INVOICE TYPE SELECTOR ═══ -->
-  <div id="typeSelector" style="margin-bottom:28px">
-    <div style="text-align:center;margin-bottom:18px">
-      <div style="font-family:'DM Serif Display',serif;font-size:1.45rem;color:var(--navy-ink);margin-bottom:4px">Create a new invoice</div>
-      <span style="font-size:.74rem;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)">Select a document type to begin</span>
+<!-- ═══ DASHBOARD ═══ -->
+<div id="screen-dashboard" class="screen on">
+  <section class="hero">
+    <div class="hero-bg">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%">
+<defs>
+<radialGradient id="gd1" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#1a3a8c" stop-opacity=".3"/><stop offset="100%" stop-color="#050D1C" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1200" height="360" fill="url(#gd1)"/>
+<g opacity=".25" fill="#7ba8e0">
+<circle cx="8" cy="8" r="1"/><circle cx="50" cy="8" r="1"/><circle cx="92" cy="8" r="1"/><circle cx="134" cy="8" r="1"/><circle cx="176" cy="8" r="1"/><circle cx="218" cy="8" r="1"/><circle cx="260" cy="8" r="1"/><circle cx="302" cy="8" r="1"/><circle cx="344" cy="8" r="1"/><circle cx="386" cy="8" r="1"/><circle cx="428" cy="8" r="1"/><circle cx="470" cy="8" r="1"/><circle cx="512" cy="8" r="1"/><circle cx="554" cy="8" r="1"/><circle cx="596" cy="8" r="1"/><circle cx="638" cy="8" r="1"/><circle cx="680" cy="8" r="1"/><circle cx="722" cy="8" r="1"/><circle cx="764" cy="8" r="1"/><circle cx="806" cy="8" r="1"/><circle cx="848" cy="8" r="1"/><circle cx="890" cy="8" r="1"/><circle cx="932" cy="8" r="1"/><circle cx="974" cy="8" r="1"/><circle cx="1016" cy="8" r="1"/><circle cx="1058" cy="8" r="1"/><circle cx="1100" cy="8" r="1"/><circle cx="1142" cy="8" r="1"/><circle cx="1184" cy="8" r="1"/><circle cx="1226" cy="8" r="1"/><circle cx="8" cy="29" r="1"/><circle cx="50" cy="29" r="1"/><circle cx="92" cy="29" r="1"/><circle cx="134" cy="29" r="1"/><circle cx="176" cy="29" r="1"/><circle cx="218" cy="29" r="1"/><circle cx="260" cy="29" r="1"/><circle cx="302" cy="29" r="1"/><circle cx="344" cy="29" r="1"/><circle cx="386" cy="29" r="1"/><circle cx="428" cy="29" r="1"/><circle cx="470" cy="29" r="1"/><circle cx="512" cy="29" r="1"/><circle cx="554" cy="29" r="1"/><circle cx="596" cy="29" r="1"/><circle cx="638" cy="29" r="1"/><circle cx="680" cy="29" r="1"/><circle cx="722" cy="29" r="1"/><circle cx="764" cy="29" r="1"/><circle cx="806" cy="29" r="1"/><circle cx="848" cy="29" r="1"/><circle cx="890" cy="29" r="1"/><circle cx="932" cy="29" r="1"/><circle cx="974" cy="29" r="1"/><circle cx="1016" cy="29" r="1"/><circle cx="1058" cy="29" r="1"/><circle cx="1100" cy="29" r="1"/><circle cx="1142" cy="29" r="1"/><circle cx="1184" cy="29" r="1"/><circle cx="1226" cy="29" r="1"/><circle cx="8" cy="50" r="1"/><circle cx="50" cy="50" r="1"/><circle cx="92" cy="50" r="1"/><circle cx="134" cy="50" r="1"/><circle cx="176" cy="50" r="1"/><circle cx="218" cy="50" r="1"/><circle cx="260" cy="50" r="1"/><circle cx="302" cy="50" r="1"/><circle cx="344" cy="50" r="1"/><circle cx="386" cy="50" r="1"/><circle cx="428" cy="50" r="1"/><circle cx="470" cy="50" r="1"/><circle cx="512" cy="50" r="1"/><circle cx="554" cy="50" r="1"/><circle cx="596" cy="50" r="1"/><circle cx="638" cy="50" r="1"/><circle cx="680" cy="50" r="1"/><circle cx="722" cy="50" r="1"/><circle cx="764" cy="50" r="1"/><circle cx="806" cy="50" r="1"/><circle cx="848" cy="50" r="1"/><circle cx="890" cy="50" r="1"/><circle cx="932" cy="50" r="1"/><circle cx="974" cy="50" r="1"/><circle cx="1016" cy="50" r="1"/><circle cx="1058" cy="50" r="1"/><circle cx="1100" cy="50" r="1"/><circle cx="1142" cy="50" r="1"/><circle cx="1184" cy="50" r="1"/><circle cx="1226" cy="50" r="1"/><circle cx="8" cy="71" r="1"/><circle cx="50" cy="71" r="1"/><circle cx="92" cy="71" r="1"/><circle cx="134" cy="71" r="1"/><circle cx="176" cy="71" r="1"/><circle cx="218" cy="71" r="1"/><circle cx="260" cy="71" r="1"/><circle cx="302" cy="71" r="1"/><circle cx="344" cy="71" r="1"/><circle cx="386" cy="71" r="1"/><circle cx="428" cy="71" r="1"/><circle cx="470" cy="71" r="1"/><circle cx="512" cy="71" r="1"/><circle cx="554" cy="71" r="1"/><circle cx="596" cy="71" r="1"/><circle cx="638" cy="71" r="1"/><circle cx="680" cy="71" r="1"/><circle cx="722" cy="71" r="1"/><circle cx="764" cy="71" r="1"/><circle cx="806" cy="71" r="1"/><circle cx="848" cy="71" r="1"/><circle cx="890" cy="71" r="1"/><circle cx="932" cy="71" r="1"/><circle cx="974" cy="71" r="1"/><circle cx="1016" cy="71" r="1"/><circle cx="1058" cy="71" r="1"/><circle cx="1100" cy="71" r="1"/><circle cx="1142" cy="71" r="1"/><circle cx="1184" cy="71" r="1"/><circle cx="1226" cy="71" r="1"/><circle cx="8" cy="92" r="1"/><circle cx="50" cy="92" r="1"/><circle cx="92" cy="92" r="1"/><circle cx="134" cy="92" r="1"/><circle cx="176" cy="92" r="1"/><circle cx="218" cy="92" r="1"/><circle cx="260" cy="92" r="1"/><circle cx="302" cy="92" r="1"/><circle cx="344" cy="92" r="1"/><circle cx="386" cy="92" r="1"/><circle cx="428" cy="92" r="1"/><circle cx="470" cy="92" r="1"/><circle cx="512" cy="92" r="1"/><circle cx="554" cy="92" r="1"/><circle cx="596" cy="92" r="1"/><circle cx="638" cy="92" r="1"/><circle cx="680" cy="92" r="1"/><circle cx="722" cy="92" r="1"/><circle cx="764" cy="92" r="1"/><circle cx="806" cy="92" r="1"/><circle cx="848" cy="92" r="1"/><circle cx="890" cy="92" r="1"/><circle cx="932" cy="92" r="1"/><circle cx="974" cy="92" r="1"/><circle cx="1016" cy="92" r="1"/><circle cx="1058" cy="92" r="1"/><circle cx="1100" cy="92" r="1"/><circle cx="1142" cy="92" r="1"/><circle cx="1184" cy="92" r="1"/><circle cx="1226" cy="92" r="1"/><circle cx="8" cy="113" r="1"/><circle cx="50" cy="113" r="1"/><circle cx="92" cy="113" r="1"/><circle cx="134" cy="113" r="1"/><circle cx="176" cy="113" r="1"/><circle cx="218" cy="113" r="1"/><circle cx="260" cy="113" r="1"/><circle cx="302" cy="113" r="1"/><circle cx="344" cy="113" r="1"/><circle cx="386" cy="113" r="1"/><circle cx="428" cy="113" r="1"/><circle cx="470" cy="113" r="1"/><circle cx="512" cy="113" r="1"/><circle cx="554" cy="113" r="1"/><circle cx="596" cy="113" r="1"/><circle cx="638" cy="113" r="1"/><circle cx="680" cy="113" r="1"/><circle cx="722" cy="113" r="1"/><circle cx="764" cy="113" r="1"/><circle cx="806" cy="113" r="1"/><circle cx="848" cy="113" r="1"/><circle cx="890" cy="113" r="1"/><circle cx="932" cy="113" r="1"/><circle cx="974" cy="113" r="1"/><circle cx="1016" cy="113" r="1"/><circle cx="1058" cy="113" r="1"/><circle cx="1100" cy="113" r="1"/><circle cx="1142" cy="113" r="1"/><circle cx="1184" cy="113" r="1"/><circle cx="1226" cy="113" r="1"/><circle cx="8" cy="134" r="1"/><circle cx="50" cy="134" r="1"/><circle cx="92" cy="134" r="1"/><circle cx="134" cy="134" r="1"/><circle cx="176" cy="134" r="1"/><circle cx="218" cy="134" r="1"/><circle cx="260" cy="134" r="1"/><circle cx="302" cy="134" r="1"/><circle cx="344" cy="134" r="1"/><circle cx="386" cy="134" r="1"/><circle cx="428" cy="134" r="1"/><circle cx="470" cy="134" r="1"/><circle cx="512" cy="134" r="1"/><circle cx="554" cy="134" r="1"/><circle cx="596" cy="134" r="1"/><circle cx="638" cy="134" r="1"/><circle cx="680" cy="134" r="1"/><circle cx="722" cy="134" r="1"/><circle cx="764" cy="134" r="1"/><circle cx="806" cy="134" r="1"/><circle cx="848" cy="134" r="1"/><circle cx="890" cy="134" r="1"/><circle cx="932" cy="134" r="1"/><circle cx="974" cy="134" r="1"/><circle cx="1016" cy="134" r="1"/><circle cx="1058" cy="134" r="1"/><circle cx="1100" cy="134" r="1"/><circle cx="1142" cy="134" r="1"/><circle cx="1184" cy="134" r="1"/><circle cx="1226" cy="134" r="1"/><circle cx="8" cy="155" r="1"/><circle cx="50" cy="155" r="1"/><circle cx="92" cy="155" r="1"/><circle cx="134" cy="155" r="1"/><circle cx="176" cy="155" r="1"/><circle cx="218" cy="155" r="1"/><circle cx="260" cy="155" r="1"/><circle cx="302" cy="155" r="1"/><circle cx="344" cy="155" r="1"/><circle cx="386" cy="155" r="1"/><circle cx="428" cy="155" r="1"/><circle cx="470" cy="155" r="1"/><circle cx="512" cy="155" r="1"/><circle cx="554" cy="155" r="1"/><circle cx="596" cy="155" r="1"/><circle cx="638" cy="155" r="1"/><circle cx="680" cy="155" r="1"/><circle cx="722" cy="155" r="1"/><circle cx="764" cy="155" r="1"/><circle cx="806" cy="155" r="1"/><circle cx="848" cy="155" r="1"/><circle cx="890" cy="155" r="1"/><circle cx="932" cy="155" r="1"/><circle cx="974" cy="155" r="1"/><circle cx="1016" cy="155" r="1"/><circle cx="1058" cy="155" r="1"/><circle cx="1100" cy="155" r="1"/><circle cx="1142" cy="155" r="1"/><circle cx="1184" cy="155" r="1"/><circle cx="1226" cy="155" r="1"/><circle cx="8" cy="176" r="1"/><circle cx="50" cy="176" r="1"/><circle cx="92" cy="176" r="1"/><circle cx="134" cy="176" r="1"/><circle cx="176" cy="176" r="1"/><circle cx="218" cy="176" r="1"/><circle cx="260" cy="176" r="1"/><circle cx="302" cy="176" r="1"/><circle cx="344" cy="176" r="1"/><circle cx="386" cy="176" r="1"/><circle cx="428" cy="176" r="1"/><circle cx="470" cy="176" r="1"/><circle cx="512" cy="176" r="1"/><circle cx="554" cy="176" r="1"/><circle cx="596" cy="176" r="1"/><circle cx="638" cy="176" r="1"/><circle cx="680" cy="176" r="1"/><circle cx="722" cy="176" r="1"/><circle cx="764" cy="176" r="1"/><circle cx="806" cy="176" r="1"/><circle cx="848" cy="176" r="1"/><circle cx="890" cy="176" r="1"/><circle cx="932" cy="176" r="1"/><circle cx="974" cy="176" r="1"/><circle cx="1016" cy="176" r="1"/><circle cx="1058" cy="176" r="1"/><circle cx="1100" cy="176" r="1"/><circle cx="1142" cy="176" r="1"/><circle cx="1184" cy="176" r="1"/><circle cx="1226" cy="176" r="1"/><circle cx="8" cy="197" r="1"/><circle cx="50" cy="197" r="1"/><circle cx="92" cy="197" r="1"/><circle cx="134" cy="197" r="1"/><circle cx="176" cy="197" r="1"/><circle cx="218" cy="197" r="1"/><circle cx="260" cy="197" r="1"/><circle cx="302" cy="197" r="1"/><circle cx="344" cy="197" r="1"/><circle cx="386" cy="197" r="1"/><circle cx="428" cy="197" r="1"/><circle cx="470" cy="197" r="1"/><circle cx="512" cy="197" r="1"/><circle cx="554" cy="197" r="1"/><circle cx="596" cy="197" r="1"/><circle cx="638" cy="197" r="1"/><circle cx="680" cy="197" r="1"/><circle cx="722" cy="197" r="1"/><circle cx="764" cy="197" r="1"/><circle cx="806" cy="197" r="1"/><circle cx="848" cy="197" r="1"/><circle cx="890" cy="197" r="1"/><circle cx="932" cy="197" r="1"/><circle cx="974" cy="197" r="1"/><circle cx="1016" cy="197" r="1"/><circle cx="1058" cy="197" r="1"/><circle cx="1100" cy="197" r="1"/><circle cx="1142" cy="197" r="1"/><circle cx="1184" cy="197" r="1"/><circle cx="1226" cy="197" r="1"/><circle cx="8" cy="218" r="1"/><circle cx="50" cy="218" r="1"/><circle cx="92" cy="218" r="1"/><circle cx="134" cy="218" r="1"/><circle cx="176" cy="218" r="1"/><circle cx="218" cy="218" r="1"/><circle cx="260" cy="218" r="1"/><circle cx="302" cy="218" r="1"/><circle cx="344" cy="218" r="1"/><circle cx="386" cy="218" r="1"/><circle cx="428" cy="218" r="1"/><circle cx="470" cy="218" r="1"/><circle cx="512" cy="218" r="1"/><circle cx="554" cy="218" r="1"/><circle cx="596" cy="218" r="1"/><circle cx="638" cy="218" r="1"/><circle cx="680" cy="218" r="1"/><circle cx="722" cy="218" r="1"/><circle cx="764" cy="218" r="1"/><circle cx="806" cy="218" r="1"/><circle cx="848" cy="218" r="1"/><circle cx="890" cy="218" r="1"/><circle cx="932" cy="218" r="1"/><circle cx="974" cy="218" r="1"/><circle cx="1016" cy="218" r="1"/><circle cx="1058" cy="218" r="1"/><circle cx="1100" cy="218" r="1"/><circle cx="1142" cy="218" r="1"/><circle cx="1184" cy="218" r="1"/><circle cx="1226" cy="218" r="1"/><circle cx="8" cy="239" r="1"/><circle cx="50" cy="239" r="1"/><circle cx="92" cy="239" r="1"/><circle cx="134" cy="239" r="1"/><circle cx="176" cy="239" r="1"/><circle cx="218" cy="239" r="1"/><circle cx="260" cy="239" r="1"/><circle cx="302" cy="239" r="1"/><circle cx="344" cy="239" r="1"/><circle cx="386" cy="239" r="1"/><circle cx="428" cy="239" r="1"/><circle cx="470" cy="239" r="1"/><circle cx="512" cy="239" r="1"/><circle cx="554" cy="239" r="1"/><circle cx="596" cy="239" r="1"/><circle cx="638" cy="239" r="1"/><circle cx="680" cy="239" r="1"/><circle cx="722" cy="239" r="1"/><circle cx="764" cy="239" r="1"/><circle cx="806" cy="239" r="1"/><circle cx="848" cy="239" r="1"/><circle cx="890" cy="239" r="1"/><circle cx="932" cy="239" r="1"/><circle cx="974" cy="239" r="1"/><circle cx="1016" cy="239" r="1"/><circle cx="1058" cy="239" r="1"/><circle cx="1100" cy="239" r="1"/><circle cx="1142" cy="239" r="1"/><circle cx="1184" cy="239" r="1"/><circle cx="1226" cy="239" r="1"/><circle cx="8" cy="260" r="1"/><circle cx="50" cy="260" r="1"/><circle cx="92" cy="260" r="1"/><circle cx="134" cy="260" r="1"/><circle cx="176" cy="260" r="1"/><circle cx="218" cy="260" r="1"/><circle cx="260" cy="260" r="1"/><circle cx="302" cy="260" r="1"/><circle cx="344" cy="260" r="1"/><circle cx="386" cy="260" r="1"/><circle cx="428" cy="260" r="1"/><circle cx="470" cy="260" r="1"/><circle cx="512" cy="260" r="1"/><circle cx="554" cy="260" r="1"/><circle cx="596" cy="260" r="1"/><circle cx="638" cy="260" r="1"/><circle cx="680" cy="260" r="1"/><circle cx="722" cy="260" r="1"/><circle cx="764" cy="260" r="1"/><circle cx="806" cy="260" r="1"/><circle cx="848" cy="260" r="1"/><circle cx="890" cy="260" r="1"/><circle cx="932" cy="260" r="1"/><circle cx="974" cy="260" r="1"/><circle cx="1016" cy="260" r="1"/><circle cx="1058" cy="260" r="1"/><circle cx="1100" cy="260" r="1"/><circle cx="1142" cy="260" r="1"/><circle cx="1184" cy="260" r="1"/><circle cx="1226" cy="260" r="1"/><circle cx="8" cy="281" r="1"/><circle cx="50" cy="281" r="1"/><circle cx="92" cy="281" r="1"/><circle cx="134" cy="281" r="1"/><circle cx="176" cy="281" r="1"/><circle cx="218" cy="281" r="1"/><circle cx="260" cy="281" r="1"/><circle cx="302" cy="281" r="1"/><circle cx="344" cy="281" r="1"/><circle cx="386" cy="281" r="1"/><circle cx="428" cy="281" r="1"/><circle cx="470" cy="281" r="1"/><circle cx="512" cy="281" r="1"/><circle cx="554" cy="281" r="1"/><circle cx="596" cy="281" r="1"/><circle cx="638" cy="281" r="1"/><circle cx="680" cy="281" r="1"/><circle cx="722" cy="281" r="1"/><circle cx="764" cy="281" r="1"/><circle cx="806" cy="281" r="1"/><circle cx="848" cy="281" r="1"/><circle cx="890" cy="281" r="1"/><circle cx="932" cy="281" r="1"/><circle cx="974" cy="281" r="1"/><circle cx="1016" cy="281" r="1"/><circle cx="1058" cy="281" r="1"/><circle cx="1100" cy="281" r="1"/><circle cx="1142" cy="281" r="1"/><circle cx="1184" cy="281" r="1"/><circle cx="1226" cy="281" r="1"/><circle cx="8" cy="302" r="1"/><circle cx="50" cy="302" r="1"/><circle cx="92" cy="302" r="1"/><circle cx="134" cy="302" r="1"/><circle cx="176" cy="302" r="1"/><circle cx="218" cy="302" r="1"/><circle cx="260" cy="302" r="1"/><circle cx="302" cy="302" r="1"/><circle cx="344" cy="302" r="1"/><circle cx="386" cy="302" r="1"/><circle cx="428" cy="302" r="1"/><circle cx="470" cy="302" r="1"/><circle cx="512" cy="302" r="1"/><circle cx="554" cy="302" r="1"/><circle cx="596" cy="302" r="1"/><circle cx="638" cy="302" r="1"/><circle cx="680" cy="302" r="1"/><circle cx="722" cy="302" r="1"/><circle cx="764" cy="302" r="1"/><circle cx="806" cy="302" r="1"/><circle cx="848" cy="302" r="1"/><circle cx="890" cy="302" r="1"/><circle cx="932" cy="302" r="1"/><circle cx="974" cy="302" r="1"/><circle cx="1016" cy="302" r="1"/><circle cx="1058" cy="302" r="1"/><circle cx="1100" cy="302" r="1"/><circle cx="1142" cy="302" r="1"/><circle cx="1184" cy="302" r="1"/><circle cx="1226" cy="302" r="1"/><circle cx="8" cy="323" r="1"/><circle cx="50" cy="323" r="1"/><circle cx="92" cy="323" r="1"/><circle cx="134" cy="323" r="1"/><circle cx="176" cy="323" r="1"/><circle cx="218" cy="323" r="1"/><circle cx="260" cy="323" r="1"/><circle cx="302" cy="323" r="1"/><circle cx="344" cy="323" r="1"/><circle cx="386" cy="323" r="1"/><circle cx="428" cy="323" r="1"/><circle cx="470" cy="323" r="1"/><circle cx="512" cy="323" r="1"/><circle cx="554" cy="323" r="1"/><circle cx="596" cy="323" r="1"/><circle cx="638" cy="323" r="1"/><circle cx="680" cy="323" r="1"/><circle cx="722" cy="323" r="1"/><circle cx="764" cy="323" r="1"/><circle cx="806" cy="323" r="1"/><circle cx="848" cy="323" r="1"/><circle cx="890" cy="323" r="1"/><circle cx="932" cy="323" r="1"/><circle cx="974" cy="323" r="1"/><circle cx="1016" cy="323" r="1"/><circle cx="1058" cy="323" r="1"/><circle cx="1100" cy="323" r="1"/><circle cx="1142" cy="323" r="1"/><circle cx="1184" cy="323" r="1"/><circle cx="1226" cy="323" r="1"/><circle cx="8" cy="344" r="1"/><circle cx="50" cy="344" r="1"/><circle cx="92" cy="344" r="1"/><circle cx="134" cy="344" r="1"/><circle cx="176" cy="344" r="1"/><circle cx="218" cy="344" r="1"/><circle cx="260" cy="344" r="1"/><circle cx="302" cy="344" r="1"/><circle cx="344" cy="344" r="1"/><circle cx="386" cy="344" r="1"/><circle cx="428" cy="344" r="1"/><circle cx="470" cy="344" r="1"/><circle cx="512" cy="344" r="1"/><circle cx="554" cy="344" r="1"/><circle cx="596" cy="344" r="1"/><circle cx="638" cy="344" r="1"/><circle cx="680" cy="344" r="1"/><circle cx="722" cy="344" r="1"/><circle cx="764" cy="344" r="1"/><circle cx="806" cy="344" r="1"/><circle cx="848" cy="344" r="1"/><circle cx="890" cy="344" r="1"/><circle cx="932" cy="344" r="1"/><circle cx="974" cy="344" r="1"/><circle cx="1016" cy="344" r="1"/><circle cx="1058" cy="344" r="1"/><circle cx="1100" cy="344" r="1"/><circle cx="1142" cy="344" r="1"/><circle cx="1184" cy="344" r="1"/><circle cx="1226" cy="344" r="1"/><circle cx="8" cy="365" r="1"/><circle cx="50" cy="365" r="1"/><circle cx="92" cy="365" r="1"/><circle cx="134" cy="365" r="1"/><circle cx="176" cy="365" r="1"/><circle cx="218" cy="365" r="1"/><circle cx="260" cy="365" r="1"/><circle cx="302" cy="365" r="1"/><circle cx="344" cy="365" r="1"/><circle cx="386" cy="365" r="1"/><circle cx="428" cy="365" r="1"/><circle cx="470" cy="365" r="1"/><circle cx="512" cy="365" r="1"/><circle cx="554" cy="365" r="1"/><circle cx="596" cy="365" r="1"/><circle cx="638" cy="365" r="1"/><circle cx="680" cy="365" r="1"/><circle cx="722" cy="365" r="1"/><circle cx="764" cy="365" r="1"/><circle cx="806" cy="365" r="1"/><circle cx="848" cy="365" r="1"/><circle cx="890" cy="365" r="1"/><circle cx="932" cy="365" r="1"/><circle cx="974" cy="365" r="1"/><circle cx="1016" cy="365" r="1"/><circle cx="1058" cy="365" r="1"/><circle cx="1100" cy="365" r="1"/><circle cx="1142" cy="365" r="1"/><circle cx="1184" cy="365" r="1"/><circle cx="1226" cy="365" r="1"/>
+</g>
+<path d="M 620 200 Q 500 120 350 100 Q 250 85 160 95" fill="none" stroke="#E8631A" stroke-width="1.4" stroke-dasharray="8 5" opacity=".7"><animate attributeName="stroke-dashoffset" from="0" to="-130" dur="4s" repeatCount="indefinite"/></path>
+<path d="M 620 200 Q 680 150 750 130 Q 820 110 900 100" fill="none" stroke="#4a90d9" stroke-width="1.4" stroke-dasharray="8 5" opacity=".6"><animate attributeName="stroke-dashoffset" from="0" to="-130" dur="5s" repeatCount="indefinite"/></path>
+<path d="M 620 200 Q 620 140 660 100 Q 700 60 760 50" fill="none" stroke="#E8631A" stroke-width="1.2" stroke-dasharray="6 5" opacity=".55"><animate attributeName="stroke-dashoffset" from="0" to="-110" dur="6s" repeatCount="indefinite"/></path>
+<path d="M 620 200 Q 700 220 800 230 Q 900 240 1020 220" fill="none" stroke="#4a90d9" stroke-width="1.2" stroke-dasharray="7 5" opacity=".5"><animate attributeName="stroke-dashoffset" from="0" to="-120" dur="4.5s" repeatCount="indefinite"/></path>
+<path d="M 620 200 Q 580 240 530 250 Q 460 265 380 250" fill="none" stroke="#a0c4f0" stroke-width="1" stroke-dasharray="5 5" opacity=".45"><animate attributeName="stroke-dashoffset" from="0" to="-100" dur="7s" repeatCount="indefinite"/></path>
+<circle cx="620" cy="200" r="6" fill="#E8631A" opacity=".9"/>
+<circle cx="620" cy="200" r="12" fill="#E8631A" opacity=".25"><animate attributeName="r" from="6" to="22" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" from=".4" to="0" dur="2s" repeatCount="indefinite"/></circle>
+<text x="628" y="196" fill="#E8631A" font-size="9" font-family="DM Sans,sans-serif" font-weight="700" opacity=".9">INDIA</text>
+<circle cx="160" cy="95" r="3.5" fill="#7ba8e0" opacity=".8"/><text x="155" y="88" fill="#7ba8e0" font-size="7.5" font-family="DM Sans,sans-serif" opacity=".8">ROTTERDAM</text>
+<circle cx="900" cy="100" r="3.5" fill="#7ba8e0" opacity=".8"/><text x="905" y="96" fill="#7ba8e0" font-size="7.5" font-family="DM Sans,sans-serif" opacity=".8">SINGAPORE</text>
+<circle cx="760" cy="50" r="3.5" fill="#7ba8e0" opacity=".8"/><text x="748" y="43" fill="#7ba8e0" font-size="7.5" font-family="DM Sans,sans-serif" opacity=".8">NOVOROSSIYSK</text>
+<circle cx="1020" cy="220" r="3.5" fill="#7ba8e0" opacity=".7"/><text x="1025" y="218" fill="#7ba8e0" font-size="7.5" font-family="DM Sans,sans-serif" opacity=".7">SHANGHAI</text>
+<circle cx="380" cy="250" r="3.5" fill="#7ba8e0" opacity=".7"/><text x="368" y="265" fill="#7ba8e0" font-size="7.5" font-family="DM Sans,sans-serif" opacity=".7">JEBEL ALI</text>
+</svg>
+      <div class="ship-wrap"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 90" width="240" height="90">
+<path d="M12 62 L12 46 L36 46 L36 34 L78 34 L78 46 L228 46 L234 55 L228 62 Z" fill="#fff" opacity=".12"/>
+<rect x="22" y="26" width="35" height="20" fill="#fff" opacity=".1" rx="2"/>
+<rect x="52" y="18" width="9" height="18" fill="#fff" opacity=".15" rx="2"/>
+<rect x="90" y="34" width="20" height="13" fill="#E8631A" opacity=".45" rx="1"/>
+<rect x="112" y="34" width="20" height="13" fill="#fff" opacity=".1" rx="1"/>
+<rect x="134" y="34" width="20" height="13" fill="#E8631A" opacity=".3" rx="1"/>
+<rect x="156" y="34" width="20" height="13" fill="#fff" opacity=".1" rx="1"/>
+<rect x="178" y="34" width="20" height="13" fill="#E8631A" opacity=".35" rx="1"/>
+<path d="M0 65 Q40 60 80 65 Q120 70 160 65 Q200 60 240 65" fill="none" stroke="#fff" stroke-width="1.2" opacity=".12"/>
+</svg></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;max-width:860px;margin:0 auto">
-      <button class="type-card active" id="btnTax" onclick="setInvType('tax')">
-        <div class="type-icon">🧾</div>
-        <div class="type-title">Tax Invoice</div>
-        <div class="type-desc">Freight charges, LTHC, BL fees, Seal charges with full GST breakup</div>
-      </button>
-      <button class="type-card" id="btnComm" onclick="setInvType('commission')">
-        <div class="type-icon">💼</div>
-        <div class="type-title">Commission Invoice</div>
-        <div class="type-desc">USD 20 commission per shipment with booking-level details</div>
-      </button>
-      <button class="type-card" id="btnProforma" onclick="setInvType('proforma')">
-        <div class="type-icon">📄</div>
-        <div class="type-title">Proforma Invoice</div>
-        <div class="type-desc">Estimate invoice — no GST, not a tax document</div>
-      </button>
+    <div class="hero-content">
+      <div class="hero-over">Freightysh Invoice Center &nbsp;·&nbsp; Sea Freight Specialists</div>
+      <h1 class="hero-title">Keep it Moving.<br/>Keep it Freightysh.</h1>
+      <p class="hero-sub">Your complete freight forwarding invoice suite — built for the team that never stops shipping.</p>
+      <div class="hero-acts">
+        <button class="btn-hp" onclick="startInvoice('tax')">&#43; Tax Invoice</button>
+        <button class="btn-hs" onclick="startInvoice('commission')">Commission Invoice</button>
+      </div>
     </div>
+  </section>
+  <div class="dbody">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-val" id="stat-month">INR 0</div><div class="stat-lbl">Revenue This Month</div></div>
+      <div class="stat-card"><div class="stat-icon">🧾</div><div class="stat-val" id="stat-count">0</div><div class="stat-lbl">Invoices Created</div></div>
+      <div class="stat-card"><div class="stat-icon">🚢</div><div class="stat-val" id="stat-total">INR 0</div><div class="stat-lbl">Total Invoiced (All Time)</div></div>
+      <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-val" id="stat-mcount">0</div><div class="stat-lbl">Invoices This Month</div></div>
+    </div>
+    <div class="sec-hd"><h2>Quick Start</h2></div>
+    <div class="act-grid">
+      <button class="act-card" onclick="startInvoice('tax')"><div class="act-ico">🧾</div><div class="act-title">Tax Invoice</div><div class="act-desc">Freight charges with full GST breakup</div></button>
+      <button class="act-card" onclick="startInvoice('commission')"><div class="act-ico">💼</div><div class="act-title">Commission Invoice</div><div class="act-desc">Shipment-wise USD commission</div></button>
+      <button class="act-card" onclick="startInvoice('proforma')"><div class="act-ico">📄</div><div class="act-title">Proforma Invoice</div><div class="act-desc">Estimate — no GST, not a tax document</div></button>
+      <button class="act-card" onclick="showScreen('ratecard')"><div class="act-ico">📋</div><div class="act-title">Rate Card</div><div class="act-desc">Manage your common charge catalog</div></button>
+    </div>
+    <div class="sec-hd"><h2>Recent Invoices</h2><button class="sec-link" onclick="showScreen('register')">View All →</button></div>
+    <div id="recentTable"></div>
   </div>
+</div>
 
-  <!-- ═══ TAX INVOICE FLOW ═══ -->
-  <div id="taxFlow">
-  <div id="draftBanner" style="display:none" class="draft-banner"></div>
-  <div class="prog" id="prog">
-    <div class="stp on" onclick="go(0)">① Invoice &amp; Customer</div>
-    <div class="stp"    onclick="go(1)">② Shipment Details</div>
-    <div class="stp"    onclick="go(2)">③ Charges</div>
-    <div class="stp"    onclick="go(3)">④ Preview &amp; Generate</div>
-  </div>
+<!-- ═══ CREATE INVOICE ═══ -->
+<div id="screen-create" class="screen">
+  <div class="create-shell">
+    <!-- LEFT: FORM -->
+    <div class="form-col" id="formCol">
+      <!-- Type tabs -->
+      <div class="type-bar">
+        <button class="type-btn on" id="btnTax" onclick="setInvType('tax')"><div class="type-ico">🧾</div><div class="type-name">Tax Invoice</div><div class="type-desc">Full GST breakup</div></button>
+        <button class="type-btn" id="btnComm" onclick="setInvType('commission')"><div class="type-ico">💼</div><div class="type-name">Commission</div><div class="type-desc">USD per shipment</div></button>
+        <button class="type-btn" id="btnProforma" onclick="setInvType('proforma')"><div class="type-ico">📄</div><div class="type-name">Proforma</div><div class="type-desc">Estimate only</div></button>
+      </div>
 
-  <!-- STEP 0 -->
-  <div id="s0">
-    <div class="card">
-      <div class="ch"><div class="ci">🧾</div><h2>Invoice Details</h2></div>
-      <div class="cb">
-        <div class="g4">
-          <div class="f">
-            <label>Invoice No <span>*</span></label>
-            <div style="display:flex;align-items:center;gap:6px">
-              <input class="mono" id="iNo" value="FSH/001/25-26" style="flex:1"/>
-              <button class="reset-link" onclick="resetInvNo()" title="Reset to last saved number">↺ Reset</button>
+      <!-- TAX / PROFORMA FLOW -->
+      <div id="taxFlow">
+        <div id="draftBanner" style="display:none" class="draft-banner"></div>
+        <div class="stpbar" id="taxStepBar">
+          <div class="si on" onclick="go(0)">① Details</div>
+          <div class="si" onclick="go(1)">② Shipment</div>
+          <div class="si" onclick="go(2)">③ Charges</div>
+          <div class="si" onclick="go(3)">④ Preview</div>
+        </div>
+
+        <!-- STEP 0 -->
+        <div id="s0">
+          <div class="fc"><div class="fch"><div class="fch-ico">🧾</div><div class="fch-title">Invoice Details</div></div>
+          <div class="fcb">
+            <div class="g4">
+              <div class="f"><label>Invoice No <span>*</span></label>
+                <div style="display:flex;align-items:center;gap:6px"><input class="mono" id="iNo" value="FSH/001/25-26" style="flex:1"/><button class="reset-link" onclick="resetInvNo()">↺</button></div>
+              </div>
+              <div class="f"><label>Invoice Date <span>*</span></label><input type="date" id="iDt"/></div>
+              <div class="f"><label>Due Date</label><input type="date" id="iDd"/></div>
+              <div class="f"><label>Print Type</label><select id="iPrintType"><option value="original">Original</option><option value="duplicate">Duplicate</option><option value="triplicate">Triplicate</option><option value="sample">Sample</option><option value="cancelled">Cancelled</option></select></div>
             </div>
-          </div>
-          <div class="f"><label>Invoice Date <span>*</span></label><input type="date" id="iDt" value="2026-03-21"/></div>
-          <div class="f"><label>Due Date <span>*</span></label><input type="date" id="iDd" value="2026-03-26"/></div>
-          <div class="f"><label>USD/INR Rate</label><input class="mono" type="number" id="iUr" value="94.29" step="0.01"/></div>
+            <div class="g4" style="margin-top:11px">
+              <div class="f"><label>Shipper Ref</label><input id="iSr" value="MIPLWB/066/25-26"/></div>
+              <div class="f"><label>Shipment Type</label><select id="iSt"><option>SEA EXPORT</option><option>SEA IMPORT</option><option>AIR EXPORT</option><option>AIR IMPORT</option></select></div>
+              <div class="f"><label>Tax Type</label><select id="iTaxType"><option value="igst">IGST (Inter-State)</option><option value="cgst_sgst">CGST + SGST (Intra-State)</option></select></div>
+              <div class="f"><label>FX Currency</label><select id="fxCurrency" onchange="updateFxLabel()"><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="AED">AED</option><option value="SGD">SGD</option></select></div>
+            </div>
+            <div class="g2" style="margin-top:11px">
+              <div class="f"><label id="fxLabel">USD / INR Rate</label><input class="mono" type="number" id="iUr" value="94.29" step="0.01"/></div>
+              <div class="f" style="display:none"><label>placeholder</label></div>
+            </div>
+          </div></div>
+          <div class="fc"><div class="fch"><div class="fch-ico">🏢</div><div class="fch-title">Customer Details</div></div>
+          <div class="fcb">
+            <div class="ar">
+              <select id="addrBook" onchange="fillFromBook(this.value)"><option value="">— Select saved customer —</option></select>
+              <button onclick="saveToBook()">💾 Save</button>
+            </div>
+            <div class="g2">
+              <div class="f s2"><label>Customer Name <span>*</span></label><input id="cNm" value="MICBAC INDIA (OPC) PRIVATE LIMITED"/></div>
+              <div class="f s2"><label>Address <span>*</span></label><textarea id="cAd">NO-314, GREEN OASIS UNIT, KAIKHALI, KOLKATA - 700052, WEST BENGAL</textarea></div>
+              <div class="f"><label>State</label><input id="cSt" value="WEST BENGAL"/></div>
+              <div class="f"><label>State Code</label><input class="mono" id="cSc" value="19"/></div>
+              <div class="f"><label>GSTIN</label><input class="mono" id="cGs" value="19AANCM7741C1Z8"/></div>
+              <div class="f"><label>PAN</label><input class="mono" id="cPn" value="AANCM7741C"/></div>
+            </div>
+          </div></div>
+          <div class="step-foot"><span></span><button class="btn bp" onclick="go(1)">Next: Shipment →</button></div>
         </div>
-        <div class="g3" style="margin-top:13px">
-          <div class="f"><label>Shipper Ref</label><input id="iSr" value="MIPLWB/066/25-26"/></div>
-          <div class="f"><label>Shipment Type</label>
-            <select id="iSt"><option>SEA EXPORT</option><option>SEA IMPORT</option><option>AIR EXPORT</option><option>AIR IMPORT</option></select>
-          </div>
-          <div class="f"><label>Tax Type</label>
-            <select id="iTaxType">
-              <option value="igst">IGST (Inter-State)</option>
-              <option value="cgst_sgst">CGST + SGST (Intra-State)</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="ch"><div class="ci">🏢</div><h2>Customer Details</h2></div>
-      <div class="cb">
-        <div class="addr-row">
-          <select id="addrBook" onchange="fillFromBook(this.value)"><option value="">— Select saved customer —</option></select>
-          <button onclick="saveToBook()">💾 Save Customer</button>
-        </div>
-        <div class="g2">
-          <div class="f s2"><label>Customer Name <span>*</span></label><input id="cNm" value="MICBAC INDIA (OPC) PRIVATE LIMITED"/></div>
-          <div class="f s2"><label>Address <span>*</span></label><textarea id="cAd">NO-314, GREEN OASIS UNIT, KAIKHALI, KOLKATA - 700052, WEST BENGAL</textarea></div>
-          <div class="f"><label>State</label><input id="cSt" value="WEST BENGAL"/></div>
-          <div class="f"><label>State Code</label><input class="mono" id="cSc" value="19"/></div>
-          <div class="f"><label>GSTIN</label><input class="mono" id="cGs" value="19AANCM7741C1Z8"/></div>
-          <div class="f"><label>PAN</label><input class="mono" id="cPn" value="AANCM7741C"/></div>
-        </div>
-      </div>
-    </div>
-    <div class="br"><span></span><button class="btn bp" onclick="go(1)">Next: Shipment →</button></div>
-  </div>
 
-  <!-- STEP 1 -->
-  <div id="s1" style="display:none">
-    <div class="card">
-      <div class="ch"><div class="ci">🚢</div><h2>Shipment Details</h2></div>
-      <div class="cb">
-        <div class="sl">Booking</div>
-        <div class="g4">
-          <div class="f"><label>Cargo Type</label><select id="sCt"><option>FCL</option><option>LCL</option><option>RORO</option><option>BULK</option></select></div>
-          <div class="f"><label>MBL No.</label><input class="mono" id="sMb" value="MUN556273NSV"/></div>
-          <div class="f"><label>MBL Date</label><input type="date" id="sMd" value="2026-03-19"/></div>
-          <div class="f"><label>HBL No.</label><input class="mono" id="sHb" value="-"/></div>
+        <!-- STEP 1 -->
+        <div id="s1" style="display:none">
+          <div class="fc"><div class="fch"><div class="fch-ico">🚢</div><div class="fch-title">Shipment Details</div></div>
+          <div class="fcb">
+            <div class="sl">Booking</div>
+            <div class="g4">
+              <div class="f"><label>Cargo Type</label><select id="sCt"><option>FCL</option><option>LCL</option><option>RORO</option><option>BULK</option></select></div>
+              <div class="f"><label>MBL No.</label><input class="mono" id="sMb" value="MUN556273NSV"/></div>
+              <div class="f"><label>MBL Date</label><input type="date" id="sMd"/></div>
+              <div class="f"><label>HBL No.</label><input class="mono" id="sHb" value="-"/></div>
+            </div>
+            <div class="g4" style="margin-top:10px">
+              <div class="f"><label>SB No.</label><input class="mono" id="sSb" value="1439717"/></div>
+              <div class="f"><label>Incoterms</label><select id="sIn"><option>CFR</option><option>CIF</option><option>FOB</option><option>DAP</option><option>EXW</option><option>DDP</option></select></div>
+              <div class="f"><label>Vessel / Voyage</label><input id="sVs" value="BARYON / 86"/></div>
+              <div class="f"><label>Shipping Line</label><input id="sSl" value="10 CUBITS TECH PRIVATE LIMITED"/></div>
+            </div>
+            <div class="sl">Parties</div>
+            <div class="g2">
+              <div class="f"><label>Shipper</label><input id="sSh" value="MICBAC INDIA (OPC) PVT. LTD."/></div>
+              <div class="f"><label>Consignee</label><input id="sCn" value="INDIVIDUAL ENTREPRENEUR RUSANOVSKY"/></div>
+            </div>
+            <div class="sl">Cargo &amp; Weight</div>
+            <div class="g4">
+              <div class="f"><label>Cargo</label><input id="sCg" value="STEAM ACTIVATED CARBON"/></div>
+              <div class="f"><label>Packages</label><input id="sPk" value="1120 BAGS OF 25 KG EACH"/></div>
+              <div class="f"><label>Gross Wt.</label><input id="sGw" value="28,224.000 KGS"/></div>
+              <div class="f"><label>Net Wt.</label><input id="sNw" value="28,000.000 KGS"/></div>
+            </div>
+            <div class="g4" style="margin-top:10px">
+              <div class="f"><label>Volume</label><input id="sVl" value="30.00 CBM"/></div>
+              <div class="f"><label>Container No.</label><input class="mono" id="sCo" value="ECNU4001177 (40' HC)"/></div>
+              <div class="f s2"><label>Shipment Tracker URL</label><input type="url" id="sTrackerLink" placeholder="https://www.track.com/..."/></div>
+            </div>
+            <div class="sl">Ports</div>
+            <div class="g2">
+              <div class="f"><label>Place of Receipt</label><input id="sPr" value="MUNDRA"/></div>
+              <div class="f"><label>Loading Port</label><input id="sLp" value="MUNDRA(TD)(MICT)"/></div>
+              <div class="f"><label>Discharge Port</label><input id="sDp" value="NOVOROSSIYSK PORT, RUSSIA"/></div>
+              <div class="f"><label>Place of Delivery</label><input id="sPd" value="NOVOROSSIYSK PORT, RUSSIA"/></div>
+            </div>
+          </div></div>
+          <div class="step-foot"><button class="btn bs" onclick="go(0)">← Back</button><button class="btn bp" onclick="go(2)">Next: Charges →</button></div>
         </div>
-        <div class="g4" style="margin-top:12px">
-          <div class="f"><label>SB No.</label><input class="mono" id="sSb" value="1439717"/></div>
-          <div class="f"><label>Incoterms</label><select id="sIn"><option>CFR</option><option>CIF</option><option>FOB</option><option>DAP</option><option>EXW</option><option>DDP</option></select></div>
-          <div class="f"><label>Vessel/Voyage</label><input id="sVs" value="BARYON / 86"/></div>
-          <div class="f"><label>Shipping Line</label><input id="sSl" value="10 CUBITS TECH PRIVATE LIMITED"/></div>
-        </div>
-        <div class="sl">Parties</div>
-        <div class="g2">
-          <div class="f"><label>Shipper</label><input id="sSh" value="MICBAC INDIA (OPC) PVT. LTD."/></div>
-          <div class="f"><label>Consignee</label><input id="sCn" value="INDIVIDUAL ENTREPRENEUR RUSANOVSKY"/></div>
-        </div>
-        <div class="sl">Cargo &amp; Weight</div>
-        <div class="g4">
-          <div class="f"><label>Cargo</label><input id="sCg" value="STEAM ACTIVATED CARBON"/></div>
-          <div class="f"><label>Packages</label><input id="sPk" value="1120 BAGS OF 25 KG EACH"/></div>
-          <div class="f"><label>Gross Wt.</label><input id="sGw" value="28,224.000 KGS"/></div>
-          <div class="f"><label>Net Wt.</label><input id="sNw" value="28,000.000 KGS"/></div>
-        </div>
-        <div class="g4" style="margin-top:12px">
-          <div class="f"><label>Volume</label><input id="sVl" value="30.00 CBM"/></div>
-          <div class="f"><label>Container No.</label><input class="mono" id="sCo" value="ECNU4001177 (40' HC)"/></div>
-        </div>
-        <div class="sl">Ports &amp; Routing</div>
-        <div class="g2">
-          <div class="f"><label>Place of Receipt</label><input id="sPr" value="MUNDRA"/></div>
-          <div class="f"><label>Loading Port</label><input id="sLp" value="MUNDRA(TD)(MICT)"/></div>
-          <div class="f"><label>Discharge Port</label><input id="sDp" value="NOVOROSSIYSK PORT, RUSSIA"/></div>
-          <div class="f"><label>Place of Delivery</label><input id="sPd" value="NOVOROSSIYSK PORT, RUSSIA"/></div>
-        </div>
-      </div>
-    </div>
-    <div class="br">
-      <button class="btn bs" onclick="go(0)">← Back</button>
-      <button class="btn bp" onclick="go(2)">Next: Charges →</button>
-    </div>
-  </div>
 
-  <!-- STEP 2 -->
-  <div id="s2" style="display:none">
-    <div class="card">
-      <div class="ch"><div class="ci">💰</div><h2>Charge Line Items</h2></div>
-      <div class="cb">
-        <div style="overflow-x:auto">
-          <table class="ct">
-            <thead><tr>
-              <th style="width:26px">#</th><th style="min-width:160px">Description</th>
-              <th style="width:80px">SAC/HSN</th><th style="width:58px">Cur</th>
-              <th style="width:88px">Rate</th><th style="width:46px">Qty</th>
-              <th style="width:62px">IGST%</th><th style="width:56px">Type</th>
-              <th style="width:108px">Taxable(INR)</th><th style="width:98px">IGST Amt</th>
-              <th style="width:108px">Total(INR)</th><th style="width:34px"></th>
-            </tr></thead>
-            <tbody id="cBody"></tbody>
-          </table>
+        <!-- STEP 2 -->
+        <div id="s2" style="display:none">
+          <div class="fc"><div class="fch"><div class="fch-ico">💰</div><div class="fch-title">Charge Line Items</div></div>
+          <div class="fcb">
+            <div style="overflow-x:auto">
+              <table class="ct"><thead><tr>
+                <th style="width:26px">#</th><th style="min-width:150px">Description</th>
+                <th style="width:76px">SAC</th><th style="width:56px">Cur</th>
+                <th style="width:84px">Rate</th><th style="width:44px">Qty</th>
+                <th style="width:58px">IGST%</th><th style="width:50px">Type</th>
+                <th style="width:104px">Taxable(INR)</th><th style="width:96px">IGST Amt</th>
+                <th style="width:104px">Total(INR)</th><th style="width:32px"></th>
+              </tr></thead><tbody id="cBody"></tbody></table>
+            </div>
+            <button class="ab" onclick="addRow()">&#43; Add Charge Line</button>
+            <datalist id="sacList"><option value="996521">Ocean Freight</option><option value="996759">Port/Terminal Services</option><option value="996713">Air Freight</option><option value="996511">Road Transport</option><option value="998599">Commission/Agency</option></datalist>
+            <div class="tp">
+              <h4>Live Totals</h4>
+              <div class="tr"><span class="lb">Total Taxable (INR)</span><span class="vl" id="pTx">—</span></div>
+              <div class="tr"><span class="lb">Total IGST</span><span class="vl" id="pIg">—</span></div>
+              <div class="tr"><span class="lb">Total Foreign Currency</span><span class="vl" id="pUsd">—</span></div>
+              <div class="tr"><span class="lb">Round-Off</span><span class="vl" id="pRo">—</span></div>
+              <div class="g2" style="margin-top:10px;gap:10px">
+                <div class="f"><label>Advance Received (INR)</label><input class="mono" type="number" id="iAdv" value="0" min="0" oninput="refreshTotals()"/></div>
+                <div class="f"><label>TDS Deduction (INR)</label><input class="mono" type="number" id="iTds" value="0" min="0" oninput="refreshTotals()"/></div>
+              </div>
+              <div class="tr gd" style="margin-top:8px"><span class="lb">NET PAYABLE</span><span class="vl" id="pGr">—</span></div>
+            </div>
+          </div></div>
+          <div class="step-foot"><button class="btn bs" onclick="go(1)">← Back</button><button class="btn bp" onclick="go(3)">Next: Preview →</button></div>
         </div>
-        <button class="ab" onclick="addRow()">＋ Add Charge Line</button>
-        <datalist id="sacList">
-          <option value="996521">Ocean Freight</option>
-          <option value="996759">Port/Terminal Services</option>
-          <option value="996713">Air Freight</option>
-          <option value="996511">Road Transport</option>
-          <option value="998599">Commission/Agency</option>
-          <option value="999799">Other Services</option>
-        </datalist>
-        <div class="tp">
-          <h4>Live Totals</h4>
-          <div class="tr"><span class="lb">Total Taxable (INR)</span><span class="vl" id="pTx">—</span></div>
-          <div class="tr"><span class="lb">Total IGST</span><span class="vl" id="pIg">—</span></div>
-          <div class="tr"><span class="lb">Total USD Charges</span><span class="vl" id="pUsd">—</span></div>
-          <div class="tr"><span class="lb">Round-Off</span><span class="vl" id="pRo">—</span></div>
-          <div class="g2" style="margin-top:10px;gap:10px">
-            <div class="f"><label>Advance Received (INR)</label><input class="mono" type="number" id="iAdv" value="0" min="0" oninput="refreshTotals()"/></div>
-            <div class="f"><label>TDS Deduction (INR)</label><input class="mono" type="number" id="iTds" value="0" min="0" oninput="refreshTotals()"/></div>
+
+        <!-- STEP 3 -->
+        <div id="s3" style="display:none">
+          <div class="fc"><div class="fch"><div class="fch-ico">👁</div><div class="fch-title">Invoice Summary</div></div>
+          <div class="fcb">
+            <div class="sg" id="sg"></div>
+            <div class="gb"><div><div style="font-size:.82rem;opacity:.75">Net Payable (INR)</div><div class="ga" id="sGr">—</div></div><div style="text-align:right"><div style="font-size:.7rem;opacity:.6;margin-bottom:2px">In Words</div><div id="sWd" style="font-size:.78rem;max-width:300px;text-align:right"></div></div></div>
+          </div></div>
+          <div class="step-foot">
+            <button class="btn bs" onclick="go(2)">← Back</button>
+            <button class="btn bs bsm" onclick="duplicateInvoice()">📋 Duplicate</button>
+            <button class="btn bs bsm" onclick="saveTemplatePrompt()">💾 Save Template</button>
+            <button class="btn bs bsm" id="previewBtn" onclick="previewInvoice()">👁 Preview</button>
+            <button class="btn bg" id="genBtn" onclick="makePDF()">⬇ Download PDF</button>
           </div>
-          <div class="tr gd" style="margin-top:8px"><span class="lb">NET PAYABLE</span><span class="vl" id="pGr">—</span></div>
         </div>
-      </div>
-    </div>
-    <div class="br">
-      <button class="btn bs" onclick="go(1)">← Back</button>
-      <button class="btn bp" onclick="go(3)">Next: Preview →</button>
-    </div>
-  </div>
+      </div><!-- /taxFlow -->
 
-  <!-- STEP 3 -->
-  <div id="s3" style="display:none">
-    <div class="card">
-      <div class="ch"><div class="ci">👁</div><h2>Invoice Summary</h2></div>
-      <div class="cb">
-        <div class="sg" id="sg"></div>
-        <div class="gb">
-          <div><div style="font-size:.83rem;opacity:.8">Net Payable (INR)</div><div class="ga" id="sGr">—</div></div>
-          <div style="text-align:right"><div style="font-size:.72rem;opacity:.7;margin-bottom:3px">In Words</div><div id="sWd" style="font-size:.8rem;max-width:320px;text-align:right"></div></div>
+      <!-- COMMISSION FLOW -->
+      <div id="commFlow" style="display:none">
+        <div class="stpbar">
+          <div class="si on" onclick="cgo(0)">① Invoice &amp; Customer</div>
+          <div class="si" onclick="cgo(1)">② Shipments</div>
+          <div class="si" onclick="cgo(2)">③ Preview &amp; Generate</div>
+        </div>
+        <div id="cs0">
+          <div class="fc"><div class="fch"><div class="fch-ico">🧾</div><div class="fch-title">Commission Invoice Details</div></div>
+          <div class="fcb">
+            <div class="g4">
+              <div class="f"><label>Invoice No <span>*</span></label><input class="mono" id="cInvNo" value="FSH/002/25-26"/></div>
+              <div class="f"><label>Invoice Date <span>*</span></label><input type="date" id="cInvDate"/></div>
+              <div class="f"><label>Due Date</label><input type="date" id="cDueDate"/></div>
+              <div class="f"><label>USD/INR Rate</label><input class="mono" type="number" id="cUsdRate" value="94" step="0.01"/></div>
+            </div>
+            <div class="g2" style="margin-top:11px">
+              <div class="f"><label>Tax Type</label><select id="cTaxType"><option value="igst">IGST @ 18% (Inter-State)</option><option value="cgst_sgst">CGST + SGST @ 9% Each</option></select></div>
+              <div class="f"><label>Commission Rate (USD per shipment)</label><input class="mono" type="number" id="cRate" value="20" step="1"/></div>
+            </div>
+          </div></div>
+          <div class="fc"><div class="fch"><div class="fch-ico">🏢</div><div class="fch-title">Bill To</div></div>
+          <div class="fcb">
+            <div class="g2">
+              <div class="f s2"><label>Company Name <span>*</span></label><input id="cToName" value="MICBAC INDIA (OPC) PRIVATE LIMITED"/></div>
+              <div class="f s2"><label>Address</label><textarea id="cToAddr">NO-314, GREEN OASIS UNIT, KAIKHALI, KOLKATA - 700052, WEST BENGAL</textarea></div>
+              <div class="f"><label>State</label><input id="cToState" value="WEST BENGAL"/></div>
+              <div class="f"><label>State Code</label><input class="mono" id="cToStateCode" value="19"/></div>
+              <div class="f"><label>GSTIN</label><input class="mono" id="cToGstin" value="19AANCM7741C1Z8"/></div>
+              <div class="f"><label>PAN</label><input class="mono" id="cToPan" value="AANCM7741C"/></div>
+            </div>
+          </div></div>
+          <div class="step-foot"><span></span><button class="btn bp" onclick="cgo(1)">Next: Shipments →</button></div>
+        </div>
+        <div id="cs1" style="display:none">
+          <div class="fc"><div class="fch"><div class="fch-ico">🚢</div><div class="fch-title">Shipment Line Items</div></div>
+          <div class="fcb">
+            <div style="overflow-x:auto">
+              <table class="ct" style="min-width:820px"><thead><tr>
+                <th style="width:26px">#</th><th style="min-width:120px">Invoice No.</th>
+                <th style="width:96px">Inv. Date</th><th style="width:56px">Liner</th>
+                <th style="width:106px">Booking Ref</th><th style="min-width:140px">Vessel / Voyage</th>
+                <th style="width:106px">Port of Loading</th><th style="width:106px">Port of Dest.</th>
+                <th style="width:66px">CNTR</th><th style="width:76px">ETD</th>
+                <th style="width:58px">USD</th><th style="width:30px"></th>
+              </tr></thead><tbody id="commBody"></tbody></table>
+            </div>
+            <button class="ab" onclick="addCommRow()">&#43; Add Shipment Line</button>
+            <div class="tp" style="margin-top:12px">
+              <h4>Live Commission Preview</h4>
+              <div class="tr"><span class="lb">Total USD</span><span class="vl" id="cpUsd">—</span></div>
+              <div class="tr"><span class="lb">Taxable (INR)</span><span class="vl" id="cpTax">—</span></div>
+              <div class="tr"><span class="lb">Tax Amount</span><span class="vl" id="cpGst">—</span></div>
+              <div class="tr gd"><span class="lb">NET PAYABLE</span><span class="vl" id="cpNet">—</span></div>
+            </div>
+          </div></div>
+          <div class="step-foot"><button class="btn bs" onclick="cgo(0)">← Back</button><button class="btn bp" onclick="cgo(2)">Next: Preview →</button></div>
+        </div>
+        <div id="cs2" style="display:none">
+          <div class="fc"><div class="fch"><div class="fch-ico">👁</div><div class="fch-title">Commission Invoice Summary</div></div>
+          <div class="fcb">
+            <div class="sg" id="csg"></div>
+            <div class="grand-box"><div><div style="font-size:.82rem;opacity:.75">Net Payable (INR)</div><div class="ga" id="cGrand">—</div></div><div style="text-align:right"><div style="font-size:.72rem;opacity:.6;margin-bottom:3px">Shipments</div><div id="cCount" style="font-family:'JetBrains Mono',monospace;font-size:.88rem"></div></div></div>
+          </div></div>
+          <div class="step-foot">
+            <button class="btn bs" onclick="cgo(1)">← Back</button>
+            <button class="btn bs bsm" onclick="saveTemplatePrompt()">💾 Save Template</button>
+            <button class="btn bg" id="cGenBtn" onclick="makeCommissionPDF()">⬇ Download Commission PDF</button>
+          </div>
+        </div>
+      </div><!-- /commFlow -->
+    </div><!-- /form-col -->
+
+    <!-- RIGHT: LIVE PREVIEW -->
+    <div class="prev-col">
+      <div class="prev-sticky">
+        <div class="prev-bar">
+          <div class="prev-bar-lbl"><div class="pdot"></div> Live Preview</div>
+        </div>
+        <div class="prev-card" id="invoice-preview">
+          <div style="text-align:center;padding:40px 20px;color:var(--muted);font-size:.8rem">
+            <div style="font-size:2rem;margin-bottom:10px">📄</div>
+            <div style="font-family:'DM Serif Display',serif;font-size:1rem;color:var(--text2);margin-bottom:6px">Invoice Preview</div>
+            Start filling the form to see a live preview here.
+          </div>
         </div>
       </div>
     </div>
-    <div style="margin-top:16px;padding:14px 18px;background:var(--light);border-radius:var(--r);border:1.5px solid var(--border)">
-      <div class="f" style="max-width:260px">
-        <label>Print Type</label>
-        <select id="iPrintType">
-          <option value="original">Original</option>
-          <option value="duplicate">Duplicate</option>
-          <option value="triplicate">Triplicate</option>
-          <option value="copy">Copy</option>
-        </select>
-      </div>
+  </div><!-- /create-shell -->
+</div><!-- /screen-create -->
+
+<!-- ═══ REGISTER ═══ -->
+<div id="screen-register" class="screen">
+  <div class="pw">
+    <div class="ptitle">Invoice Register</div>
+    <div class="psub">Full history of all generated invoices — searchable, filterable, exportable.</div>
+    <div class="filter-bar">
+      <input class="srch" id="regSearch" placeholder="Search by invoice no, customer, amount..." oninput="renderRegister()"/>
+      <select class="fsel" id="regType" onchange="renderRegister()">
+        <option value="all">All Types</option>
+        <option value="Tax">Tax Invoice</option>
+        <option value="Commission">Commission Invoice</option>
+        <option value="Proforma">Proforma Invoice</option>
+      </select>
+      <span id="regCount" style="font-size:.82rem;color:var(--muted);white-space:nowrap"></span>
+      <button class="exp-btn" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="exp-btn" style="background:var(--orange)" onclick="clearHistory()">Clear All</button>
     </div>
-    <div class="br">
-      <button class="btn bs" onclick="go(2)">← Back</button>
-      <button class="btn bs" onclick="duplicateInvoice()">📋 Duplicate</button>
-      <button class="btn bs" onclick="emailDraft()">✉ Email Draft</button>
-      <button class="btn bs" id="previewBtn" onclick="previewInvoice()">👁 Preview</button>
-      <button class="btn bg" id="genBtn" onclick="makePDF()">⬇ Download Invoice (PDF)</button>
+    <div id="registerTable"></div>
+  </div>
+</div>
+
+<!-- ═══ RATE CARD ═══ -->
+<div id="screen-ratecard" class="screen">
+  <div class="pw">
+    <div class="ptitle">Rate Card</div>
+    <div class="psub">Save common freight charges and add them to any invoice in one click.</div>
+    <div class="rc-grid">
+      <div class="fc">
+        <div class="fch"><div class="fch-ico">➕</div><div class="fch-title">Add Charge</div></div>
+        <div class="fcb">
+          <div class="f" style="margin-bottom:11px"><label>Description <span>*</span></label><input id="rcDesc" placeholder="e.g. OCEAN FREIGHT"/></div>
+          <div class="g2">
+            <div class="f"><label>SAC Code</label><input id="rcSac" value="996521" list="sacList"/></div>
+            <div class="f"><label>Currency</label><select id="rcCur"><option value="USD">USD</option><option value="INR">INR</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="AED">AED</option></select></div>
+          </div>
+          <div class="g2" style="margin-top:11px">
+            <div class="f"><label>Rate</label><input class="mono" type="number" id="rcRate" placeholder="0.00"/></div>
+            <div class="f"><label>IGST %</label><input class="mono" type="number" id="rcIgst" value="18"/></div>
+          </div>
+          <button class="btn bp" style="margin-top:14px;width:100%;justify-content:center" onclick="saveRateCharge()">Save to Rate Card</button>
+        </div>
+      </div>
+      <div>
+        <div id="rcList"></div>
+      </div>
     </div>
   </div>
 </div>
 
-  </div><!-- /taxFlow -->
-
-  <!-- ═══ COMMISSION INVOICE FLOW ═══ -->
-  <div id="commFlow" style="display:none">
-
-  <div class="prog">
-    <div class="stp on" onclick="cgo(0)">① Invoice & Customer</div>
-    <div class="stp"    onclick="cgo(1)">② Shipments</div>
-    <div class="stp"    onclick="cgo(2)">③ Preview & Generate</div>
+<!-- ═══ TEMPLATES ═══ -->
+<div id="screen-templates" class="screen">
+  <div class="pw">
+    <div class="ptitle">Invoice Templates</div>
+    <div class="psub">Save your current form as a reusable template for repeat shipments.</div>
+    <div style="margin-bottom:20px">
+      <button class="btn bp" onclick="saveTemplatePrompt()">💾 Save Current Form as Template</button>
+    </div>
+    <div class="tpl-grid" id="tplGrid"></div>
   </div>
+</div>
 
-  <!-- COMM STEP 0: Invoice + Customer -->
-  <div id="cs0">
-    <div class="card">
-      <div class="ch"><div class="ci">🧾</div><h2>Commission Invoice Details</h2></div>
-      <div class="cb">
-        <div class="g4">
-          <div class="f"><label>Invoice No <span>*</span></label><input class="mono" id="cInvNo" value="FSH/002/25-26"/></div>
-          <div class="f"><label>Invoice Date <span>*</span></label><input type="date" id="cInvDate"/></div>
-          <div class="f"><label>Due Date</label><input type="date" id="cDueDate"/></div>
-          <div class="f"><label>USD/INR Rate</label><input class="mono" type="number" id="cUsdRate" value="94" step="0.01"/></div>
-        </div>
-        <div class="g2" style="margin-top:13px">
-          <div class="f"><label>Tax Type <span>*</span></label>
-            <select id="cTaxType">
-              <option value="igst">IGST @ 18% (Inter-State)</option>
-              <option value="cgst_sgst">CGST + SGST @ 9% Each (Intra-State)</option>
-            </select>
-          </div>
-          <div class="f"><label>Commission Rate</label>
-            <div class="f" style="flex-direction:row;align-items:center;gap:8px">
-              <input class="mono" type="number" id="cRate" value="20" step="1" style="width:100px"/>
-              <span style="font-size:.85rem;color:var(--muted)">USD per shipment</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="ch"><div class="ci">🏢</div><h2>Bill To</h2></div>
-      <div class="cb">
-        <div class="g2">
-          <div class="f s2"><label>Company Name <span>*</span></label><input id="cToName" value="MICBAC INDIA (OPC) PRIVATE LIMITED"/></div>
-          <div class="f s2"><label>Address <span>*</span></label><textarea id="cToAddr">NO-314, GREEN OASIS UNIT, KAIKHALI, KOLKATA - 700052, WEST BENGAL</textarea></div>
-          <div class="f"><label>State</label><input id="cToState" value="WEST BENGAL"/></div>
-          <div class="f"><label>State Code</label><input class="mono" id="cToStateCode" value="19"/></div>
-          <div class="f"><label>GSTIN</label><input class="mono" id="cToGstin" value="19AANCM7741C1Z8"/></div>
-          <div class="f"><label>PAN</label><input class="mono" id="cToPan" value="AANCM7741C"/></div>
-        </div>
-      </div>
-    </div>
-    <div class="br"><span></span><button class="btn bp" onclick="cgo(1)">Next: Shipments →</button></div>
+<!-- ═══ MODALS ═══ -->
+<div class="modal-bd" id="histModal">
+  <div class="modal-box">
+    <div class="modal-hd"><h3>📋 Invoice History</h3><button class="modal-close" onclick="document.getElementById('histModal').classList.remove('on')">✕</button></div>
+    <div class="modal-body"><div id="histTableWrap"></div><div id="histCount" style="font-size:.78rem;color:var(--muted);margin-top:10px"></div></div>
   </div>
-
-  <!-- COMM STEP 1: Shipments -->
-  <div id="cs1" style="display:none">
-    <div class="card">
-      <div class="ch"><div class="ci">🚢</div><h2>Shipment Line Items</h2></div>
-      <div class="cb">
-        <div style="overflow-x:auto">
-          <table class="ct" style="min-width:900px">
-            <thead><tr>
-              <th style="width:26px">#</th>
-              <th style="min-width:130px">Invoice No.</th>
-              <th style="width:100px">Inv. Date</th>
-              <th style="width:60px">Liner</th>
-              <th style="width:110px">Booking Ref</th>
-              <th style="min-width:160px">Vessel / Voyage</th>
-              <th style="width:110px">Port of Loading</th>
-              <th style="width:110px">Port of Dest.</th>
-              <th style="width:70px">CNTR</th>
-              <th style="width:80px">ETD</th>
-              <th style="width:60px">USD</th>
-              <th style="width:32px"></th>
-            </tr></thead>
-            <tbody id="commBody"></tbody>
-          </table>
-        </div>
-        <button class="ab" onclick="addCommRow()">＋ Add Shipment Line</button>
-        <div class="tp" style="margin-top:14px">
-          <h4>Live Commission Preview</h4>
-          <div class="tr"><span class="lb">Total USD</span><span class="vl" id="cpUsd">—</span></div>
-          <div class="tr"><span class="lb">Taxable (INR)</span><span class="vl" id="cpTax">—</span></div>
-          <div class="tr"><span class="lb">Tax Amount</span><span class="vl" id="cpGst">—</span></div>
-          <div class="tr gd"><span class="lb">NET PAYABLE</span><span class="vl" id="cpNet">—</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="br">
-      <button class="btn bs" onclick="cgo(0)">← Back</button>
-      <button class="btn bp" onclick="cgo(2)">Next: Preview →</button>
-    </div>
-  </div>
-
-  <!-- COMM STEP 2: Preview -->
-  <div id="cs2" style="display:none">
-    <div class="card">
-      <div class="ch"><div class="ci">👁</div><h2>Commission Invoice Summary</h2></div>
-      <div class="cb">
-        <div class="sg" id="csg"></div>
-        <div class="grand-box">
-          <div><div style="font-size:.83rem;opacity:.8">Net Payable (INR)</div><div class="ga" id="cGrand">—</div></div>
-          <div style="text-align:right"><div style="font-size:.75rem;opacity:.7;margin-bottom:4px">Shipments</div><div id="cCount" style="font-family:'JetBrains Mono',monospace;font-size:.9rem"></div></div>
-        </div>
-      </div>
-    </div>
-    <div class="br">
-      <button class="btn bs" onclick="cgo(1)">← Back</button>
-      <button class="btn bg" id="genBtn" onclick="makeCommissionPDF()">⬇ Download Commission Invoice (PDF)</button>
-    </div>
-  </div>
-
-  </div><!-- /commFlow -->
-
-<canvas id="qrCanvas" style="display:none"></canvas>
-<div class="toast" id="toast"><span id="tIco">✓</span> <span id="tMsg"></span></div>
+</div>
 
 <!-- Preview Modal -->
 <div id="previewModal" style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.7);flex-direction:column;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:12px;width:min(95vw,1100px);height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)">
-    <div style="background:var(--navy);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <span style="color:#fff;font-family:'DM Serif Display',serif;font-size:1.1rem">Invoice Preview</span>
+  <div style="background:var(--card);border-radius:14px;width:min(95vw,1100px);height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+    <div style="background:var(--navy3);padding:13px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <span style="color:#fff;font-family:'DM Serif Display',serif;font-size:1.05rem">Invoice Preview</span>
       <div style="display:flex;gap:10px;align-items:center">
-        <button onclick="makePDF()" style="background:var(--orange);color:#fff;border:none;border-radius:50px;padding:8px 20px;font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:600;cursor:pointer">⬇ Download</button>
-        <button onclick="closePreview()" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:50px;padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:.83rem;cursor:pointer">✕ Close</button>
+        <button onclick="makePDF()" style="background:var(--orange);color:#fff;border:none;border-radius:50px;padding:7px 18px;font-family:'DM Sans',sans-serif;font-size:.81rem;font-weight:700;cursor:pointer">⬇ Download</button>
+        <button onclick="closePreview()" style="background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:50px;padding:7px 13px;font-family:'DM Sans',sans-serif;font-size:.81rem;cursor:pointer">✕ Close</button>
       </div>
     </div>
     <iframe id="previewFrame" style="flex:1;border:none;width:100%;background:#e5e5e5"></iframe>
   </div>
 </div>
 
-<!-- History Modal -->
-<div id="histModal">
-  <div class="hist-inner">
-    <button class="hist-close" onclick="closeHistory()">✕</button>
-    <h3>📋 Invoice History</h3>
-    <div id="histTableWrap"></div>
-    <div class="hist-footer">
-      <span style="font-size:.78rem;color:var(--muted)" id="histCount"></span>
-      <button class="btn bs" style="font-size:.78rem;padding:7px 18px" onclick="clearHistory()">Clear History</button>
-    </div>
+<!-- ═══ LOADING OVERLAY ═══ -->
+<div id="loadingOv">
+  <div class="ld-ship">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 72" width="180" height="72">
+      <path d="M8 50 L8 36 L28 36 L28 26 L60 26 L60 36 L172 36 L176 44 L172 50 Z" fill="white" opacity=".9"/>
+      <rect x="16" y="18" width="26" height="18" fill="white" opacity=".7" rx="2"/>
+      <rect x="38" y="10" width="7" height="16" fill="white" opacity=".8" rx="2"/>
+      <rect x="70" y="26" width="16" height="11" fill="#E8631A" opacity=".9" rx="1"/>
+      <rect x="88" y="26" width="16" height="11" fill="white" opacity=".5" rx="1"/>
+      <rect x="106" y="26" width="16" height="11" fill="#E8631A" opacity=".8" rx="1"/>
+      <rect x="124" y="26" width="16" height="11" fill="white" opacity=".5" rx="1"/>
+      <rect x="142" y="26" width="16" height="11" fill="#E8631A" opacity=".7" rx="1"/>
+      <path d="M0 54 Q30 50 60 54 Q90 58 120 54 Q150 50 180 54" fill="none" stroke="white" stroke-width="1.2" opacity=".4"/>
+    </svg>
   </div>
+  <div class="ld-txt" id="loadingMsg">Generating Invoice...</div>
+  <div class="ld-sub">Freightysh &nbsp;·&nbsp; Keep it moving</div>
+  <div class="ld-bar-wrap"><div class="ld-bar"></div></div>
 </div>
-<script>
-const LS={get:(k,d=null)=>{try{return JSON.parse(localStorage.getItem(k))??d;}catch{return d;}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}}};
 
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="tIco">✓</span><span id="tMsg"></span></div>
+
+<canvas id="qrCanvas" style="display:none"></canvas>
+
+<script>
 const LOGO="/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCADIAMgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD06iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKADtRR2ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAO1FHaigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA7UUdqKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKADtRQelFABRRRQAUVTvdUtLJtkzkvjOxRk1HZ6xaXkwhj8wOegZetZ+1hzct9TRUqjjzW0NCiiitDMKKKpXmq2lnMI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a25TA6CiudvNWuyk8SNEkhjnIQKweMp93J6HPX+WetWJb6/W9jtzLbIRMYyTGQrkxhlHXg5yPf8ASjlYG1UUkbyceaUX/Y4P51jSa5PsSbZFFCWKPv5fcuNwC5GcEkcZPHQ1Y026u/OjjuCjxytPtODuXa+Bk9+D6Dp3ocQTNCG1ggJaOMBj1Y8sfqTzU1FFSklsNtvcD0ooPSimIKKKKACiiigAwKYIYxMZQg8wqF3ew5x+tPooAKKKKACiiigBk0KTxGOQZU+hI/UUkEEVvEI4UCrkn1yT1JPc1JRQAUYFFFADIYo4IljiQIijAA7U+iigAooooAgjs7eO4M6x/vDnkknGeuM9M+1SuiujIw4YYPOKdRQBHDDHBEsUSBUXoKkoooAKKKKAA9KKD0ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAD0ooPSigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAPSig9KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAA9KKD0ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAD0ooooA//2Q==",SIG="/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA0JCgsKCA0LCgsODg0PEyAVExISEyccHhcgLikxMC4pLSwzOko+MzZGNywtQFdBRkxOUlNSMj5aYVpQYEpRUk//2wBDAQ4ODhMREyYVFSZPNS01T09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0//wAARCACgARgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD06iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKA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9Et4HuZYEurpIpGjPzeXzv8Arx2rq6xfEWgjWXsJlkEc1lcLKjHJGMgsMepxTW+oHOi5itbiw/4Re81S88px59tl5Y/JA5Hz8A9AMGmadrOpaBYSXGoWNohmuWmuIWugLgl36hMYwARxntXf1ycng+drK4sE1OOO2mLEutqpmYlt3zOTzz7Diq5l1AuS6rq9xrl9pumW1mBZiNmluJGG4OM4AUZ9eawdH1jX4fDenvGtpNcX2oNEjzyMflJckt6EFSBjtXW2Ol/ZNVvb8z+Y92kSsCgGCgIzn3z0rOtPCqW8VtC1/NJDaXn2q3Qoo2feypIHIJY80roCnL4h1TSDqcWqpa3L2sUUkT26sm8yMVAI5PBHWn6brOqvqttBLm7hnZhKV0+WAQYGQQzcMOMc4NbFxoVpdXt3cTmRvtUCQSR7sLhSSGGOQcnrmktdESC7juJr6+umhB8tZ5squeM4AGTjuc0XQGH4I+2XpvNdu74N9qkZHgEQAXYdq/N14GePer3goGfSptVk/wBZqVzJOSf7udqj6bVFYUtzN4X/ALX0WKN2+1nzNMY8mR5MKy/gTn6V2mk2S6bpNpYqQRbwrHkdyByaJAW6KKKkAooooAKKKKACiiigAooooAKKKKACiiigBHcIhds4UZOBmloooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAayIxUsoJU5UkdDTqKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA/9k=";
-let step=0,rows=[
+function n2w(n){
+  const a=["","ONE","TWO","THREE","FOUR","FIVE","SIX","SEVEN","EIGHT","NINE","TEN","ELEVEN","TWELVE","THIRTEEN","FOURTEEN","FIFTEEN","SIXTEEN","SEVENTEEN","EIGHTEEN","NINETEEN"];
+  const b=["","","TWENTY","THIRTY","FORTY","FIFTY","SIXTY","SEVENTY","EIGHTY","NINETY"];
+  function h(x){if(!x)return"";if(x<20)return a[x];if(x<100)return b[Math.floor(x/10)]+(x%10?" "+a[x%10]:"");if(x<1000)return a[Math.floor(x/100)]+" HUNDRED"+(x%100?" "+h(x%100):"");if(x<100000)return h(Math.floor(x/1000))+" THOUSAND"+(x%1000?" "+h(x%1000):"");if(x<10000000)return h(Math.floor(x/100000))+" LAKH"+(x%100000?" "+h(x%100000):"");return h(Math.floor(x/10000000))+" CRORE"+(x%10000000?" "+h(x%10000000):"");}
+  return h(n)||"ZERO";
+}
+
+const LS={get:(k,d=null)=>{try{return JSON.parse(localStorage.getItem(k))??d;}catch{return d;}},set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}}};
+const el=id=>document.getElementById(id);
+const g=id=>(el(id)?.value||"").toUpperCase().trim();
+const gr=id=>el(id)?.value||"";
+const fmt=n=>Math.abs(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtI=n=>Math.abs(n).toLocaleString("en-IN");
+const fd=d=>{if(!d)return"-";const[y,m,dy]=d.split("-");return dy+"-"+["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"][+m-1]+"-"+y;};
+
+// ─── Navigation ─────────────────────────────────────────────
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on"));
+  document.querySelectorAll(".nl").forEach(l=>l.classList.toggle("on",l.dataset.screen===id));
+  const sc=el("screen-"+id);if(sc)sc.classList.add("on");
+  if(id==="dashboard")renderDashboard();
+  if(id==="register")renderRegister();
+  if(id==="ratecard")renderRateCard();
+  if(id==="templates")renderTemplates();
+}
+function startInvoice(type){setInvType(type);showScreen("create");}
+
+// ─── Theme ──────────────────────────────────────────────────
+function toggleTheme(){
+  const dark=document.documentElement.getAttribute("data-theme")==="dark";
+  const next=dark?"light":"dark";
+  document.documentElement.setAttribute("data-theme",next);
+  el("themeToggle").textContent=next==="dark"?"☀":"🌙";
+  LS.set("theme",next);
+}
+
+// ─── Dashboard ──────────────────────────────────────────────
+function renderDashboard(){
+  const reg=LS.get("invoiceRegister",[])||[];
+  const now=new Date();
+  const month=reg.filter(r=>{if(!r.date)return false;const d=new Date(r.date);return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth();});
+  const monthRev=month.reduce((s,r)=>s+(Number(r.amount)||0),0);
+  const totalRev=reg.reduce((s,r)=>s+(Number(r.amount)||0),0);
+  el("stat-month").textContent="INR "+fmtI(monthRev);
+  el("stat-total").textContent="INR "+fmtI(totalRev);
+  el("stat-count").textContent=reg.length;
+  el("stat-mcount").textContent=month.length;
+  const recent=reg.slice(0,8);
+  if(!recent.length){el("recentTable").innerHTML='<div class="empty"><div class="empty-ico">📭</div><h3>No invoices yet</h3><p>Create your first invoice to see it here.</p></div>';return;}
+  let h='<table class="dt"><thead><tr><th>Invoice No</th><th>Type</th><th>Customer</th><th>Amount (INR)</th><th>Date</th></tr></thead><tbody>';
+  recent.forEach(r=>{
+    const bc=r.type&&r.type.includes("Commission")?"badge-comm":r.type&&r.type.includes("Proforma")?"badge-pro":"badge-tax";
+    h+='<tr><td class="mono">'+(r.invNo||"—")+'</td><td><span class="badge '+bc+'">'+(r.type||"—")+'</span></td><td>'+(r.customer||"—")+'</td><td class="amt" style="font-size:.98rem">'+(r.amount!=null?"<span style=\"font-family:serif\">"+Number(r.amount).toLocaleString("en-IN")+"</span>":"—")+'</td><td>'+(r.date||"—")+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  el("recentTable").innerHTML=h;
+}
+
+// ─── Invoice Type ────────────────────────────────────────────
+let invType="tax";
+function setInvType(type){
+  invType=type;
+  const isT=type==="tax"||type==="proforma";
+  el("taxFlow").style.display=isT?"":"none";
+  el("commFlow").style.display=type==="commission"?"":"none";
+  el("btnTax").classList.toggle("on",type==="tax");
+  el("btnComm").classList.toggle("on",type==="commission");
+  el("btnProforma").classList.toggle("on",type==="proforma");
+  const lbl={tax:"Tax Invoice",commission:"Commission Invoice",proforma:"Proforma Invoice"};
+  const badge=el("invTypeBadge");if(badge)badge.textContent=lbl[type]||"Tax Invoice";
+  if(type==="commission")rebuildCommRows();
+  schedulePreview();
+}
+
+// ─── Tax Invoice Steps ───────────────────────────────────────
+let step=0;
+function go(n){
+  if(n>step&&!chk(step))return;
+  el("s"+step).style.display="none";
+  step=n;
+  el("s"+step).style.display="";
+  document.querySelectorAll("#taxStepBar .si").forEach((s,i)=>s.className="si"+(i===n?" on":i<n?" dn":""));
+  if(n===2){rebuildRows();refreshTotals();}
+  if(n===3)buildSummary();
+  window.scrollTo({top:0,behavior:"smooth"});
+  schedulePreview();
+}
+function chk(n){
+  const req={0:["iNo","iDt","cNm","cAd"],1:["sMb","sSh","sCn"]};
+  for(const id of(req[n]||[])){const e=el(id);if(!e?.value?.trim()){toast("Fill all required fields","err");e?.focus();return false;}}
+  return true;
+}
+
+// ─── Commission Steps ─────────────────────────────────────────
+let cStep=0;
+function cgo(n){
+  if(n>cStep&&!cchk(cStep))return;
+  el("cs"+cStep).style.display="none";
+  cStep=n;
+  el("cs"+cStep).style.display="";
+  document.querySelectorAll("#commFlow .si").forEach((s,i)=>s.className="si"+(i===n?" on":i<n?" dn":""));
+  if(n===1){rebuildCommRows();refreshCommTotals();}
+  if(n===2)buildCommSummary();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function cchk(n){
+  const req={0:["cInvNo","cInvDate","cToName"]};
+  for(const id of(req[n]||[])){const e=el(id);if(!e?.value?.trim()){toast("Fill all required fields","err");e?.focus();return false;}}
+  return true;
+}
+
+// ─── FX Label ─────────────────────────────────────────────────
+function updateFxLabel(){
+  const cur=gr("fxCurrency")||"USD";
+  const lbl=el("fxLabel");
+  if(lbl)lbl.textContent=cur+" / INR Rate";
+  schedulePreview();
+}
+
+// ─── Charge Rows ──────────────────────────────────────────────
+let rows=[
   {desc:"OCEAN FREIGHT",sac:"996521",cur:"USD",rate:4600,qty:1,igst:5,type:"T"},
   {desc:"LTHC",sac:"996759",cur:"INR",rate:24000,qty:1,igst:18,type:"T"},
   {desc:"BL FEES",sac:"996759",cur:"INR",rate:3000,qty:1,igst:18,type:"T"},
   {desc:"SEAL CHARGES",sac:"996759",cur:"INR",rate:400,qty:1,igst:18,type:"T"},
 ];
-const g=id=>(document.getElementById(id)?.value||"").toUpperCase().trim();
-const gr=id=>document.getElementById(id)?.value||"";
-const fmt=n=>Number(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
-const fmtI=n=>Math.abs(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
-const fd=d=>{if(!d)return"-";const[y,m,dy]=d.split("-");return dy+"-"+["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"][+m-1]+"-"+y;};
-
-function go(n){
-  if(n>step&&!chk(step))return;
-  document.getElementById("s"+step).style.display="none";
-  step=n;
-  document.getElementById("s"+step).style.display="";
-  document.querySelectorAll(".stp").forEach((s,i)=>s.className="stp"+(i===n?" on":i<n?" dn":""));
-  if(n===2){rebuildRows();refreshTotals();}
-  if(n===3)buildSummary();
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-function chk(n){
-  const req={0:["iNo","iDt","iDd","cNm","cAd"],1:["sMb","sSh","sCn"]};
-  for(const id of(req[n]||[])){const el=document.getElementById(id);if(!el?.value?.trim()){toast("Fill all required fields","err");el?.focus();return false;}}
-  return true;
-}
-
 function calc(){
   const usd=parseFloat(gr("iUr"))||94.29;
   return rows.map(r=>{
-    const ex=r.cur==="USD"?usd:1,tx=parseFloat((r.rate*r.qty*ex).toFixed(2)),ig=parseFloat((tx*r.igst/100).toFixed(2));
-    return{...r,ex,amtCur:r.rate*r.qty,taxable:tx,igstAmt:ig,total:tx+ig};
+    const ex=r.cur==="INR"?1:usd,tx=parseFloat((r.rate*r.qty*ex).toFixed(2)),ig=parseFloat((tx*r.igst/100).toFixed(2));
+    return {...r,ex,amtCur:r.rate*r.qty,taxable:tx,igstAmt:ig,total:tx+ig};
   });
 }
 function totals(){
   const c=calc();
   const tx=parseFloat(c.reduce((s,r)=>s+r.taxable,0).toFixed(2));
   const ig=parseFloat(c.reduce((s,r)=>s+r.igstAmt,0).toFixed(2));
-  const adv=parseFloat(document.getElementById("iAdv")?.value||0)||0;
-  const tds=parseFloat(document.getElementById("iTds")?.value||0)||0;
-  const usdTotal=parseFloat(c.filter(r=>r.cur==="USD").reduce((s,r)=>s+r.amtCur,0).toFixed(2));
+  const adv=parseFloat(el("iAdv")?.value||0)||0;
+  const tds=parseFloat(el("iTds")?.value||0)||0;
+  const usdTotal=parseFloat(c.filter(r=>r.cur!=="INR").reduce((s,r)=>s+r.amtCur,0).toFixed(2));
   const raw=tx+ig,rounded=Math.round(raw),ro=parseFloat((rounded-raw).toFixed(2));
   const grand=Math.round(rounded-adv-tds);
   return{tx,ig,raw,rounded,ro,adv,tds,grand,usdTotal};
 }
 function refreshTotals(){
   const t=totals();
-  document.getElementById("pTx").textContent="₹ "+fmt(t.tx);
-  document.getElementById("pIg").textContent="₹ "+fmt(t.ig);
-  const pusd=document.getElementById("pUsd");
-  if(pusd)pusd.textContent=t.usdTotal>0?"$ "+fmt(t.usdTotal):"—";
-  document.getElementById("pRo").textContent="₹ "+fmt(t.ro);
-  document.getElementById("pGr").textContent="₹ "+fmtI(t.grand);
+  const cur=gr("fxCurrency")||"USD";
+  el("pTx").textContent="INR "+fmt(t.tx);
+  el("pIg").textContent="INR "+fmt(t.ig);
+  const pusd=el("pUsd");if(pusd)pusd.textContent=t.usdTotal>0?cur+" "+fmt(t.usdTotal):"—";
+  el("pRo").textContent="INR "+fmt(t.ro);
+  el("pGr").textContent="INR "+fmtI(t.grand);
+  schedulePreview();
 }
 function rebuildRows(){
   const usd=parseFloat(gr("iUr"))||94.29;
-  document.getElementById("cBody").innerHTML="";
+  const cur=gr("fxCurrency")||"USD";
+  el("cBody").innerHTML="";
   rows.forEach((r,i)=>{
-    const ex=r.cur==="USD"?usd:1,tx=r.rate*r.qty*ex,ig=tx*r.igst/100;
+    const ex=r.cur==="INR"?1:usd,tx=r.rate*r.qty*ex,ig=tx*r.igst/100;
     const tr=document.createElement("tr");
-    tr.innerHTML=`<td style="text-align:center;color:var(--muted);font-size:.75rem">${i+1}</td>
-    <td><input value="${r.desc}" oninput="rows[${i}].desc=this.value.toUpperCase();this.value=this.value.toUpperCase()"/></td>
-    <td><input class="mono" value="${r.sac}" list="sacList" oninput="rows[${i}].sac=this.value" style="width:76px"/></td>
-    <td><select onchange="rows[${i}].cur=this.value;rebuildRows()">
-      <option value="USD"${r.cur==="USD"?" selected":""}>USD</option>
-      <option value="INR"${r.cur==="INR"?" selected":""}>INR</option></select></td>
-    <td><input class="mono" type="number" value="${r.rate}" oninput="rows[${i}].rate=+this.value||0;updateRowCalcs(${i})" style="width:84px"/></td>
-    <td><input class="mono" type="number" value="${r.qty}" oninput="rows[${i}].qty=+this.value||1;updateRowCalcs(${i})" style="width:44px"/></td>
-    <td><input class="mono" type="number" value="${r.igst}" oninput="rows[${i}].igst=+this.value||0;updateRowCalcs(${i})" style="width:50px"/></td>
-    <td><select onchange="rows[${i}].type=this.value"><option value="T"${r.type==="T"?" selected":""}>T</option><option value="E"${r.type==="E"?" selected":""}>E</option><option value="N"${r.type==="N"?" selected":""}>N</option><option value="R"${r.type==="R"?" selected":""}>R</option></select></td>
-    <td class="mc" style="text-align:right">${fmt(tx)}</td>
-    <td class="mc" style="text-align:right">${fmt(ig)}</td>
-    <td class="mc" style="text-align:right;font-weight:600">${fmt(tx+ig)}</td>
-    <td><button class="db" onclick="rows.splice(${i},1);rebuildRows()">✕</button></td>`;
-    document.getElementById("cBody").appendChild(tr);
+    const curOpts=["USD","INR","EUR","GBP","AED","SGD"].map(c=>'<option value="'+c+'"'+(r.cur===c?" selected":"")+'>'+c+'</option>').join("");
+    tr.innerHTML='<td style="text-align:center;color:var(--muted);font-size:.74rem">'+( i+1)+'</td>'+
+      '<td><input value="'+r.desc+'" oninput="rows['+i+'].desc=this.value.toUpperCase();this.value=this.value.toUpperCase()"/></td>'+
+      '<td><input class="mono" value="'+r.sac+'" list="sacList" oninput="rows['+i+'].sac=this.value" style="width:70px"/></td>'+
+      '<td><select onchange="rows['+i+'].cur=this.value;rebuildRows()">'+curOpts+'</select></td>'+
+      '<td><input class="mono" type="number" value="'+r.rate+'" oninput="rows['+i+'].rate=+this.value||0;updateRowCalcs('+i+')" style="width:78px"/></td>'+
+      '<td><input class="mono" type="number" value="'+r.qty+'" oninput="rows['+i+'].qty=+this.value||1;updateRowCalcs('+i+')" style="width:40px"/></td>'+
+      '<td><input class="mono" type="number" value="'+r.igst+'" oninput="rows['+i+'].igst=+this.value||0;updateRowCalcs('+i+')" style="width:46px"/></td>'+
+      '<td><select onchange="rows['+i+'].type=this.value"><option value="T"'+(r.type==="T"?" selected":"")+'>T</option><option value="E"'+(r.type==="E"?" selected":"")+'>E</option><option value="N"'+(r.type==="N"?" selected":"")+'>N</option></select></td>'+
+      '<td class="mono" style="text-align:right">'+fmt(tx)+'</td>'+
+      '<td class="mono" style="text-align:right">'+fmt(ig)+'</td>'+
+      '<td class="mono" style="text-align:right;font-weight:700">'+fmt(tx+ig)+'</td>'+
+      '<td><button class="db" onclick="rows.splice('+i+',1);rebuildRows()">✕</button></td>';
+    el("cBody").appendChild(tr);
   });
   refreshTotals();
 }
 function addRow(){rows.push({desc:"",sac:"996759",cur:"INR",rate:0,qty:1,igst:18,type:"T"});rebuildRows();}
-
 function updateRowCalcs(i){
   const usd=parseFloat(gr("iUr"))||94.29;
   const r=rows[i];
-  const ex=r.cur==="USD"?usd:1;
+  const ex=r.cur==="INR"?1:usd;
   const tx=parseFloat((r.rate*r.qty*ex).toFixed(2));
   const ig=parseFloat((tx*r.igst/100).toFixed(2));
   rows[i]={...r,ex,amtCur:r.rate*r.qty,taxable:tx,igstAmt:ig,total:tx+ig};
-  const tbody=document.getElementById("cBody");
+  const tbody=el("cBody");
   if(!tbody||!tbody.rows[i])return;
   const cells=tbody.rows[i].cells;
-  // cells[8]=taxable, [9]=igstAmt, [10]=total
-  cells[8].textContent=fmt(tx);
-  cells[9].textContent=fmt(ig);
-  cells[10].textContent=fmt(tx+ig);
+  cells[8].textContent=fmt(tx);cells[9].textContent=fmt(ig);cells[10].textContent=fmt(tx+ig);
   refreshTotals();
 }
 
+// ─── Commission Rows ──────────────────────────────────────────
+let commRows=[{invNo:"",invDate:"",liner:"OOCL",booking:"",vessel:"",pol:"",pod:"",cntr:"1x40HC",etd:"",usd:20}];
+function addCommRow(){const rate=parseFloat(gr("cRate"))||20;commRows.push({invNo:"",invDate:"",liner:"OOCL",booking:"",vessel:"",pol:"",pod:"",cntr:"1x40HC",etd:"",usd:rate});rebuildCommRows();}
+function deleteCommRow(i){if(commRows.length===1){toast("At least one row required","err");return;}commRows.splice(i,1);rebuildCommRows();}
+function rebuildCommRows(){
+  const tbody=el("commBody");if(!tbody)return;
+  tbody.innerHTML="";
+  commRows.forEach((r,i)=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML='<td style="text-align:center;color:var(--muted);font-size:.74rem">'+(i+1)+'</td>'+
+      '<td><input value="'+(r.invNo||"")+'" oninput="commRows['+i+'].invNo=this.value" placeholder="MIPLWB/063/25-26"/></td>'+
+      '<td><input type="date" value="'+(r.invDate||"")+'" oninput="commRows['+i+'].invDate=this.value" style="width:90px"/></td>'+
+      '<td><input value="'+(r.liner||"")+'" oninput="commRows['+i+'].liner=this.value.toUpperCase();this.value=this.value.toUpperCase()" style="width:50px"/></td>'+
+      '<td><input class="mono" value="'+(r.booking||"")+'" oninput="commRows['+i+'].booking=this.value" placeholder="2321570190"/></td>'+
+      '<td><input value="'+(r.vessel||"")+'" oninput="commRows['+i+'].vessel=this.value.toUpperCase();this.value=this.value.toUpperCase()" placeholder="VESSEL / VOYAGE"/></td>'+
+      '<td><input value="'+(r.pol||"")+'" oninput="commRows['+i+'].pol=this.value.toUpperCase();this.value=this.value.toUpperCase()" placeholder="MUNDRA"/></td>'+
+      '<td><input value="'+(r.pod||"")+'" oninput="commRows['+i+'].pod=this.value.toUpperCase();this.value=this.value.toUpperCase()" placeholder="NHAVA SHEVA"/></td>'+
+      '<td><input value="'+(r.cntr||"")+'" oninput="commRows['+i+'].cntr=this.value.toUpperCase();this.value=this.value.toUpperCase()" style="width:60px"/></td>'+
+      '<td><input value="'+(r.etd||"")+'" oninput="commRows['+i+'].etd=this.value" placeholder="12.04.2026" style="width:72px"/></td>'+
+      '<td><input class="mono" type="number" value="'+(r.usd||20)+'" oninput="commRows['+i+'].usd=parseFloat(this.value)||0;refreshCommTotals()" style="width:52px"/></td>'+
+      '<td><button class="db" onclick="deleteCommRow('+i+')">✕</button></td>';
+    tbody.appendChild(tr);
+  });
+  refreshCommTotals();
+}
+function commTotals(){
+  const usdRate=parseFloat(gr("cUsdRate"))||94;
+  const taxType=el("cTaxType")?.value||"igst";
+  const totalUsd=commRows.reduce((s,r)=>s+(parseFloat(r.usd)||0),0);
+  const taxable=parseFloat((totalUsd*usdRate).toFixed(2));
+  const tax=parseFloat((taxable*0.18).toFixed(2));
+  const raw=taxable+tax,net=Math.round(raw);
+  return{totalUsd,taxable,tax,net};
+}
+function refreshCommTotals(){
+  const{totalUsd,taxable,tax,net}=commTotals();
+  const e=id=>el(id);
+  if(e("cpUsd"))e("cpUsd").textContent="$"+fmt(totalUsd);
+  if(e("cpTax"))e("cpTax").textContent="INR "+fmt(taxable);
+  if(e("cpGst"))e("cpGst").textContent="INR "+fmt(tax);
+  if(e("cpNet"))e("cpNet").textContent="INR "+fmtI(net);
+  schedulePreview();
+}
+
+// ─── Live Preview ─────────────────────────────────────────────
+let prevTimer=null;
+function schedulePreview(){clearTimeout(prevTimer);prevTimer=setTimeout(renderPreview,280);}
+function renderPreview(){
+  const pv=el("invoice-preview");if(!pv)return;
+  const isComm=invType==="commission";
+  const isProforma=invType==="proforma";
+  const invNo=isComm?gr("cInvNo"):gr("iNo");
+  const invDate=fd(isComm?gr("cInvDate"):gr("iDt"));
+  const custName=isComm?(el("cToName")?.value||"").toUpperCase():g("cNm");
+  const custGstin=isComm?g("cToGstin"):g("cGs");
+  const typeLabel=isComm?"COMMISSION INVOICE":isProforma?"PROFORMA INVOICE":"TAX INVOICE";
+  const vessel=isComm?"":g("sVs");
+  const pol=isComm?"":g("sLp");
+  const usdRate=parseFloat(gr("iUr")||gr("cUsdRate"))||94;
+  const cur=isComm?"USD":(gr("fxCurrency")||"USD");
+  let chargesHtml="";
+  if(!isComm){
+    const comp=calc();
+    chargesHtml='<table class="ipt"><thead><tr><th>Description</th><th>Taxable</th><th>IGST</th><th>Total</th></tr></thead><tbody>';
+    comp.slice(0,5).forEach(function(c){chargesHtml+='<tr><td>'+c.desc.slice(0,18)+'</td><td>'+fmt(c.taxable)+'</td><td>'+fmt(isProforma?0:c.igstAmt)+'</td><td>'+fmt(isProforma?c.taxable:c.total)+'</td></tr>';});
+    chargesHtml+='</tbody></table>';
+  } else {
+    chargesHtml='<table class="ipt"><thead><tr><th>Invoice No</th><th>Vessel</th><th>POL</th><th>USD</th></tr></thead><tbody>';
+    commRows.slice(0,5).forEach(function(r){chargesHtml+='<tr><td>'+(r.invNo||"—").slice(0,16)+'</td><td>'+(r.vessel||"—").slice(0,14)+'</td><td>'+(r.pol||"—")+'</td><td>$'+(r.usd||20)+'</td></tr>';});
+    chargesHtml+='</tbody></table>';
+  }
+  const t=isComm?commTotals():totals();
+  const netAmt=isComm?t.net:t.grand;
+  if(!invNo&&!custName){pv.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted);font-size:.8rem"><div style="font-size:2rem;margin-bottom:10px">📄</div><div style="font-family:Georgia,serif;font-size:1rem;color:var(--text2);margin-bottom:6px">Invoice Preview</div>Start filling the form to see a live preview here.</div>';return;}
+  pv.innerHTML=
+    '<div class="iph">'+
+      '<div><div class="iph-co">FREIGHTYSH LLP</div><div class="iph-org">FREIGHT FORWARDING</div><div class="iph-sub">Rourkela, Odisha  |  GSTIN 21AAKFF8134C1ZU</div></div>'+
+      '<div><div class="iph-type">'+typeLabel+'</div><div class="iph-sub" style="text-align:right">'+(invNo||"—")+'<br/>'+(invDate||"—")+'</div></div>'+
+    '</div>'+
+    '<div class="ipbt"><div class="ipbt-lbl">BILL TO</div><div class="ipbt-val">'+(custName||"Customer Name")+'</div><div class="ipbt-gstin">GSTIN: '+(custGstin||"—")+'</div></div>'+
+    (vessel||pol?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:5px 0"><div><div style="font-size:6.5px;color:var(--muted);font-weight:700;text-transform:uppercase">VESSEL</div><div style="font-size:7.5px;font-weight:600">'+(vessel||"—")+'</div></div><div><div style="font-size:6.5px;color:var(--muted);font-weight:700;text-transform:uppercase">LOADING PORT</div><div style="font-size:7.5px;font-weight:600">'+(pol||"—")+'</div></div></div>':'')+
+    chargesHtml+
+    '<div class="ip-total"><div class="ip-tl">NET PAYABLE</div><div class="ip-tv">INR '+fmtI(Math.abs(netAmt||0))+'</div></div>'+
+    '<div style="font-size:6.5px;color:var(--muted);margin-top:5px;text-align:center">1 '+cur+' = INR '+usdRate.toFixed(2)+'  •  Live Preview</div>';
+}
+
+// ─── Summary ──────────────────────────────────────────────────
 function buildSummary(){
   const t=totals();
-  document.getElementById("sg").innerHTML=[
-    {t:"Invoice",h:`<p><strong>${g("iNo")}</strong><br>Date: ${fd(gr("iDt"))}<br>Due: ${fd(gr("iDd"))}<br>Ref: ${g("iSr")}</p>`},
-    {t:"Customer",h:`<p><strong>${g("cNm")}</strong><br>${g("cAd")}</p>`},
-    {t:"Shipment",h:`<p>MBL: <strong>${g("sMb")}</strong><br>Vessel: ${g("sVs")}<br>${g("sLp")} → ${g("sDp")}</p>`},
-    {t:"Cargo",h:`<p><strong>${g("sCg")}</strong><br>${g("sPk")}<br>GWT: ${g("sGw")}</p>`},
-  ].map(b=>`<div class="sb"><h4>${b.t}</h4>${b.h}</div>`).join("");
-  document.getElementById("sGr").textContent="₹ "+fmtI(t.grand);
-  document.getElementById("sWd").textContent=n2w(Math.abs(t.grand))+" ONLY";
+  el("sg").innerHTML=[
+    {t:"Invoice",h:'<p><strong>'+g("iNo")+'</strong><br/>Date: '+fd(gr("iDt"))+'<br/>Due: '+fd(gr("iDd"))+'<br/>Ref: '+g("iSr")+'</p>'},
+    {t:"Customer",h:'<p><strong>'+g("cNm")+'</strong><br/>'+g("cAd")+'</p>'},
+    {t:"Shipment",h:'<p>MBL: <strong>'+g("sMb")+'</strong><br/>Vessel: '+g("sVs")+'<br/>'+g("sLp")+' → '+g("sDp")+'</p>'},
+    {t:"Cargo",h:'<p><strong>'+g("sCg")+'</strong><br/>'+g("sPk")+'<br/>GWT: '+g("sGw")+'</p>'},
+  ].map(b=>'<div class="sb"><h4>'+b.t+'</h4>'+b.h+'</div>').join("");
+  el("sGr").textContent="INR "+fmtI(t.grand);
+  el("sWd").textContent=n2w(Math.abs(t.grand))+" ONLY";
+}
+function buildCommSummary(){
+  const{totalUsd,taxable,tax,net}=commTotals();
+  el("csg").innerHTML=[
+    {t:"Invoice",h:'<p><strong>'+gr("cInvNo")+'</strong><br/>Date: '+fd(gr("cInvDate"))+'<br/>Rate: USD '+gr("cUsdRate")+'</p>'},
+    {t:"Bill To",h:'<p><strong>'+(el("cToName")?.value||"")+'</strong><br/>'+(el("cToAddr")?.value||"")+'</p>'},
+    {t:"Shipments",h:'<p>'+commRows.length+' line(s)<br/>Total USD: $'+fmt(totalUsd)+'<br/>Taxable: INR '+fmt(taxable)+'</p>'},
+    {t:"Tax",h:'<p>'+(el("cTaxType")?.options[el("cTaxType")?.selectedIndex]?.text||"")+'<br/>Tax: INR '+fmt(tax)+'</p>'},
+  ].map(b=>'<div class="sb"><h4>'+b.t+'</h4>'+b.h+'</div>').join("");
+  el("cGrand").textContent="INR "+fmtI(net);
+  el("cCount").textContent=commRows.length+" shipment(s)";
 }
 
+// ─── Rate Card ────────────────────────────────────────────────
+function renderRateCard(){
+  const items=LS.get("rateCard",[])||[];
+  if(!items.length){el("rcList").innerHTML='<div class="empty"><div class="empty-ico">📋</div><h3>No charges saved</h3><p>Add common freight charges to reuse them instantly.</p></div>';return;}
+  el("rcList").innerHTML=items.map((it,i)=>'<div class="rc-item"><div class="rc-info"><div class="rc-name">'+it.desc+'</div><div class="rc-meta">SAC '+it.sac+'  |  '+it.cur+' '+it.rate+'  |  IGST '+it.igst+'%</div></div><button class="rc-use" onclick="useRateCharge('+i+')">+ Add to Invoice</button><button class="db" style="margin-left:4px" onclick="deleteRateCharge('+i+')">✕</button></div>').join("");
+}
+function saveRateCharge(){
+  const desc=(el("rcDesc")?.value||"").trim().toUpperCase();
+  const sac=el("rcSac")?.value||"996521";
+  const cur=el("rcCur")?.value||"INR";
+  const rate=parseFloat(el("rcRate")?.value)||0;
+  const igst=parseFloat(el("rcIgst")?.value)||18;
+  if(!desc){toast("Enter a description","err");return;}
+  const items=LS.get("rateCard",[])||[];
+  items.push({desc,sac,cur,rate,igst});
+  LS.set("rateCard",items);
+  renderRateCard();
+  if(el("rcDesc"))el("rcDesc").value="";
+  toast("Charge saved to Rate Card!","ok");
+}
+function deleteRateCharge(i){const items=LS.get("rateCard",[])||[];items.splice(i,1);LS.set("rateCard",items);renderRateCard();toast("Deleted","ok");}
+function useRateCharge(i){
+  const items=LS.get("rateCard",[])||[];const it=items[i];if(!it)return;
+  rows.push({desc:it.desc,sac:it.sac,cur:it.cur,rate:it.rate,qty:1,igst:it.igst,type:"T"});
+  rebuildRows();showScreen("create");
+  if(invType==="commission")return;
+  go(2);toast(it.desc+" added to invoice!","ok");
+}
+
+// ─── Templates ────────────────────────────────────────────────
+function renderTemplates(){
+  const tpls=LS.get("templates",[])||[];
+  if(!tpls.length){el("tplGrid").innerHTML='<div class="empty"><div class="empty-ico">📁</div><h3>No templates saved</h3><p>Save your current invoice form as a template to quickly reuse it for repeat shipments.</p></div>';return;}
+  el("tplGrid").innerHTML=tpls.map((t,i)=>'<div class="tpl-card"><div class="tpl-title">'+t.name+'</div><div class="tpl-meta">'+(t.type||"Tax Invoice")+'  •  '+(t.savedAt?new Date(t.savedAt).toLocaleDateString():"")+'</div><div class="tpl-acts"><button class="btn bp bsm" onclick="loadTemplate('+i+')">Load</button><button class="btn bdang bsm" onclick="deleteTemplate('+i+')">Delete</button></div></div>').join("");
+}
+function saveTemplatePrompt(){
+  const name=prompt("Template name:");if(!name)return;
+  const tpls=LS.get("templates",[])||[];
+  const draft=collectTaxDraft();
+  tpls.push({name,type:invType,...draft,savedAt:new Date().toISOString()});
+  LS.set("templates",tpls);
+  toast("Template saved!","ok");renderTemplates();
+}
+function loadTemplate(i){
+  const tpls=LS.get("templates",[])||[];const t=tpls[i];if(!t)return;
+  setInvType(t.type||"tax");restoreTaxDraft(t);rebuildRows();showScreen("create");
+  toast("Template loaded!","ok");
+}
+function deleteTemplate(i){const tpls=LS.get("templates",[])||[];tpls.splice(i,1);LS.set("templates",tpls);renderTemplates();toast("Template deleted","ok");}
+
+// ─── Register ─────────────────────────────────────────────────
+function renderRegister(){
+  let reg=LS.get("invoiceRegister",[])||[];
+  const q=(el("regSearch")?.value||"").toLowerCase();
+  const tf=el("regType")?.value||"all";
+  if(q)reg=reg.filter(r=>JSON.stringify(r).toLowerCase().includes(q));
+  if(tf!=="all")reg=reg.filter(r=>r.type&&r.type.includes(tf));
+  const cnt=el("regCount");if(cnt)cnt.textContent=reg.length+" invoice"+(reg.length!==1?"s":"");
+  if(!reg.length){el("registerTable").innerHTML='<div class="empty"><div class="empty-ico">📭</div><h3>No invoices found</h3><p>Try a different search, or create new invoices from the Create Invoice screen.</p></div>';return;}
+  let h='<table class="dt"><thead><tr><th>Invoice No</th><th>Type</th><th>Customer</th><th>Amount (INR)</th><th>Date</th><th>Saved At</th></tr></thead><tbody>';
+  reg.forEach(r=>{
+    const bc=r.type&&r.type.includes("Commission")?"badge-comm":r.type&&r.type.includes("Proforma")?"badge-pro":"badge-tax";
+    h+='<tr><td class="mono">'+(r.invNo||"—")+'</td><td><span class="badge '+bc+'">'+(r.type||"—")+'</span></td><td>'+(r.customer||"—")+'</td><td style="font-family:Georgia,serif;font-size:.97rem">'+(r.amount!=null?Number(r.amount).toLocaleString("en-IN"):"—")+'</td><td>'+(r.date||"—")+'</td><td style="color:var(--muted);font-size:.78rem">'+(r.savedAt?new Date(r.savedAt).toLocaleDateString():"—")+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  el("registerTable").innerHTML=h;
+}
+function exportCSV(){
+  const reg=LS.get("invoiceRegister",[])||[];
+  if(!reg.length){toast("No invoices to export","err");return;}
+  const headers=["Invoice No","Type","Customer","Amount (INR)","Date","Saved At"];
+  const dataRows=reg.map(r=>[r.invNo||"",r.type||"",r.customer||"",r.amount||0,r.date||"",r.savedAt||""]);
+  let csv=headers.join(",")+String.fromCharCode(10);
+  dataRows.forEach(r=>{csv+=r.map(v=>'"'+String(v).replace(/"/g,'\"')+'"').join(",")+String.fromCharCode(10);});
+  const blob=new Blob([csv],{type:"text/csv"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download="freightysh-invoices.csv";
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},1000);
+  toast("Exported to CSV!","ok");
+}
+function clearHistory(){if(!confirm("Clear all invoice history?"))return;LS.set("invoiceRegister",null);renderRegister();renderDashboard();toast("History cleared","ok");}
+
+// ─── Address Book ─────────────────────────────────────────────
+function populateAddrBook(){
+  const sel=el("addrBook");if(!sel)return;
+  const ab=LS.get("addressBook",[])||[];
+  sel.innerHTML='<option value="">— '+(ab.length?ab.length+" saved":"Select")+" customer —</option>";
+  ab.forEach((c,i)=>sel.add(new Option(c.name+(c.gstin?" ("+c.gstin+")":""),String(i))));
+}
+function fillFromBook(idx){
+  if(idx==="")return;
+  const ab=LS.get("addressBook",[])||[];const c=ab[parseInt(idx,10)];if(!c)return;
+  const s=(id,v)=>{const e=el(id);if(e)e.value=v||"";};
+  s("cNm",c.name);s("cAd",c.addr);s("cSt",c.state);s("cSc",c.stateCode);s("cGs",c.gstin);s("cPn",c.pan);
+  schedulePreview();
+}
+function saveToBook(){
+  const ab=LS.get("addressBook",[])||[];
+  const gstin=(el("cGs")?.value||"").trim().toUpperCase();
+  const entry={name:(el("cNm")?.value||"").toUpperCase(),addr:(el("cAd")?.value||"").toUpperCase(),state:(el("cSt")?.value||"").toUpperCase(),stateCode:(el("cSc")?.value||"").trim(),gstin,pan:(el("cPn")?.value||"").toUpperCase()};
+  const idx=ab.findIndex(c=>c.gstin===gstin&&gstin);
+  if(idx>=0)ab[idx]=entry;else ab.push(entry);
+  LS.set("addressBook",ab);populateAddrBook();toast("Customer saved!","ok");
+}
+
+// ─── Draft ────────────────────────────────────────────────────
+function collectTaxDraft(){
+  const ids=["iNo","iDt","iDd","iUr","iSr","iSt","iTaxType","fxCurrency","iPrintType","cNm","cAd","cSt","cSc","cGs","cPn","sMb","sMd","sHb","sSb","sIn","sVs","sSl","sSh","sCn","sCg","sPk","sGw","sNw","sVl","sCo","sPr","sLp","sDp","sPd","sCt","sTrackerLink","iAdv","iTds"];
+  const vals={};ids.forEach(id=>{const e=el(id);if(e)vals[id]=e.value;});
+  return{vals,rows:JSON.parse(JSON.stringify(rows)),savedAt:new Date().toISOString()};
+}
+function restoreTaxDraft(draft){
+  if(!draft)return;
+  Object.entries(draft.vals||{}).forEach(([id,v])=>{const e=el(id);if(e)e.value=v;});
+  if(Array.isArray(draft.rows))rows=draft.rows;
+}
+function showDraftBanner(draft){
+  const banner=el("draftBanner");if(!banner)return;
+  const dt=draft.savedAt?new Date(draft.savedAt).toLocaleString():"";
+  banner.innerHTML="Draft restored — saved "+dt+'. <button onclick="clearTaxDraft()">Clear</button>';
+  banner.style.display="flex";
+}
+function clearTaxDraft(){LS.set("taxDraft",null);const b=el("draftBanner");if(b)b.style.display="none";toast("Draft cleared","ok");}
+function autoSaveTaxDraft(){LS.set("taxDraft",collectTaxDraft());}
+
+// ─── Invoice No Auto-increment ────────────────────────────────
+function nextInvNo(last){if(!last)return null;const parts=last.split("/");if(parts.length<3||isNaN(parseInt(parts[1],10)))return null;const n=parseInt(parts[1],10)+1;parts[1]=String(n).padStart(parts[1].length,"0");return parts.join("/");}
+function resetInvNo(){const last=LS.get("lastInvNo");if(last){const nxt=nextInvNo(last);if(nxt&&el("iNo"))el("iNo").value=nxt;}else if(el("iNo"))el("iNo").value="FSH/001/25-26";}
+
+// ─── Register ─────────────────────────────────────────────────
+function pushToRegister(entry){
+  const reg=LS.get("invoiceRegister",[])||[];
+  reg.unshift({...entry,savedAt:new Date().toISOString()});
+  if(reg.length>100)reg.length=100;
+  LS.set("invoiceRegister",reg);
+}
+function openHistory(){
+  const reg=LS.get("invoiceRegister",[])||[];
+  const wrap=el("histTableWrap");const cnt=el("histCount");
+  if(!reg.length){wrap.innerHTML='<p style="color:var(--muted);font-size:.84rem;padding:14px 0">No invoices yet.</p>';if(cnt)cnt.textContent="";}
+  else{
+    if(cnt)cnt.textContent=reg.length+" invoice(s)";
+    wrap.innerHTML='<table class="hist-table"><thead><tr><th>Invoice No</th><th>Type</th><th>Customer</th><th>Amount (INR)</th><th>Date</th></tr></thead><tbody>'+
+      reg.map(r=>'<tr><td class="mono">'+(r.invNo||"—")+'</td><td>'+(r.type||"—")+'</td><td>'+(r.customer||"—")+'</td><td>'+(r.amount!=null?Number(r.amount).toLocaleString("en-IN"):"—")+'</td><td>'+(r.date||"—")+'</td></tr>').join("")+
+    '</tbody></table>';
+  }
+  el("histModal").classList.add("on");
+}
+
+// ─── Preview Modal ────────────────────────────────────────────
+function previewInvoice(){
+  const isProforma=invType==="proforma";
+  makeTaxInvoicePDF(isProforma,true,(doc)=>{
+    const dataUrl=doc.output("datauristring");
+    el("previewFrame").src=dataUrl;
+    el("previewModal").style.display="flex";
+  });
+}
+function closePreview(){el("previewModal").style.display="none";el("previewFrame").src="";}
+
+// ─── Loading Overlay ──────────────────────────────────────────
+function showLoading(msg){const ov=el("loadingOv");if(ov)ov.classList.add("on");if(msg&&el("loadingMsg"))el("loadingMsg").textContent=msg;}
+function hideLoading(){const ov=el("loadingOv");if(ov)ov.classList.remove("on");}
+
+// ─── makePDF routing ──────────────────────────────────────────
+function makePDF(){
+  showLoading("Generating Invoice...");
+  if(invType==="commission")makeCommissionPDF();
+  else if(invType==="proforma")makeTaxInvoicePDF(true);
+  else makeTaxInvoicePDF(false);
+}
+
+// ─── Duplicate / Email ────────────────────────────────────────
+function duplicateInvoice(){
+  go(0);
+  const last=LS.get("lastInvNo");
+  const nxt=nextInvNo(last||gr("iNo")||"FSH/000/25-26");
+  if(nxt&&el("iNo"))el("iNo").value=nxt;
+  const today=new Date().toISOString().slice(0,10);
+  if(el("iDt"))el("iDt").value=today;
+  toast("Duplicated — update date and number","ok");
+}
+function emailDraft(){
+  const t=totals();const invNo=g("iNo")||"Invoice";const cust=g("cNm")||"Customer";
+  const NL=String.fromCharCode(10);
+  const subject=encodeURIComponent("Invoice "+invNo+" from Freightysh LLP");
+  const body=encodeURIComponent("Dear "+cust+","+NL+NL+"Please find attached Invoice No. "+invNo+"."+NL+NL+"Net Payable: INR "+fmtI(t.grand)+NL+NL+"Payment Details:"+NL+"Beneficiary: Freightysh LLP"+NL+"Bank: Yes Bank"+NL+"A/C: 008127000000642"+NL+"IFSC: YESB0000081"+NL+NL+"Regards,"+NL+"Freightysh LLP"+NL+"info@freightysh.in | 7000070408");
+  window.open("mailto:?subject="+subject+"&body="+body);
+}
+// ─── Toast ────────────────────────────────────────────────────
 function toast(msg,type){
-  const el=document.getElementById("toast");
-  el.style.background=type==="err"?"#DC2626":"var(--navy)";
-  document.getElementById("tIco").textContent=type==="err"?"✕":"✓";
-  document.getElementById("tMsg").textContent=msg;
-  el.classList.add("show");setTimeout(()=>el.classList.remove("show"),3000);
-}
-
-function n2w(n){
-  const a=["","ONE","TWO","THREE","FOUR","FIVE","SIX","SEVEN","EIGHT","NINE","TEN","ELEVEN","TWELVE","THIRTEEN","FOURTEEN","FIFTEEN","SIXTEEN","SEVENTEEN","EIGHTEEN","NINETEEN"];
-  const b=["","","TWENTY","THIRTY","FORTY","FIFTY","SIXTY","SEVENTY","EIGHTY","NINETY"];
-  function h(x){if(!x)return"";if(x<20)return a[x];if(x<100)return b[Math.floor(x/10)]+(x%10?" "+a[x%10]:"");if(x<1000)return a[Math.floor(x/100)]+" HUNDRED"+(x%100?" "+h(x%100):"");if(x<100000)return h(Math.floor(x/1000))+" THOUSAND"+(x%1000?" "+h(x%1000):"");if(x<10000000)return h(Math.floor(x/100000))+" LAKH"+(x%100000?" "+h(x%100000):"");return h(Math.floor(x/10000000))+" CRORE"+(x%10000000?" "+h(x%10000000):"");}
-  return h(n)||"ZERO";
+  const e=el("toast");
+  e.style.background=type==="err"?"#DC2626":"var(--navy)";
+  el("tIco").textContent=type==="err"?"✕":"✓";
+  el("tMsg").textContent=msg;
+  e.classList.add("on");setTimeout(()=>e.classList.remove("on"),3200);
 }
 
 function makeTaxInvoicePDF(proforma=false,returnDoc=false,onDoc=null){
@@ -911,151 +1503,9 @@ function makeTaxInvoicePDF(proforma=false,returnDoc=false,onDoc=null){
       LS.set("taxDraft",null);
     }
    }catch(e){console.error(e);toast("Error: "+e.message,"err");}
-   finally{if(btn){btn.disabled=false;btn.textContent=returnDoc?"Preview":"Download Invoice (PDF)";if(!returnDoc)btn.onclick=makePDF;}}
+   finally{if(btn){btn.disabled=false;btn.textContent=returnDoc?"Preview":"Download Invoice (PDF)";if(!returnDoc)btn.onclick=makePDF;} hideLoading();}
   },100);
 }
-
-function previewInvoice(){
-  const isProforma=invType==="proforma";
-  makeTaxInvoicePDF(isProforma,true,(doc)=>{
-    const dataUrl=doc.output("datauristring");
-    document.getElementById("previewFrame").src=dataUrl;
-    document.getElementById("previewModal").style.display="flex";
-  });
-}
-function closePreview(){
-  const modal=document.getElementById("previewModal");
-  modal.style.display="none";
-  document.getElementById("previewFrame").src="";
-}
-
-rebuildRows();
-
-
-let invType = 'tax';
-function setInvType(type) {
-  invType = type;
-  const isTaxLike = type==='tax'||type==='proforma';
-  document.getElementById('taxFlow').style.display  = isTaxLike?'':'none';
-  document.getElementById('commFlow').style.display = type==='commission'?'':'none';
-  document.getElementById('btnTax').classList.toggle('active',  type==='tax');
-  document.getElementById('btnComm').classList.toggle('active', type==='commission');
-  document.getElementById('btnProforma').classList.toggle('active', type==='proforma');
-  const labels={tax:'Tax Invoice',commission:'Commission Invoice',proforma:'Proforma Invoice'};
-  document.getElementById('invTypeBadge').textContent = labels[type]||'Tax Invoice';
-  if(type==='commission') rebuildCommRows();
-}
-
-// Override makePDF to route based on type
-function makePDF() {
-  if(invType==='commission') makeCommissionPDF();
-  else if(invType==='proforma') makeTaxInvoicePDF(true);
-  else makeTaxInvoicePDF(false);
-}
-
-// ── Commission rows state ────────────────────────────────────────────────
-let commRows = [
-  {invNo:"", invDate:"", liner:"OOCL", booking:"", vessel:"", pol:"", pod:"", cntr:"1×40'HC", etd:"", usd:20},
-];
-
-function addCommRow() {
-  const rate = parseFloat(document.getElementById("cRate")?.value)||20;
-  commRows.push({invNo:"",invDate:"",liner:"OOCL",booking:"",vessel:"",pol:"",pod:"",cntr:"1×40'HC",etd:"",usd:rate});
-  rebuildCommRows();
-}
-
-function deleteCommRow(i) {
-  if(commRows.length===1){toast("At least one row required","err");return;}
-  commRows.splice(i,1); rebuildCommRows();
-}
-
-function rebuildCommRows() {
-  const rate = parseFloat(document.getElementById("cRate")?.value)||20;
-  const tbody = document.getElementById("commBody");
-  if(!tbody) return;
-  tbody.innerHTML="";
-  commRows.forEach((r,i)=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`
-      <td style="text-align:center;color:var(--muted);font-size:.75rem">${i+1}</td>
-      <td><input value="${r.invNo}" placeholder="MIPLWB/063/25-26" oninput="commRows[${i}].invNo=this.value"/></td>
-      <td><input type="date" value="${r.invDate}" oninput="commRows[${i}].invDate=this.value" style="width:100px"/></td>
-      <td><input value="${r.liner}" oninput="commRows[${i}].liner=this.value.toUpperCase();this.value=this.value.toUpperCase()" style="width:56px"/></td>
-      <td><input class="mono" value="${r.booking}" oninput="commRows[${i}].booking=this.value" placeholder="2321570190"/></td>
-      <td><input value="${r.vessel}" oninput="commRows[${i}].vessel=this.value.toUpperCase();this.value=this.value.toUpperCase()" placeholder="VESSEL / VOYAGE"/></td>
-      <td><input value="${r.pol}" oninput="commRows[${i}].pol=this.value.toUpperCase();this.value=this.value.toUpperCase()" placeholder="KOLKATA PORT"/></td>
-      <td><input value="${r.pod}" oninput="commRows[${i}].pod=this.value.toUpperCase();this.value=this.value.toUpperCase()" placeholder="HAI PHONG"/></td>
-      <td><input value="${r.cntr}" oninput="commRows[${i}].cntr=this.value.toUpperCase();this.value=this.value.toUpperCase()" style="width:68px"/></td>
-      <td><input value="${r.etd}" oninput="commRows[${i}].etd=this.value" placeholder="12.04.2026" style="width:78px"/></td>
-      <td><input class="mono" type="number" value="${r.usd}" oninput="commRows[${i}].usd=parseFloat(this.value)||0;refreshCommTotals()" style="width:56px"/></td>
-      <td><button class="db" onclick="deleteCommRow(${i})">✕</button></td>`;
-    tbody.appendChild(tr);
-  });
-  refreshCommTotals();
-}
-
-function commTotals() {
-  const usdRate = parseFloat(document.getElementById("cUsdRate")?.value||94)||94;
-  const taxType = document.getElementById("cTaxType")?.value||"igst";
-  const totalUsd = commRows.reduce((s,r)=>s+(parseFloat(r.usd)||0),0);
-  const taxable  = parseFloat((totalUsd*usdRate).toFixed(2));
-  let tax=0;
-  if(taxType==="igst") tax=parseFloat((taxable*0.18).toFixed(2));
-  else tax=parseFloat((taxable*0.18).toFixed(2)); // cgst+sgst total same 18%
-  const raw=taxable+tax, net=Math.round(raw);
-  return {totalUsd,taxable,tax,net};
-}
-
-function refreshCommTotals() {
-  const {totalUsd,taxable,tax,net}=commTotals();
-  const el=id=>document.getElementById(id);
-  if(el("cpUsd")) el("cpUsd").textContent="$"+fmtC(totalUsd);
-  if(el("cpTax")) el("cpTax").textContent="₹"+fmtC(taxable);
-  if(el("cpGst")) el("cpGst").textContent="₹"+fmtC(tax);
-  if(el("cpNet")) el("cpNet").textContent="₹"+fmtCI(net);
-}
-
-function fmtC(n){return Math.abs(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});}
-function fmtCI(n){return Math.abs(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});}
-
-// Commission step navigation
-let cStep=0;
-function cgo(n) {
-  if(n>cStep&&!cchk(cStep))return;
-  document.getElementById("cs"+cStep).style.display="none";
-  cStep=n;
-  document.getElementById("cs"+cStep).style.display="";
-  document.querySelectorAll("#commFlow .stp").forEach((s,i)=>
-    s.className="stp"+(i===n?" on":i<n?" dn":""));
-  if(n===1){rebuildCommRows();refreshCommTotals();}
-  if(n===2)buildCommSummary();
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-
-function cchk(n){
-  const req={0:["cInvNo","cInvDate","cToName"],1:[]};
-  for(const id of(req[n]||[])){
-    const el=document.getElementById(id);
-    if(!el?.value?.trim()){toast("Fill all required fields","err");el?.focus();return false;}
-  }
-  return true;
-}
-
-function buildCommSummary() {
-  const {totalUsd,taxable,tax,net}=commTotals();
-  const gv=id=>(document.getElementById(id)?.value||"");
-  const fd=d=>{if(!d)return"-";const[y,m,dy]=d.split("-");const M=["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];return dy+"-"+M[+m-1]+"-"+y;};
-  document.getElementById("csg").innerHTML=[
-    {t:"Invoice",h:`<p><strong>${gv("cInvNo")}</strong><br>Date: ${fd(gv("cInvDate"))}<br>USD Rate: ${gv("cUsdRate")}</p>`},
-    {t:"Bill To",h:`<p><strong>${gv("cToName")}</strong><br>${gv("cToAddr")}</p>`},
-    {t:"Shipments",h:`<p>${commRows.length} line(s)<br>Total USD: $${fmtC(totalUsd)}<br>Taxable: ₹${fmtC(taxable)}</p>`},
-    {t:"Tax",h:`<p>${document.getElementById("cTaxType")?.options[document.getElementById("cTaxType")?.selectedIndex]?.text||""}<br>Tax: ₹${fmtC(tax)}</p>`},
-  ].map(b=>`<div class="sb"><h4>${b.t}</h4>${b.h}</div>`).join("");
-  document.getElementById("cGrand").textContent="₹"+fmtCI(net);
-  document.getElementById("cCount").textContent=commRows.length+" shipment(s)";
-}
-
-
 function makeCommissionPDF(returnDoc,onDoc){
   const btn=document.getElementById("genBtn");
   if(btn&&!returnDoc){btn.disabled=true;btn.textContent="Generating...";}
@@ -1265,147 +1715,55 @@ function makeCommissionPDF(returnDoc,onDoc){
     LS.set("lastInvNo",g("cInvNo"));
     pushToRegister({invNo:g("cInvNo"),customer:g("cToName"),amount:net,date:gr("cInvDate"),type:"Commission Invoice"});
    }catch(e){console.error(e);toast("Error: "+e.message,"err");}
-   finally{if(btn&&!returnDoc){btn.disabled=false;btn.textContent="Download Commission Invoice (PDF)";}}
+   finally{if(btn&&!returnDoc){btn.disabled=false;btn.textContent="Download Commission Invoice (PDF)";}hideLoading();}
   },100);
 }
 
-// ── Invoice Number Auto-increment ──────────────────────────────────────
-function nextInvNo(last){
-  if(!last)return null;
-  const m=last.match(/^(FSH\/)(\d+)(\/.+)$/);
-  if(!m)return null;
-  const n=parseInt(m[2],10)+1;
-  return m[1]+String(n).padStart(m[2].length,0)+m[3];
-}
-function resetInvNo(){
-  const last=LS.get("lastInvNo");
-  if(last){const nxt=nextInvNo(last);if(nxt)document.getElementById("iNo").value=nxt;}
-  else document.getElementById("iNo").value="FSH/001/25-26";
-}
+// ─── Init ────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded",function(){
+  // Theme
+  const theme=LS.get("theme","light");
+  document.documentElement.setAttribute("data-theme",theme);
+  const tgl=document.getElementById("themeToggle");
+  if(tgl)tgl.textContent=theme==="dark"?"☀":"🌙";
 
-// ── Invoice Register ────────────────────────────────────────────────────
-function pushToRegister(entry){
-  const reg=LS.get("invoiceRegister",[])||[];
-  reg.unshift({...entry,savedAt:new Date().toISOString()});
-  if(reg.length>50)reg.length=50;
-  LS.set("invoiceRegister",reg);
-}
-function openHistory(){
-  const reg=LS.get("invoiceRegister",[])||[];
-  const modal=document.getElementById("histModal");
-  const wrap=document.getElementById("histTableWrap");
-  const cnt=document.getElementById("histCount");
-  if(!reg.length){wrap.innerHTML='<p style="color:var(--muted);font-size:.84rem;padding:14px 0">No invoices yet.</p>';cnt.textContent="";}
-  else{
-    cnt.textContent=reg.length+" invoice(s)";
-    wrap.innerHTML='<table class="hist-table"><thead><tr><th>Invoice No</th><th>Type</th><th>Customer</th><th>Amount (INR)</th><th>Date</th></tr></thead><tbody>'+
-      reg.map(r=>`<tr><td style="font-family:'JetBrains Mono',monospace">${r.invNo||"—"}</td><td>${r.type||"—"}</td><td>${r.customer||"—"}</td><td style="font-family:'JetBrains Mono',monospace;text-align:right">${r.amount!=null?Number(r.amount).toLocaleString("en-IN"):"—"}</td><td>${r.date||"—"}</td></tr>`).join("")
-    +"</tbody></table>";
-  }
-  modal.style.display="block";
-}
-function closeHistory(){document.getElementById("histModal").style.display="none";}
-function clearHistory(){LS.set("invoiceRegister",null);openHistory();toast("History cleared","ok");}
-
-// ── Address Book ────────────────────────────────────────────────────────
-function populateAddrBook(){
-  const sel=document.getElementById("addrBook");
-  if(!sel)return;
-  const ab=LS.get("addressBook",[])||[];
-  sel.innerHTML=`<option value="">— ${ab.length?ab.length+" saved customer"+(ab.length>1?"s":""):"Select saved customer"} —</option>`;
-  ab.forEach((c,i)=>sel.add(new Option(c.name+(c.gstin?" ("+c.gstin+")":""),String(i))));
-}
-function fillFromBook(idx){
-  if(idx==="")return;
-  const ab=LS.get("addressBook",[])||[];
-  const c=ab[parseInt(idx,10)];
-  if(!c)return;
-  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v||"";};
-  set("cNm",c.name);set("cAd",c.addr);set("cSt",c.state);set("cSc",c.stateCode);set("cGs",c.gstin);set("cPn",c.pan);
-}
-function saveToBook(){
-  const ab=LS.get("addressBook",[])||[];
-  const gstin=(document.getElementById("cGs")?.value||"").trim().toUpperCase();
-  const entry={name:(document.getElementById("cNm")?.value||"").toUpperCase(),addr:(document.getElementById("cAd")?.value||"").toUpperCase(),state:(document.getElementById("cSt")?.value||"").toUpperCase(),stateCode:(document.getElementById("cSc")?.value||"").trim(),gstin,pan:(document.getElementById("cPn")?.value||"").toUpperCase()};
-  const idx=ab.findIndex(c=>c.gstin===gstin&&gstin);
-  if(idx>=0)ab[idx]=entry;else ab.push(entry);
-  LS.set("addressBook",ab);
-  populateAddrBook();
-  toast("Customer saved!","ok");
-}
-
-// ── Draft Save/Restore ──────────────────────────────────────────────────
-function collectTaxDraft(){
-  const ids=["iNo","iDt","iDd","iUr","iSr","iSt","iTaxType","cNm","cAd","cSt","cSc","cGs","cPn","sMb","sMd","sHb","sSb","sIn","sVs","sSl","sSh","sCn","sCg","sPk","sGw","sNw","sVl","sCo","sPr","sLp","sDp","sPd","sCt","iAdv","iTds"];
-  const vals={};
-  ids.forEach(id=>{const el=document.getElementById(id);if(el)vals[id]=el.value;});
-  return{vals,rows:JSON.parse(JSON.stringify(rows)),savedAt:new Date().toISOString()};
-}
-function restoreTaxDraft(draft){
-  if(!draft)return;
-  Object.entries(draft.vals||{}).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v;});
-  if(Array.isArray(draft.rows))rows=draft.rows;
-}
-function showDraftBanner(draft){
-  const banner=document.getElementById("draftBanner");
-  if(!banner)return;
-  const dt=draft.savedAt?new Date(draft.savedAt).toLocaleString():"";
-  banner.innerHTML=`Draft restored — last saved ${dt}. <button onclick="clearTaxDraft()">Clear</button>`;
-  banner.style.display="flex";
-}
-function clearTaxDraft(){LS.set("taxDraft",null);document.getElementById("draftBanner").style.display="none";toast("Draft cleared","ok");}
-function autoSaveTaxDraft(){LS.set("taxDraft",collectTaxDraft());}
-
-// ── Duplicate Invoice ────────────────────────────────────────────────────
-function duplicateInvoice(){
-  go(0);
-  const last=LS.get("lastInvNo");
-  const nxt=nextInvNo(last||document.getElementById("iNo")?.value||"FSH/000/25-26");
-  if(nxt)document.getElementById("iNo").value=nxt;
+  // Dates
   const today=new Date().toISOString().slice(0,10);
-  document.getElementById("iDt").value=today;
-  toast("Duplicated — update invoice number and date","ok");
-}
+  const due=new Date(Date.now()+5*864e5).toISOString().slice(0,10);
+  const fields=["iDt","cInvDate"];fields.forEach(function(id){const e=document.getElementById(id);if(e&&!e.value)e.value=today;});
+  const dfields=["iDd","cDueDate"];dfields.forEach(function(id){const e=document.getElementById(id);if(e&&!e.value)e.value=due;});
+  const mbl=document.getElementById("sMd");if(mbl&&!mbl.value)mbl.value=today;
 
-// ── Email Draft ──────────────────────────────────────────────────────────
-function emailDraft(){
-  const t=totals();
-  const invNo=g("iNo")||"Invoice";
-  const cust=g("cNm")||"Customer";
-  const amt=fmtI(t.grand);
-  const subject=encodeURIComponent("Invoice "+invNo+" from Freightysh LLP");
-  const body=encodeURIComponent(
-    "Dear "+cust+",\n\nPlease find attached Invoice No. "+invNo+
-    " dated "+fd(gr("iDt"))+".\n\nNet Payable: INR "+amt+
-    "\n\nPayment Details:\nBeneficiary: Freightysh LLP\nBank: Yes Bank\nA/C: 008127000000642\nIFSC: YESB0000081\n\nRegards,\nFreightysh LLP\ninfo@freightysh.in | 7000070408"
-  );
-  window.open("mailto:?subject="+subject+"&body="+body);
-}
-
-// ── Init on page load ────────────────────────────────────────────────────
-document.addEventListener("DOMContentLoaded",()=>{
-  // Auto-increment invoice number
+  // Auto-increment
   const lastNo=LS.get("lastInvNo");
-  if(lastNo){const nxt=nextInvNo(lastNo);if(nxt){const el=document.getElementById("iNo");if(el)el.value=nxt;}}
+  if(lastNo){const nxt=nextInvNo(lastNo);if(nxt){const e=document.getElementById("iNo");if(e)e.value=nxt;}}
 
-  // Restore tax draft
+  // Restore draft
   const taxDraft=LS.get("taxDraft");
   if(taxDraft){restoreTaxDraft(taxDraft);showDraftBanner(taxDraft);rebuildRows();}
 
   // Address book
   populateAddrBook();
 
-  // Auto-save on any input in taxFlow
-  const taxFlow=document.getElementById("taxFlow");
-  if(taxFlow)taxFlow.addEventListener("input",()=>autoSaveTaxDraft());
+  // Rate card & rate card empty state
+  renderRateCard();
 
-  // Close history modal on backdrop click
-  document.getElementById("histModal")?.addEventListener("click",function(e){
-    if(e.target===this)closeHistory();
-  });
+  // Commission rows init
+  rebuildCommRows();
+
+  // Live preview wire-up
+  const formCol=document.getElementById("formCol");
+  if(formCol)formCol.addEventListener("input",function(){autoSaveTaxDraft();schedulePreview();});
+  const cFlow=document.getElementById("commFlow");
+  if(cFlow)cFlow.addEventListener("input",schedulePreview);
+
+  // Dashboard
+  renderDashboard();
+
+  // History modal backdrop
+  document.getElementById("histModal")?.addEventListener("click",function(e){if(e.target===this)this.classList.remove("on");});
 });
-
 rebuildRows();
+
 </script>
-</body>
 </html>
