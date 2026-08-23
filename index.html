@@ -434,6 +434,9 @@ input,select,textarea{font-family:"DM Sans",sans-serif}
         <div id="s0">
           <div class="fc"><div class="fch"><div class="fch-ico">🧾</div><div class="fch-title">Invoice Details</div></div>
           <div class="fcb">
+            <div class="g2" style="margin-bottom:11px">
+              <div class="f s2"><label>Registered Office / GSTIN <span>*</span></label><select id="iCompany" onchange="renderPreview()"><option value="odisha" selected>Rourkela, Odisha — GSTIN 21AAKFF8134C1ZU</option><option value="wb">Kolkata, West Bengal — GSTIN 19AAKFF8134C1ZU</option></select></div>
+            </div>
             <div class="g4">
               <div class="f"><label>Invoice No <span>*</span></label>
                 <div style="display:flex;align-items:center;gap:6px"><input class="mono" id="iNo" value="FSH/001/25-26" style="flex:1"/><button class="reset-link" onclick="resetInvNo()">↺</button></div>
@@ -575,6 +578,9 @@ input,select,textarea{font-family:"DM Sans",sans-serif}
         <div id="cs0">
           <div class="fc"><div class="fch"><div class="fch-ico">🧾</div><div class="fch-title">Commission Invoice Details</div></div>
           <div class="fcb">
+            <div class="g2" style="margin-bottom:11px">
+              <div class="f s2"><label>Registered Office / GSTIN <span>*</span></label><select id="cCompany" onchange="renderPreview()"><option value="odisha" selected>Rourkela, Odisha — GSTIN 21AAKFF8134C1ZU</option><option value="wb">Kolkata, West Bengal — GSTIN 19AAKFF8134C1ZU</option></select></div>
+            </div>
             <div class="g4">
               <div class="f"><label>Invoice No <span>*</span></label><input class="mono" id="cInvNo" value="FSH/002/25-26"/></div>
               <div class="f"><label>Invoice Date <span>*</span></label><input type="date" id="cInvDate"/></div>
@@ -947,6 +953,11 @@ const LS={get:(k,d=null)=>{try{return JSON.parse(localStorage.getItem(k))??d;}ca
 const el=id=>document.getElementById(id);
 const g=id=>(el(id)?.value||"").toUpperCase().trim();
 const gr=id=>el(id)?.value||"";
+const COMPANY_PROFILES={
+  odisha:{label:"Rourkela, Odisha",addrLine:"C/308 Koelnagar, Rourkela, Odisha - 769014",addrLineEm:"C/308 Koelnagar, Rourkela, Odisha — 769014, India",gstin:"21AAKFF8134C1ZU",pan:"AAKFF8134C",stateCode:"21",stateName:"Odisha",jurisdiction:"Rourkela"},
+  wb:{label:"Kolkata, West Bengal",addrLine:"C/314 Loharuka Green Oasis, Kaikhali, Kolkata - 700052",addrLineEm:"C/314 Loharuka Green Oasis, Kaikhali, Kolkata — 700052, India",gstin:"19AAKFF8134C1ZU",pan:"AAKFF8134C",stateCode:"19",stateName:"West Bengal",jurisdiction:"Kolkata"}
+};
+const companyProfile=prefix=>COMPANY_PROFILES[el(prefix+"Company")?.value]||COMPANY_PROFILES.odisha;
 const fmt=n=>Math.abs(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtI=n=>Math.abs(n).toLocaleString("en-IN");
 const fd=d=>{if(!d)return"-";const[y,m,dy]=d.split("-");return dy+"-"+["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"][+m-1]+"-"+y;};
@@ -1203,10 +1214,11 @@ function renderPreview(){
   }
   const t=isComm?commTotals():totals();
   const netAmt=isComm?t.net:t.grand;
+  const CO=companyProfile(isComm?"c":"i");
   if(!invNo&&!custName){pv.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted);font-size:.8rem"><div style="font-size:2rem;margin-bottom:10px">📄</div><div style="font-family:Georgia,serif;font-size:1rem;color:var(--text2);margin-bottom:6px">Invoice Preview</div>Start filling the form to see a live preview here.</div>';return;}
   pv.innerHTML=
     '<div class="iph">'+
-      '<div><div class="iph-co">FREIGHTYSH LLP</div><div class="iph-org">FREIGHT FORWARDING</div><div class="iph-sub">Rourkela, Odisha  |  GSTIN 21AAKFF8134C1ZU</div></div>'+
+      '<div><div class="iph-co">FREIGHTYSH LLP</div><div class="iph-org">FREIGHT FORWARDING</div><div class="iph-sub">'+CO.label+'  |  GSTIN '+CO.gstin+'</div></div>'+
       '<div><div class="iph-type">'+typeLabel+'</div><div class="iph-sub" style="text-align:right">'+(invNo||"—")+'<br/>'+(invDate||"—")+'</div></div>'+
     '</div>'+
     '<div class="ipbt"><div class="ipbt-lbl">BILL TO</div><div class="ipbt-val">'+(custName||"Customer Name")+'</div><div class="ipbt-gstin">GSTIN: '+(custGstin||"—")+'</div></div>'+
@@ -1348,7 +1360,7 @@ function saveToBook(){
 
 // ─── Draft ────────────────────────────────────────────────────
 function collectTaxDraft(){
-  const ids=["iNo","iDt","iDd","iUr","iSr","iSt","iTaxType","fxCurrency","iPrintType","cNm","cAd","cSt","cSc","cGs","cPn","sMb","sMd","sHb","sSb","sIn","sVs","sSl","sSh","sCn","sCg","sPk","sGw","sNw","sVl","sCo","sPr","sLp","sDp","sPd","sCt","sTrackerLink","iAdv","iTds"];
+  const ids=["iCompany","iNo","iDt","iDd","iUr","iSr","iSt","iTaxType","fxCurrency","iPrintType","cNm","cAd","cSt","cSc","cGs","cPn","sMb","sMd","sHb","sSb","sIn","sVs","sSl","sSh","sCn","sCg","sPk","sGw","sNw","sVl","sCo","sPr","sLp","sDp","sPd","sCt","sTrackerLink","iAdv","iTds"];
   const vals={};ids.forEach(id=>{const e=el(id);if(e)vals[id]=e.value;});
   return{vals,rows:JSON.parse(JSON.stringify(rows)),savedAt:new Date().toISOString()};
 }
@@ -1452,6 +1464,7 @@ function makeTaxInvoicePDF(proforma=false,returnDoc=false,onDoc=null){
           LINE=[221,226,238],PANEL=[244,247,252],SOFT=[255,242,233],W=[255,255,255],SUB=[235,225,210];
     const taxTypeVal=(document.getElementById("iTaxType")?.value)||"igst";
     const printType=(document.getElementById("iPrintType")?.value)||"original";
+    const CO=companyProfile("i");
     const adv=parseFloat(document.getElementById("iAdv")?.value||0)||0;
     const tds=parseFloat(document.getElementById("iTds")?.value||0)||0;
     const fc=c=>doc.setFillColor(c[0],c[1],c[2]), sc=c=>doc.setDrawColor(c[0],c[1],c[2]), tc=c=>doc.setTextColor(c[0],c[1],c[2]);
@@ -1481,15 +1494,15 @@ function makeTaxInvoicePDF(proforma=false,returnDoc=false,onDoc=null){
     fn(13.5,"bold");tc(NAVY);doc.text("FREIGHTYSH LLP",ix,Y+5.4);
     fn(6,"bold");tc(ORANGE);doc.text("FREIGHT FORWARDING  -  LOGISTICS SOLUTIONS",ix,Y+9.4);
     fn(6.6,"normal");tc(MUTED);
-    doc.text("C/308 Koelnagar, Rourkela, Odisha - 769014",ix,Y+13.4);
+    doc.text(CO.addrLine,ix,Y+13.4);
     doc.text("info@freightysh.in    |    +91 70000 70408",ix,Y+16.9);
     fn(17,"bold");tc(NAVY);doc.text(title,PW-MR,Y+5,{align:"right"});
     const tw=doc.getTextWidth(title);
     hline(PW-MR-tw,Y+7.2,PW-MR,ORANGE,0.7);
     fn(6.3,"normal");tc(MUTED);
-    doc.text("GSTIN: 21AAKFF8134C1ZU",PW-MR,Y+11.6,{align:"right"});
-    doc.text("PAN: AAKFF8134C    |    SAC: 9965 / 9967",PW-MR,Y+15.1,{align:"right"});
-    doc.text("State: [21] Odisha",PW-MR,Y+18.6,{align:"right"});
+    doc.text("GSTIN: "+CO.gstin,PW-MR,Y+11.6,{align:"right"});
+    doc.text("PAN: "+CO.pan+"    |    SAC: 9965 / 9967",PW-MR,Y+15.1,{align:"right"});
+    doc.text("State: ["+CO.stateCode+"] "+CO.stateName,PW-MR,Y+18.6,{align:"right"});
     Y+=22; hline(ML,Y,ML+CW,NAVY,0.5); hline(ML,Y+0.6,ML+CW,ORANGE,0.22); Y+=4;
 
     const gap=4, halfW=(CW-gap)/2, blX=ML, mtX=ML+halfW+gap, blockH=26;
@@ -1641,7 +1654,7 @@ function makeTaxInvoicePDF(proforma=false,returnDoc=false,onDoc=null){
       fn(5.8,"bold");tc(MUTED);doc.text(p[0],ML,py);fn(6,"normal");tc(INK);doc.text(p[1],ML+23,py);py+=3.8;
     });
     try{
-      const qrData=JSON.stringify({inv:g("iNo"),dt:gr("iDt"),gstin:"21AAKFF8134C1ZU",amt:gt});
+      const qrData=JSON.stringify({inv:g("iNo"),dt:gr("iDt"),gstin:CO.gstin,amt:gt});
       const qc=document.getElementById("qrCanvas");qc.width=200;qc.height=200;qc.getContext("2d").clearRect(0,0,200,200);
       new QRCode(qc,{text:qrData,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});
       doc.addImage(qc.toDataURL("image/png"),"PNG",ML+w1-19,payTop+1,18,18);
@@ -1678,7 +1691,7 @@ function makeTaxInvoicePDF(proforma=false,returnDoc=false,onDoc=null){
     fn(6.3,"bold");tc(INK);doc.text("AUTHORISED SIGNATORY",c3X+w3,by+36,{align:"right"});
     fn(5.6,"bold");tc(NAVY);doc.text("TERMS & CONDITIONS",c3X,by+42);
     fn(5.3,"normal");tc(MUTED);
-    doc.splitTextToSize("Discrepancies within 7 days  -  24% p.a. on late payment  -  Govt. taxes as applicable  -  All disputes subject to Rourkela jurisdiction.",w3).slice(0,2).forEach((t,i)=>doc.text(t,c3X,by+46+i*3.4));
+    doc.splitTextToSize("Discrepancies within 7 days  -  24% p.a. on late payment  -  Govt. taxes as applicable  -  All disputes subject to "+CO.jurisdiction+" jurisdiction.",w3).slice(0,2).forEach((t,i)=>doc.text(t,c3X,by+46+i*3.4));
 
     if(proforma){fn(6,"bold");tc([176,28,28]);doc.text("THIS IS A PROFORMA INVOICE - NOT A TAX DOCUMENT",PW/2,PH-12,{align:"center"});}
 
@@ -1723,6 +1736,7 @@ function makeCommissionPDF(returnDoc,onDoc){
     const taxType=(document.getElementById("cTaxType")?.value)||"igst";
     const cg=taxType==="cgst_sgst";
     const SAC="998599";
+    const CO=companyProfile("c");
     const fc=c=>doc.setFillColor(c[0],c[1],c[2]), sc=c=>doc.setDrawColor(c[0],c[1],c[2]), tc=c=>doc.setTextColor(c[0],c[1],c[2]);
     const fn=(s,st)=>{doc.setFontSize(s);doc.setFont("helvetica",st||"normal");};
     const rect=(x,y,w,h,f,strokeC,lw)=>{if(f){fc(f);doc.rect(x,y,w,h,"F");} if(strokeC){sc(strokeC);doc.setLineWidth(lw||0.2);doc.rect(x,y,w,h,"S");}};
@@ -1748,7 +1762,7 @@ function makeCommissionPDF(returnDoc,onDoc){
     fn(13.5,"bold");tc(NAVY);doc.text("FREIGHTYSH LLP",ix,Y+5.4);
     fn(6,"bold");tc(ORANGE);doc.text("FREIGHT FORWARDING  -  LOGISTICS SOLUTIONS",ix,Y+9.4);
     fn(6.6,"normal");tc(MUTED);
-    doc.text("C/308 Koelnagar, Rourkela, Odisha - 769014",ix,Y+13.4);
+    doc.text(CO.addrLine,ix,Y+13.4);
     doc.text("info@freightysh.in    |    +91 70000 70408",ix,Y+16.9);
     fn(17,"bold");tc(NAVY);doc.text("TAX INVOICE",PW-MR,Y+5,{align:"right"});
     const tw=doc.getTextWidth("TAX INVOICE");
@@ -1757,7 +1771,7 @@ function makeCommissionPDF(returnDoc,onDoc){
     const badge="COMMISSION INVOICE", bw=doc.getTextWidth(badge)+5;
     rect(PW-MR-bw,Y+9.1,bw,5,ORANGE);doc.text(badge,PW-MR-bw/2,Y+12.6,{align:"center"});
     fn(6.3,"normal");tc(MUTED);
-    doc.text("GSTIN: 21AAKFF8134C1ZU    |    PAN: AAKFF8134C",PW-MR,Y+18.6,{align:"right"});
+    doc.text("GSTIN: "+CO.gstin+"    |    PAN: "+CO.pan,PW-MR,Y+18.6,{align:"right"});
     Y+=22; hline(ML,Y,ML+CW,NAVY,0.5); hline(ML,Y+0.6,ML+CW,ORANGE,0.22); Y+=4;
 
     const gap=4, halfW=(CW-gap)/2, blX=ML, mtX=ML+halfW+gap, blockH=26;
@@ -1868,7 +1882,7 @@ function makeCommissionPDF(returnDoc,onDoc){
     });
     fn(5.4,"italic");tc(MUTED);doc.text("Tax on reverse charges: NIL    |    TDS @ 2% if applicable: INR "+fmt(taxable*0.02),ML,py+1.5);
     try{
-      const qrData=JSON.stringify({inv:g("cInvNo"),dt:gr("cInvDate"),gstin:"21AAKFF8134C1ZU",amt:net});
+      const qrData=JSON.stringify({inv:g("cInvNo"),dt:gr("cInvDate"),gstin:CO.gstin,amt:net});
       const qc=document.getElementById("qrCanvas");qc.width=200;qc.height=200;qc.getContext("2d").clearRect(0,0,200,200);
       new QRCode(qc,{text:qrData,width:200,height:200,correctLevel:QRCode.CorrectLevel.M});
       doc.addImage(qc.toDataURL("image/png"),"PNG",ML+w1-19,by+3.5,18,18);
@@ -1899,7 +1913,7 @@ function makeCommissionPDF(returnDoc,onDoc){
     fn(6.3,"bold");tc(INK);doc.text("AUTHORISED SIGNATORY",c3X+w3,by+36,{align:"right"});
     fn(5.6,"bold");tc(NAVY);doc.text("TERMS & CONDITIONS",c3X,by+42);
     fn(5.3,"normal");tc(MUTED);
-    doc.splitTextToSize("Discrepancies within 7 days  -  24% p.a. on late payment  -  Govt. taxes as applicable  -  All disputes subject to Rourkela jurisdiction.",w3).slice(0,2).forEach((t,i)=>doc.text(t,c3X,by+46+i*3.4));
+    doc.splitTextToSize("Discrepancies within 7 days  -  24% p.a. on late payment  -  Govt. taxes as applicable  -  All disputes subject to "+CO.jurisdiction+" jurisdiction.",w3).slice(0,2).forEach((t,i)=>doc.text(t,c3X,by+46+i*3.4));
 
     const tp=doc.internal.getNumberOfPages();
     for(let p=1;p<=tp;p++){doc.setPage(p);drawFooter(p,tp);}
