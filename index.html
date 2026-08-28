@@ -1613,7 +1613,7 @@ function makeTaxInvoicePDF(proforma=false,returnDoc=false,onDoc=null){
     if(usdTotalAmt>0){fn(5.3,"normal");tc(MUTED);doc.text("Incl. USD charges $"+fmt(usdTotalAmt)+" @ INR "+usd.toFixed(2),ML+3,Y+4);}
     Y+=6+4.5;
 
-    const need=47;
+    const need=56;
     let pageBroke=false;
     if(PH-Y-9<need){
       pageBroke=true;
@@ -1686,7 +1686,7 @@ function makeTaxInvoicePDF(proforma=false,returnDoc=false,onDoc=null){
     doc.splitTextToSize("In words : "+n2w(Math.abs(gt))+" Only.",w2).forEach((wl,i)=>doc.text(wl,c2X+1,npy+13.6+i*3.6));
 
     fn(6.4,"bold");tc(NAVY);doc.text("FOR FREIGHTYSH LLP",c3X+w3,by+5,{align:"right"});
-    if(!proforma&&window.SIG_DATA){const _sd=window.SIG_DATA.replace(/^data:[^;]+;base64,/,'');doc.addImage("data:image/jpeg;base64,"+_sd,"JPEG",c3X+w3-44,by+7,42,23);}
+    if(!proforma){const _sd=(window.SIG_DATA||("data:image/jpeg;base64,"+SIG)).replace(/^data:[^;]+;base64,/,'');doc.addImage("data:image/jpeg;base64,"+_sd,"JPEG",c3X+w3-44,by+7,42,23);}
     hline(c3X+w3-48,by+32,c3X+w3,INK,0.3);
     fn(6.3,"bold");tc(INK);doc.text("AUTHORISED SIGNATORY",c3X+w3,by+36,{align:"right"});
     fn(5.6,"bold");tc(NAVY);doc.text("TERMS & CONDITIONS",c3X,by+42);
@@ -1847,7 +1847,7 @@ function makeCommissionPDF(returnDoc,onDoc){
     doc.text(fmt(taxable),xInrR-2,Y+4,{align:"right"});
     Y+=6+4.5;
 
-    const need=47;
+    const need=56;
     if(PH-Y-9<need){
       doc.addPage();
       rect(0,0,PW,3.2,NAVY); rect(0,3.2,PW,1.1,ORANGE);
@@ -1908,7 +1908,7 @@ function makeCommissionPDF(returnDoc,onDoc){
     doc.splitTextToSize("In words : "+n2w(Math.abs(net))+" Only.",w2).forEach((wl,i)=>doc.text(wl,c2X+1,npy+13.6+i*3.6));
 
     fn(6.4,"bold");tc(NAVY);doc.text("FOR FREIGHTYSH LLP",c3X+w3,by+5,{align:"right"});
-    if(window.SIG_DATA){const _sd2=window.SIG_DATA.replace(/^data:[^;]+;base64,/,'');doc.addImage("data:image/jpeg;base64,"+_sd2,"JPEG",c3X+w3-44,by+7,42,23);}
+    {const _sd2=(window.SIG_DATA||("data:image/jpeg;base64,"+SIG)).replace(/^data:[^;]+;base64,/,'');doc.addImage("data:image/jpeg;base64,"+_sd2,"JPEG",c3X+w3-44,by+7,42,23);}
     hline(c3X+w3-48,by+32,c3X+w3,INK,0.3);
     fn(6.3,"bold");tc(INK);doc.text("AUTHORISED SIGNATORY",c3X+w3,by+36,{align:"right"});
     fn(5.6,"bold");tc(NAVY);doc.text("TERMS & CONDITIONS",c3X,by+42);
